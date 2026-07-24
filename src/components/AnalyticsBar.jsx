@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { BarChart3, ChevronDown, ChevronUp } from 'lucide-react'
+import { BarChart3, ChevronDown, ChevronUp, Briefcase, Clock, TrendingUp, Award } from 'lucide-react'
 import AnalyticsChart from './AnalyticsChart'
+import { StatCard } from './ui'
 
 export default function AnalyticsBar({ applications }) {
   const [chartOpen, setChartOpen] = useState(false)
@@ -14,22 +15,10 @@ export default function AnalyticsBar({ applications }) {
   return (
     <div className="mb-4">
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-slate-900 rounded-lg p-3 shadow-sm border border-slate-200 dark:border-slate-700">
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Total</p>
-          <p className="text-lg font-semibold text-slate-900 dark:text-white mt-0.5">{total}</p>
-        </div>
-        <div className="bg-white dark:bg-slate-900 rounded-lg p-3 shadow-sm border border-slate-200 dark:border-slate-700">
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Interviews</p>
-          <p className="text-lg font-semibold text-slate-900 dark:text-white mt-0.5">{interviews}</p>
-        </div>
-        <div className="bg-white dark:bg-slate-900 rounded-lg p-3 shadow-sm border border-slate-200 dark:border-slate-700">
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Response Rate</p>
-          <p className="text-lg font-semibold text-slate-900 dark:text-white mt-0.5">{responseRate}%</p>
-        </div>
-        <div className="bg-white dark:bg-slate-900 rounded-lg p-3 shadow-sm border border-slate-200 dark:border-slate-700">
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Offers</p>
-          <p className="text-lg font-semibold text-slate-900 dark:text-white mt-0.5">{offers}</p>
-        </div>
+        <StatCard label="Total" value={total} icon={Briefcase} color="indigo" />
+        <StatCard label="Interviews" value={interviews} icon={Clock} color="orange" />
+        <StatCard label="Response Rate" value={`${responseRate}%`} icon={TrendingUp} color="emerald" />
+        <StatCard label="Offers" value={offers} icon={Award} color="amber" />
       </div>
       <button
         onClick={() => setChartOpen(prev => !prev)}

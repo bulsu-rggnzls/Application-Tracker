@@ -1,31 +1,34 @@
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import JobCard from './JobCard'
 
-const columns = [
-  { id: 'wishlist', label: 'Wishlist' },
-  { id: 'applied', label: 'Applied' },
-  { id: 'interviewing', label: 'Interviewing' },
-  { id: 'offer', label: 'Offer' },
-  { id: 'rejected', label: 'Rejected' },
-]
+const COLUMN_STYLES = {
+  wishlist: { label: 'Wishlist', headerBg: 'bg-orange-500', shadow: 'shadow-orange-500/20', border: 'border-orange-300' },
+  applied: { label: 'Applied', headerBg: 'bg-blue-500', shadow: 'shadow-blue-500/20', border: 'border-blue-300' },
+  interviewing: { label: 'Interviewing', headerBg: 'bg-purple-600', shadow: 'shadow-purple-500/20', border: 'border-purple-300' },
+  offer: { label: 'Offer', headerBg: 'bg-emerald-500', shadow: 'shadow-emerald-500/20', border: 'border-emerald-300' },
+  rejected: { label: 'Rejected', headerBg: 'bg-rose-500', shadow: 'shadow-rose-500/20', border: 'border-rose-300' },
+}
+
+const columns = ['wishlist', 'applied', 'interviewing', 'offer', 'rejected']
 
 export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete, onAcceptOffer, onRejectOffer, onSelect }) {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="grid grid-cols-5 gap-3 min-h-[500px]">
-        {columns.map((col) => {
-          const items = applications.filter(a => a.status === col.id)
+        {columns.map((colId) => {
+          const style = COLUMN_STYLES[colId]
+          const items = applications.filter(a => a.status === colId)
           return (
-            <div key={col.id} className="bg-slate-50 dark:bg-slate-900/40 rounded-lg flex flex-col">
-              <div className="px-3 py-2.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
-                <span className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
-                  {col.label}
+            <div key={colId} className="bg-slate-50 dark:bg-slate-900/40 rounded-lg flex flex-col overflow-hidden">
+              <div className={`${style.headerBg} px-3 py-2.5 flex items-center justify-between shadow-lg ${style.shadow}`}>
+                <span className="text-xs font-bold tracking-wider text-white uppercase">
+                  {style.label}
                 </span>
-                <span className="text-xs text-slate-400 dark:text-slate-500 font-medium tabular-nums">
+                <span className="text-xs text-white/80 font-bold tabular-nums bg-white/20 rounded-full px-1.5 py-0.5 leading-tight">
                   {items.length}
                 </span>
               </div>
-              <Droppable droppableId={col.id}>
+              <Droppable droppableId={colId}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -46,6 +49,7 @@ export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete,
                             onSelect={onSelect}
                             provided={provided}
                             snapshot={snapshot}
+                            statusBorder={style.border}
                           />
                         )}
                       </Draggable>

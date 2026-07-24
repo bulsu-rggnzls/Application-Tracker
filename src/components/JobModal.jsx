@@ -1,60 +1,205 @@
-import { useState, useEffect } from 'react'
-import { X, Plus, Trash2 } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import {
+  X, Plus, Trash2, Building2, Briefcase, MapPin, DollarSign,
+  CalendarDays, Link, User, Mail, ExternalLink, Clock, Loader2, Hash
+} from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
+import extractDomain from '../utils/extractDomain'
 
-const statuses = ['wishlist', 'applied', 'interviewing', 'offer', 'rejected']
-const employmentTypes = ['full-time', 'contract', 'part-time']
+const TABS = [
+  { id: 0, label: 'Basic Info', icon: '💼' },
+  { id: 1, label: 'Compensation', icon: '💰' },
+  { id: 2, label: 'Tags & Recruiter', icon: '🏷️' },
+  { id: 3, label: 'Interviews', icon: '🗓️' },
+]
+
+const employmentTypes = ['full-time', 'part-time', 'contract', 'internship']
+const currencies = [
+  { label: 'USD $', value: 'USD' },
+  { label: 'EUR €', value: 'EUR' },
+  { label: 'GBP £', value: 'GBP' },
+  { label: 'PHP ₱', value: 'PHP' },
+]
+const periods = [
+  { label: '/yr', value: 'yearly' },
+  { label: '/hr', value: 'hourly' },
+  { label: '/mo', value: 'monthly' },
+  { label: '/contract', value: 'contract' },
+]
 const platforms = ['Zoom', 'Google Meet', 'Microsoft Teams', 'Skype', 'Phone', 'In-person']
 
+const STATUSES = [
+  { id: 'wishlist', label: 'Wishlist', bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-300', border: 'border-amber-200 dark:border-amber-700', ring: 'ring-amber-400/30', activeBg: 'bg-amber-50 dark:bg-amber-900/20' },
+  { id: 'applied', label: 'Applied', bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-200 dark:border-blue-700', ring: 'ring-blue-400/30', activeBg: 'bg-blue-50 dark:bg-blue-900/20' },
+  { id: 'interviewing', label: 'Interviewing', bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-700 dark:text-purple-300', border: 'border-purple-200 dark:border-purple-700', ring: 'ring-purple-400/30', activeBg: 'bg-purple-50 dark:bg-purple-900/20' },
+  { id: 'offer', label: 'Offer', bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-700 dark:text-emerald-300', border: 'border-emerald-200 dark:border-emerald-700', ring: 'ring-emerald-400/30', activeBg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+  { id: 'rejected', label: 'Rejected', bg: 'bg-rose-100 dark:bg-rose-900/40', text: 'text-rose-700 dark:text-rose-300', border: 'border-rose-200 dark:border-rose-700', ring: 'ring-rose-400/30', activeBg: 'bg-rose-50 dark:bg-rose-900/20' },
+]
+
+function inputCls(hasIcon) {
+  return `w-full ${hasIcon ? 'pl-9' : 'pl-3'} pr-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all duration-200`
+}
+
+function selectCls() {
+  return 'w-full px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all duration-200 appearance-none cursor-pointer'
+}
+
+function InputIcon({ icon }) {
+  return <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">{icon}</span>
+}
+
+function PillInput({ tags, onAdd, onRemove, placeholder }) {
+  const [value, setValue] = useState('')
+  const inputRef = useRef(null)
+
+  function commit(raw) {
+    const trimmed = raw.replace(/,/g, '').trim()
+    if (trimmed && !tags.includes(trimmed)) {
+      onAdd(trimmed)
+    }
+    setValue('')
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault()
+      commit(value)
+    }
+    if (e.key === 'Backspace' && !value && tags.length > 0) {
+      onRemove(tags[tags.length - 1])
+    }
+  }
+
+  function handlePaste(e) {
+    const text = e.clipboardData.getData('text')
+    if (text.includes(',') || text.includes('\n')) {
+      e.preventDefault()
+      text.split(/[,\n]+/).forEach(part => commit(part))
+    }
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 dark:focus-within:border-indigo-400 transition-all duration-200 min-h-[42px] cursor-text" onClick={() => inputRef.current?.focus()}>
+      {tags.map(tag => (
+        <span
+          key={tag}
+          className="inline-flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-700 rounded-lg px-2.5 py-1 text-xs font-semibold animate-in fade-in-0 zoom-in-95 duration-150"
+        >
+          <Hash size={11} className="text-indigo-400 dark:text-indigo-500" />
+          {tag}
+          <button type="button" onClick={() => onRemove(tag)} className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 transition-colors cursor-pointer">
+            <X size={12} />
+          </button>
+        </span>
+      ))}
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        onBlur={() => { if (value) commit(value) }}
+        placeholder={tags.length === 0 ? placeholder : ''}
+        className="flex-1 min-w-[80px] bg-transparent border-none outline-none text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 py-0.5"
+      />
+    </div>
+  )
+}
+
 export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
+  const [activeTab, setActiveTab] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
+  const [showRecruiter, setShowRecruiter] = useState(false)
+  const [logoDomain, setLogoDomain] = useState('')
+
   const [form, setForm] = useState({
-    company: '', role: '', location: '', salary: '', employmentType: 'full-time',
-    status: 'wishlist', dateApplied: '', tags: '', jobUrl: '', notes: '',
-    interviews: [],
+    company: '', role: '', employmentType: 'full-time', location: '',
+    salary: { min: '', max: '', currency: 'USD', period: 'yearly' },
+    status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
+    recruiter: { name: '', email: '', linkedin: '' }, notes: '', interviews: [],
   })
 
   useEffect(() => {
+    if (!isOpen) return
+    setActiveTab(0)
     if (editingJob) {
+      const raw = editingJob.salary
+      const salary = typeof raw === 'object' && raw
+        ? { min: raw.min ? Number(raw.min) / 1000 : '', max: raw.max ? Number(raw.max) / 1000 : '', currency: raw.currency || 'USD', period: raw.period || 'yearly' }
+        : { min: '', max: '', currency: 'USD', period: 'yearly' }
       setForm({
-        ...editingJob,
-        tags: editingJob.tags.join(', '),
+        company: editingJob.company || '', role: editingJob.role || '',
+        employmentType: editingJob.employmentType || 'full-time', location: editingJob.location || '', salary,
+        status: editingJob.status || 'wishlist', dateApplied: editingJob.dateApplied || new Date().toISOString().split('T')[0],
+        jobUrl: editingJob.jobUrl || '', tags: editingJob.tags || [],
+        recruiter: editingJob.recruiter || { name: '', email: '', linkedin: '' }, notes: editingJob.notes || '',
         interviews: editingJob.interviews || [],
       })
+      setShowRecruiter(!!editingJob.recruiter?.name)
+      setLogoDomain(extractDomain(editingJob.jobUrl) || editingJob.company.toLowerCase().replace(/\s+/g, '') + '.com')
     } else {
-      setForm({ company: '', role: '', location: '', salary: '', employmentType: 'full-time', status: 'wishlist', dateApplied: '', tags: '', jobUrl: '', notes: '', interviews: [] })
+      setForm({
+        company: '', role: '', employmentType: 'full-time', location: '',
+        salary: { min: '', max: '', currency: 'USD', period: 'yearly' },
+        status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
+        recruiter: { name: '', email: '', linkedin: '' }, notes: '', interviews: [],
+      })
+      setShowRecruiter(false)
+      setLogoDomain('')
     }
+    setSubmitting(false)
   }, [editingJob, isOpen])
 
   if (!isOpen) return null
 
-  const handleSubmit = (e) => {
+  const update = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }))
+  const updateSalary = (sub) => (e) => setForm(prev => ({ ...prev, salary: { ...prev.salary, [sub]: e.target.value } }))
+  const updateRecruiter = (sub) => (e) => setForm(prev => ({ ...prev, recruiter: { ...prev.recruiter, [sub]: e.target.value } }))
+
+  const handleCompanyChange = (e) => {
+    const val = e.target.value
+    setForm(prev => ({ ...prev, company: val }))
+    if (val && !form.jobUrl) {
+      setLogoDomain(val.toLowerCase().replace(/\s+/g, '') + '.com')
+    }
+  }
+
+  const handleJobUrlChange = (e) => {
+    const val = e.target.value
+    setForm(prev => ({ ...prev, jobUrl: val }))
+    const domain = extractDomain(val)
+    if (domain) setLogoDomain(domain)
+  }
+
+  const addTag = (tag) => setForm(prev => ({ ...prev, tags: [...prev.tags, tag] }))
+  const removeTag = (tag) => setForm(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }))
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.company || !form.role) return
+    setSubmitting(true)
+    await new Promise(r => setTimeout(r, 200))
     const job = {
       id: editingJob?.id || uuidv4(),
-      company: form.company,
-      role: form.role,
-      location: form.location,
-      salary: form.salary,
-      employmentType: form.employmentType,
-      status: form.status,
-      dateApplied: form.dateApplied || '',
-      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
-      jobUrl: form.jobUrl,
+      company: form.company, role: form.role, employmentType: form.employmentType, location: form.location,
+      salary: form.salary.min || form.salary.max
+        ? { min: form.salary.min ? Number(form.salary.min) * 1000 : '', max: form.salary.max ? Number(form.salary.max) * 1000 : '', currency: form.salary.currency, period: form.salary.period }
+        : '',
+      status: form.status, dateApplied: form.dateApplied || '', tags: form.tags, jobUrl: form.jobUrl,
+      recruiter: form.recruiter.name ? { ...form.recruiter } : undefined,
       notes: form.notes,
-      interviews: form.interviews,
+      interviews: form.interviews.map(iv => ({ ...iv, meetingLink: iv.meetingLink || '', stageName: iv.stageName || '' })),
       activityLog: editingJob?.activityLog || [],
     }
     onSave(job)
     onClose()
   }
 
-  const update = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }))
-
   const addInterview = () => {
     setForm(prev => ({
       ...prev,
-      interviews: [...prev.interviews, { id: uuidv4(), date: '', time: '', interviewer: '', platform: 'Zoom', notes: '' }],
+      interviews: [...prev.interviews, { id: uuidv4(), stageName: '', date: '', time: '', interviewer: '', platform: 'Zoom', meetingLink: '', notes: '' }],
     }))
   }
 
@@ -72,118 +217,258 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
     }))
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 dark:bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-fade-in" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{editingJob ? 'Edit Application' : 'Add Application'}</h2>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-            <X size={20} />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label-base">Company *</label>
-              <input type="text" value={form.company} onChange={update('company')} required className="input-base" />
-            </div>
-            <div>
-              <label className="label-base">Role *</label>
-              <input type="text" value={form.role} onChange={update('role')} required className="input-base" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label-base">Employment Type</label>
-              <select value={form.employmentType} onChange={update('employmentType')} className="input-base">
-                {employmentTypes.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1).replace('-', ' ')}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label-base">Location</label>
-              <input type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid, On-site" className="input-base" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label-base">Salary</label>
-              <input type="text" value={form.salary} onChange={update('salary')} placeholder="$120k - $150k" className="input-base" />
-            </div>
-            <div>
-              <label className="label-base">Status</label>
-              <select value={form.status} onChange={update('status')} className="input-base">
-                {statuses.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label-base">Date Applied</label>
-              <input type="date" value={form.dateApplied} onChange={update('dateApplied')} className="input-base" />
-            </div>
-            <div>
-              <label className="label-base">Job URL</label>
-              <input type="url" value={form.jobUrl} onChange={update('jobUrl')} placeholder="https://..." className="input-base" />
-            </div>
-          </div>
-          <div>
-            <label className="label-base">Tags (comma-separated)</label>
-            <input type="text" value={form.tags} onChange={update('tags')} placeholder="React, TypeScript, Tailwind" className="input-base" />
-          </div>
-          <div>
-            <label className="label-base">Notes</label>
-            <textarea rows={3} value={form.notes} onChange={update('notes')} className="input-base resize-none" />
-          </div>
+  const logoInitial = form.company ? form.company[0].toUpperCase() : '?'
 
-          <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Interviews</label>
-              <button type="button" onClick={addInterview} className="flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer">
-                <Plus size={14} /> Add Interview
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-xl mx-4 max-h-[90vh] flex flex-col animate-fade-in" onClick={e => e.stopPropagation()}>
+
+        {/* ---------- HEADER ---------- */}
+        <div className="relative shrink-0 overflow-hidden rounded-t-2xl">
+          <div className="bg-gradient-to-r from-indigo-50/80 via-purple-50/50 to-slate-50 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-slate-900 px-6 py-5 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center text-lg font-bold shrink-0 overflow-hidden">
+                {logoDomain ? (
+                  <img src={`https://www.google.com/s2/favicons?domain=${logoDomain}&sz=64`} alt="" className="w-5 h-5" onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = '' }} />
+                ) : null}
+                <span className={logoDomain ? 'hidden' : ''}>{logoInitial}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white">{editingJob ? 'Edit Application' : 'New Application'}</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                  {form.company || form.role ? `${form.company || 'Company'}${form.company && form.role ? ' — ' : ''}${form.role || 'Role'}` : 'Enter company and role to get started'}
+                </p>
+              </div>
+              <button type="button" onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <X size={18} />
               </button>
             </div>
-            {form.interviews.length === 0 && (
-              <p className="text-xs text-slate-400 dark:text-slate-500 italic">No interviews scheduled yet.</p>
-            )}
-            <div className="space-y-3">
+          </div>
+
+          {/* Tab bar */}
+          <div className="flex bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+            {TABS.map(tab => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer border-b-2 ${
+                  activeTab === tab.id
+                    ? 'text-indigo-600 dark:text-indigo-400 border-indigo-500 dark:border-indigo-400 bg-indigo-50/40 dark:bg-indigo-900/20'
+                    : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                }`}
+              >
+                <span className="text-sm leading-none">{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ---------- BODY ---------- */}
+        <form id="job-form" onSubmit={handleSubmit} className="overflow-y-auto px-6 py-5 h-[270px]">
+
+          {/* Tab 0 – Basic Info */}
+          {activeTab === 0 && (
+            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <InputIcon icon={<Building2 size={15} />} />
+                  <input type="text" value={form.company} onChange={handleCompanyChange} required placeholder="Company name" className={inputCls(true)} />
+                </div>
+                <div className="relative">
+                  <InputIcon icon={<Briefcase size={15} />} />
+                  <input type="text" value={form.role} onChange={update('role')} required placeholder="Role title" className={inputCls(true)} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <select value={form.employmentType} onChange={update('employmentType')} className={selectCls()}>
+                    {employmentTypes.map(t => (
+                      <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1).replace('-', ' ')}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="relative">
+                  <InputIcon icon={<MapPin size={15} />} />
+                  <input type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid, On-site" className={inputCls(true)} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Status</label>
+                <div className="flex flex-wrap gap-2">
+                  {STATUSES.map(s => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setForm(prev => ({ ...prev, status: s.id }))}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border-2 text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                        form.status === s.id
+                          ? `${s.bg} ${s.text} ${s.border} ring-2 ${s.ring} scale-105`
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${form.status === s.id ? s.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-600'}`} />
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 1 – Compensation */}
+          {activeTab === 1 && (
+            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              <div>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Salary</label>
+                <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2">
+                  <div className="relative">
+                    <InputIcon icon={<DollarSign size={15} />} />
+                    <input type="number" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min ($k)" className={inputCls(true)} />
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">–</span>
+                    <input type="number" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max ($k)" className={inputCls(true)} />
+                  </div>
+                  <select value={form.salary.period} onChange={updateSalary('period')} className={`${selectCls()} w-24`}>
+                    {periods.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                  </select>
+                  <select value={form.salary.currency} onChange={updateSalary('currency')} className={`${selectCls()} w-22`}>
+                    {currencies.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <InputIcon icon={<CalendarDays size={15} />} />
+                  <input type="date" value={form.dateApplied} onChange={update('dateApplied')} className={inputCls(true)} />
+                </div>
+                <div className="relative">
+                  <InputIcon icon={<Link size={15} />} />
+                  <input type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/..." className={inputCls(true)} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2 – Tags & Recruiter */}
+          {activeTab === 2 && (
+            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              <div>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Tags</label>
+                <PillInput tags={form.tags} onAdd={addTag} onRemove={removeTag} placeholder="Type a tag and press Enter..." />
+              </div>
+              <div>
+                <button type="button" onClick={() => setShowRecruiter(!showRecruiter)} className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
+                  <User size={13} />
+                  {showRecruiter ? 'Hide recruiter info' : 'Add recruiter info'}
+                  <span className="text-slate-300 dark:text-slate-600">(optional)</span>
+                </button>
+                {showRecruiter && (
+                  <div className="mt-2 grid grid-cols-3 gap-2 animate-in fade-in-0 slide-in-from-top-1 duration-150">
+                    <div className="relative">
+                      <InputIcon icon={<User size={14} />} />
+                      <input type="text" value={form.recruiter.name} onChange={updateRecruiter('name')} placeholder="Name" className={inputCls(true)} />
+                    </div>
+                    <div className="relative">
+                      <InputIcon icon={<Mail size={14} />} />
+                      <input type="email" value={form.recruiter.email} onChange={updateRecruiter('email')} placeholder="Email" className={inputCls(true)} />
+                    </div>
+                    <div className="relative">
+                      <InputIcon icon={<ExternalLink size={14} />} />
+                      <input type="url" value={form.recruiter.linkedin} onChange={updateRecruiter('linkedin')} placeholder="LinkedIn URL" className={inputCls(true)} />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Notes</label>
+                <textarea rows={2} value={form.notes} onChange={update('notes')} placeholder="Any additional notes..." className={`${inputCls(false)} resize-none`} />
+              </div>
+            </div>
+          )}
+
+          {/* Tab 3 – Interviews */}
+          {activeTab === 3 && (
+            <div className="space-y-3 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              {form.interviews.length === 0 && (
+                <p className="text-xs text-slate-400 dark:text-slate-500 italic text-center py-8">No interviews scheduled yet.</p>
+              )}
               {form.interviews.map((iv, i) => (
-                <div key={iv.id} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-slate-600 dark:text-slate-300">Interview #{i + 1}</span>
-                    <button type="button" onClick={() => removeInterview(iv.id)} className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                      <Trash2 size={12} />
+                <div key={iv.id} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                      <Clock size={12} className="text-indigo-400" />
+                      Interview #{i + 1}
+                    </span>
+                    <button type="button" onClick={() => removeInterview(iv.id)} className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                      <Trash2 size={13} />
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Date</label>
-                      <input type="date" value={iv.date} onChange={updateInterview(iv.id, 'date')} className="w-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 rounded text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Time</label>
-                      <input type="time" value={iv.time} onChange={updateInterview(iv.id, 'time')} className="w-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 rounded text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Stage Name</label>
+                      <input type="text" value={iv.stageName} onChange={updateInterview(iv.id, 'stageName')} placeholder="e.g. Recruiter Screen" className={`${inputCls(false)} text-xs py-2`} />
                     </div>
                     <div>
                       <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Platform</label>
-                      <select value={iv.platform} onChange={updateInterview(iv.id, 'platform')} className="w-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 rounded text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                      <select value={iv.platform} onChange={updateInterview(iv.id, 'platform')} className={`${selectCls()} text-xs py-2`}>
                         {platforms.map(p => <option key={p} value={p}>{p}</option>)}
                       </select>
                     </div>
                     <div>
+                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Date</label>
+                      <input type="date" value={iv.date} onChange={updateInterview(iv.id, 'date')} className={`${inputCls(false)} text-xs py-2`} />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Time</label>
+                      <input type="time" value={iv.time} onChange={updateInterview(iv.id, 'time')} className={`${inputCls(false)} text-xs py-2`} />
+                    </div>
+                    <div>
                       <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Interviewer</label>
-                      <input type="text" value={iv.interviewer} onChange={updateInterview(iv.id, 'interviewer')} placeholder="Name" className="w-full px-2 py-1.5 border border-slate-200 dark:border-slate-700 rounded text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+                      <input type="text" value={iv.interviewer} onChange={updateInterview(iv.id, 'interviewer')} placeholder="Name" className={`${inputCls(false)} text-xs py-2`} />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Meeting Link</label>
+                      <input type="url" value={iv.meetingLink} onChange={updateInterview(iv.id, 'meetingLink')} placeholder="https://..." className={`${inputCls(false)} text-xs py-2`} />
                     </div>
                   </div>
                 </div>
               ))}
+              <button type="button" onClick={addInterview} className="w-full flex items-center justify-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 border-2 border-dashed border-indigo-200 dark:border-indigo-800 rounded-xl py-3 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200 cursor-pointer">
+                <Plus size={16} /> Add Interview Round
+              </button>
             </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
-            <button type="submit" className="btn-primary">{editingJob ? 'Save Changes' : 'Add Application'}</button>
-          </div>
+          )}
         </form>
+
+        {/* ---------- FOOTER ---------- */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-2xl">
+          <p className="text-xs text-slate-400 dark:text-slate-500">Step {activeTab + 1} of 4</p>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
+              Cancel
+            </button>
+            {activeTab < 3 ? (
+              <button type="button" onClick={() => setActiveTab(activeTab + 1)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20 rounded-lg active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                form="job-form"
+                disabled={submitting || !form.company || !form.role}
+                className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer rounded-lg"
+              >
+                {submitting ? <Loader2 size={15} className="animate-spin" /> : null}
+                {submitting ? 'Saving...' : editingJob ? 'Save Changes' : 'Add Application'}
+              </button>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   )

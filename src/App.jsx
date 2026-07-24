@@ -15,6 +15,7 @@ import AnalyticsPage from './components/AnalyticsPage'
 import JobModal from './components/JobModal'
 import JobDetailDrawer from './components/JobDetailDrawer'
 import InterviewModal from './components/InterviewModal'
+import confetti from 'canvas-confetti'
 import { exportToJSON, importFromJSON } from './utils/dataExport'
 
 export default function App() {
@@ -54,6 +55,14 @@ export default function App() {
       ))
       setPendingInterview({ jobId: draggableId, sourceStatus: source.droppableId })
     } else {
+      if (destination.droppableId === 'offer') {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#34d399', '#059669', '#fbbf24', '#f59e0b'],
+        })
+      }
       setApplications(prev => prev.map(app => {
         if (app.id !== draggableId) return app
         const from = app.status
@@ -105,6 +114,12 @@ export default function App() {
   const handleRejectOffer = useCallback((id) => {
     setApplications(prev => prev.map(app =>
       app.id === id ? logActivity({ ...app, status: 'rejected' }, 'offer_rejected', `Offer rejected at ${app.company}`) : app
+    ))
+  }, [setApplications])
+
+  const handleStatusChange = useCallback((id, newStatus) => {
+    setApplications(prev => prev.map(app =>
+      app.id === id ? logActivity({ ...app, status: newStatus }, 'status_change', `Moved to ${newStatus}`) : app
     ))
   }, [setApplications])
 
@@ -214,6 +229,7 @@ export default function App() {
         onClose={() => setDetailJob(null)}
         onEdit={openEdit}
         onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
       />
     </div>
   )

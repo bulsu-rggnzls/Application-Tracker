@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Calendar, Clock, User, Video } from 'lucide-react'
 
 const platforms = ['Zoom', 'Google Meet', 'Microsoft Teams', 'Skype', 'Phone', 'In-person']
@@ -9,6 +9,16 @@ export default function InterviewModal({ isOpen, onClose, onConfirm, job }) {
   const [platform, setPlatform] = useState('Zoom')
   const [interviewer, setInterviewer] = useState('')
   const [notes, setNotes] = useState('')
+
+  useEffect(() => {
+    if (isOpen) {
+      setDate('')
+      setTime('')
+      setPlatform('Zoom')
+      setInterviewer('')
+      setNotes('')
+    }
+  }, [isOpen, job?.id])
 
   if (!isOpen || !job) return null
 

@@ -27,13 +27,23 @@ const STATUS_LABELS = {
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-const StatCard = ({ label, value, sub }) => (
-  <div className="bg-white border border-slate-200 rounded-lg p-4">
-    <p className="text-xs text-slate-500 font-medium">{label}</p>
-    <p className="text-xl font-semibold text-slate-900 mt-0.5">{value}</p>
-    {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
-  </div>
-)
+const CARD_STYLES = {
+  total: { from: 'from-indigo-50', to: 'to-purple-50', border: 'border-indigo-200', darkFrom: 'dark:from-indigo-950/60', darkTo: 'dark:to-purple-950/60', darkBorder: 'dark:border-indigo-700' },
+  response: { from: 'from-cyan-50', to: 'to-emerald-50', border: 'border-emerald-200', darkFrom: 'dark:from-cyan-950/60', darkTo: 'dark:to-emerald-950/60', darkBorder: 'dark:border-emerald-700' },
+  offer: { from: 'from-yellow-50', to: 'to-amber-50', border: 'border-amber-300', darkFrom: 'dark:from-yellow-950/60', darkTo: 'dark:to-amber-950/60', darkBorder: 'dark:border-amber-600' },
+  time: { from: 'from-amber-50', to: 'to-orange-50', border: 'border-orange-200', darkFrom: 'dark:from-amber-950/60', darkTo: 'dark:to-orange-950/60', darkBorder: 'dark:border-orange-700' },
+}
+
+const StatCard = ({ label, value, sub, variant }) => {
+  const s = CARD_STYLES[variant] || CARD_STYLES.total
+  return (
+    <div className={`relative overflow-hidden rounded-lg p-4 shadow-sm border ${s.border} ${s.darkBorder} bg-gradient-to-br ${s.from} ${s.to} ${s.darkFrom} ${s.darkTo} hover:-translate-y-1 hover:shadow-lg transition-all duration-300`}>
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="text-xl font-bold text-slate-900 dark:text-white mt-0.5">{value}</p>
+      {sub && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{sub}</p>}
+    </div>
+  )
+}
 
 const ChartCard = ({ title, children, action }) => (
   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -211,21 +221,25 @@ export default function AnalyticsPage({ applications }) {
             label="Total Applications"
             value={stats.total}
             sub={`${stats.applied} actively applied`}
+            variant="total"
           />
           <StatCard
             label="Response Rate"
             value={`${stats.responseRate}%`}
             sub={`${prevStats ? `prev ${timeRange === 'all' ? 'period' : timeRange}: ${prevStats.responseRate}%` : 'No prior data'}`}
+            variant="response"
           />
           <StatCard
             label="Offer Rate"
             value={`${stats.offerRate}%`}
             sub={`${stats.offers} offers from ${stats.applied} applications`}
+            variant="offer"
           />
           <StatCard
             label="Avg. Time to Offer"
             value={stats.avgTimeToOffer ? `${stats.avgTimeToOffer}d` : 'N/A'}
             sub="From application to offer"
+            variant="time"
           />
         </div>
 
