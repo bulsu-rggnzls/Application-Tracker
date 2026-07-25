@@ -1,7 +1,7 @@
-import { Search, Plus, Download, Upload, LayoutGrid, Table2 } from 'lucide-react'
+import { Search, Plus, Download, Upload, LayoutGrid, Table2, Mail } from 'lucide-react'
 import { Input, Button } from './ui'
 
-export default function ControlsBar({ search, onSearchChange, onAdd, onExport, onImport, viewMode, onViewModeChange }) {
+export default function ControlsBar({ search, onSearchChange, onAdd, onExport, onImport, onComposeEmail, viewMode, onViewModeChange }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-3 flex-1">
@@ -31,6 +31,7 @@ export default function ControlsBar({ search, onSearchChange, onAdd, onExport, o
           </button>
         </div>
         <Button variant="primary" onClick={onAdd}><Plus size={14} /> Add</Button>
+        <Button variant="secondary" onClick={onComposeEmail}><Mail size={14} /> Compose</Button>
         <Button variant="secondary" onClick={onExport}><Download size={14} /> Export</Button>
         <label className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
           <Upload size={14} /> Import

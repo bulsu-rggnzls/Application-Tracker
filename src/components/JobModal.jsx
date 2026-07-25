@@ -1,16 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-  X, Plus, Trash2, Building2, Briefcase, MapPin, DollarSign,
-  CalendarDays, Link, User, Mail, ExternalLink, Clock, Loader2, Hash
+  X, Plus, Building2, Briefcase, MapPin, DollarSign,
+  CalendarDays, Link, User, Mail, ExternalLink, Hash
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import extractDomain from '../utils/extractDomain'
 
 const TABS = [
-  { id: 0, label: 'Basic Info', icon: '💼' },
-  { id: 1, label: 'Compensation', icon: '💰' },
-  { id: 2, label: 'Tags & Recruiter', icon: '🏷️' },
-  { id: 3, label: 'Interviews', icon: '🗓️' },
+  { id: 0, label: 'Basic Info' },
+  { id: 1, label: 'Compensation & Details' },
 ]
 
 const employmentTypes = ['full-time', 'part-time', 'contract', 'internship']
@@ -26,7 +24,6 @@ const periods = [
   { label: '/mo', value: 'monthly' },
   { label: '/contract', value: 'contract' },
 ]
-const platforms = ['Zoom', 'Google Meet', 'Microsoft Teams', 'Skype', 'Phone', 'In-person']
 
 const STATUSES = [
   { id: 'wishlist', label: 'Wishlist', bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-300', border: 'border-amber-200 dark:border-amber-700', ring: 'ring-amber-400/30', activeBg: 'bg-amber-50 dark:bg-amber-900/20' },
@@ -109,7 +106,6 @@ function PillInput({ tags, onAdd, onRemove, placeholder }) {
 
 export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
   const [activeTab, setActiveTab] = useState(0)
-  const [submitting, setSubmitting] = useState(false)
   const [showRecruiter, setShowRecruiter] = useState(false)
   const [logoDomain, setLogoDomain] = useState('')
 
@@ -117,7 +113,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
     company: '', role: '', employmentType: 'full-time', location: '',
     salary: { min: '', max: '', currency: 'USD', period: 'yearly' },
     status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
-    recruiter: { name: '', email: '', linkedin: '' }, notes: '', interviews: [],
+    recruiter: { name: '', email: '', linkedin: '' }, notes: '',
   })
 
   useEffect(() => {
@@ -134,7 +130,6 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
         status: editingJob.status || 'wishlist', dateApplied: editingJob.dateApplied || new Date().toISOString().split('T')[0],
         jobUrl: editingJob.jobUrl || '', tags: editingJob.tags || [],
         recruiter: editingJob.recruiter || { name: '', email: '', linkedin: '' }, notes: editingJob.notes || '',
-        interviews: editingJob.interviews || [],
       })
       setShowRecruiter(!!editingJob.recruiter?.name)
       setLogoDomain(extractDomain(editingJob.jobUrl) || editingJob.company.toLowerCase().replace(/\s+/g, '') + '.com')
@@ -143,12 +138,11 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
         company: '', role: '', employmentType: 'full-time', location: '',
         salary: { min: '', max: '', currency: 'USD', period: 'yearly' },
         status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
-        recruiter: { name: '', email: '', linkedin: '' }, notes: '', interviews: [],
+        recruiter: { name: '', email: '', linkedin: '' }, notes: '',
       })
       setShowRecruiter(false)
       setLogoDomain('')
     }
-    setSubmitting(false)
   }, [editingJob, isOpen])
 
   if (!isOpen) return null
@@ -178,8 +172,6 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.company || !form.role) return
-    setSubmitting(true)
-    await new Promise(r => setTimeout(r, 200))
     const job = {
       id: editingJob?.id || uuidv4(),
       company: form.company, role: form.role, employmentType: form.employmentType, location: form.location,
@@ -189,32 +181,11 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
       status: form.status, dateApplied: form.dateApplied || '', tags: form.tags, jobUrl: form.jobUrl,
       recruiter: form.recruiter.name ? { ...form.recruiter } : undefined,
       notes: form.notes,
-      interviews: form.interviews.map(iv => ({ ...iv, meetingLink: iv.meetingLink || '', stageName: iv.stageName || '' })),
+      interviews: editingJob?.interviews || [],
       activityLog: editingJob?.activityLog || [],
     }
     onSave(job)
     onClose()
-  }
-
-  const addInterview = () => {
-    setForm(prev => ({
-      ...prev,
-      interviews: [...prev.interviews, { id: uuidv4(), stageName: '', date: '', time: '', interviewer: '', platform: 'Zoom', meetingLink: '', notes: '' }],
-    }))
-  }
-
-  const updateInterview = (id, field) => (e) => {
-    setForm(prev => ({
-      ...prev,
-      interviews: prev.interviews.map(iv => iv.id === id ? { ...iv, [field]: e.target.value } : iv),
-    }))
-  }
-
-  const removeInterview = (id) => {
-    setForm(prev => ({
-      ...prev,
-      interviews: prev.interviews.filter(iv => iv.id !== id),
-    }))
   }
 
   const logoInitial = form.company ? form.company[0].toUpperCase() : '?'
@@ -231,7 +202,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                 {logoDomain ? (
                   <img src={`https://www.google.com/s2/favicons?domain=${logoDomain}&sz=64`} alt="" className="w-5 h-5" onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = '' }} />
                 ) : null}
-                <span className={logoDomain ? 'hidden' : ''}>{logoInitial}</span>
+                <span className={logoDomain ? 'hidden' : ''}><Briefcase size={18} /></span>
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base font-semibold text-slate-900 dark:text-white">{editingJob ? 'Edit Application' : 'New Application'}</h2>
@@ -245,56 +216,83 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
             </div>
           </div>
 
-          {/* Tab bar */}
-          <div className="flex bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer border-b-2 ${
-                  activeTab === tab.id
-                    ? 'text-indigo-600 dark:text-indigo-400 border-indigo-500 dark:border-indigo-400 bg-indigo-50/40 dark:bg-indigo-900/20'
-                    : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'
-                }`}
-              >
-                <span className="text-sm leading-none">{tab.icon}</span>
-                <span className="hidden sm:inline">{tab.label}</span>
-              </button>
+          {/* Progress stepper */}
+          <div className="flex bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-6 py-3">
+            {TABS.map((tab, i) => (
+              <div key={tab.id} className="flex items-center flex-1">
+                <div className={`flex items-center gap-2 text-xs font-medium ${
+                  activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
+                }`}>
+                  <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                    activeTab === tab.id
+                      ? 'bg-indigo-600 text-white'
+                      : activeTab > tab.id
+                        ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
+                        : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
+                  }`}>
+                    {activeTab > tab.id ? '✓' : i + 1}
+                  </span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </div>
+                {i < TABS.length - 1 && (
+                  <div className={`flex-1 h-px mx-3 ${
+                    activeTab > tab.id ? 'bg-indigo-400' : 'bg-slate-200 dark:bg-slate-700'
+                  }`} />
+                )}
+              </div>
             ))}
           </div>
         </div>
 
         {/* ---------- BODY ---------- */}
-        <form id="job-form" onSubmit={handleSubmit} className="overflow-y-auto px-6 py-5 h-[270px]">
+        <form id="job-form" onSubmit={handleSubmit} className="overflow-y-auto px-6 py-5 h-[340px]">
 
-          {/* Tab 0 – Basic Info */}
+          {/* Step 1 – Basic Info */}
           {activeTab === 0 && (
             <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
               <div className="grid grid-cols-2 gap-3">
-                <div className="relative">
-                  <InputIcon icon={<Building2 size={15} />} />
-                  <input type="text" value={form.company} onChange={handleCompanyChange} required placeholder="Company name" className={inputCls(true)} />
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Company Name</label>
+                  <div className="relative">
+                    <InputIcon icon={<Building2 size={15} />} />
+                    <input type="text" value={form.company} onChange={handleCompanyChange} required placeholder="e.g. Stripe" className={inputCls(true)} />
+                  </div>
                 </div>
-                <div className="relative">
-                  <InputIcon icon={<Briefcase size={15} />} />
-                  <input type="text" value={form.role} onChange={update('role')} required placeholder="Role title" className={inputCls(true)} />
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Role Title</label>
+                  <div className="relative">
+                    <InputIcon icon={<Briefcase size={15} />} />
+                    <input type="text" value={form.role} onChange={update('role')} required placeholder="e.g. Senior Frontend" className={inputCls(true)} />
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="relative">
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Employment Type</label>
                   <select value={form.employmentType} onChange={update('employmentType')} className={selectCls()}>
                     {employmentTypes.map(t => (
                       <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1).replace('-', ' ')}</option>
                     ))}
                   </select>
                 </div>
-                <div className="relative">
-                  <InputIcon icon={<MapPin size={15} />} />
-                  <input type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid, On-site" className={inputCls(true)} />
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Location Type</label>
+                  <div className="relative">
+                    <InputIcon icon={<MapPin size={15} />} />
+                    <input type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid, On-site" className={inputCls(true)} />
+                  </div>
                 </div>
               </div>
-
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <InputIcon icon={<CalendarDays size={15} />} />
+                  <input type="date" value={form.dateApplied} onChange={update('dateApplied')} className={inputCls(true)} />
+                </div>
+                <div className="relative">
+                  <InputIcon icon={<Link size={15} />} />
+                  <input type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/..." className={inputCls(true)} />
+                </div>
+              </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Status</label>
                 <div className="flex flex-wrap gap-2">
@@ -318,7 +316,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
             </div>
           )}
 
-          {/* Tab 1 – Compensation */}
+          {/* Step 2 – Compensation & Details */}
           {activeTab === 1 && (
             <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
               <div>
@@ -340,23 +338,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="relative">
-                  <InputIcon icon={<CalendarDays size={15} />} />
-                  <input type="date" value={form.dateApplied} onChange={update('dateApplied')} className={inputCls(true)} />
-                </div>
-                <div className="relative">
-                  <InputIcon icon={<Link size={15} />} />
-                  <input type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/..." className={inputCls(true)} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Tab 2 – Tags & Recruiter */}
-          {activeTab === 2 && (
-            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
-              <div>
+              <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Tags</label>
                 <PillInput tags={form.tags} onAdd={addTag} onRemove={removeTag} placeholder="Type a tag and press Enter..." />
               </div>
@@ -389,69 +371,21 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               </div>
             </div>
           )}
-
-          {/* Tab 3 – Interviews */}
-          {activeTab === 3 && (
-            <div className="space-y-3 animate-in fade-in-0 slide-in-from-top-2 duration-200">
-              {form.interviews.length === 0 && (
-                <p className="text-xs text-slate-400 dark:text-slate-500 italic text-center py-8">No interviews scheduled yet.</p>
-              )}
-              {form.interviews.map((iv, i) => (
-                <div key={iv.id} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                      <Clock size={12} className="text-indigo-400" />
-                      Interview #{i + 1}
-                    </span>
-                    <button type="button" onClick={() => removeInterview(iv.id)} className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Stage Name</label>
-                      <input type="text" value={iv.stageName} onChange={updateInterview(iv.id, 'stageName')} placeholder="e.g. Recruiter Screen" className={`${inputCls(false)} text-xs py-2`} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Platform</label>
-                      <select value={iv.platform} onChange={updateInterview(iv.id, 'platform')} className={`${selectCls()} text-xs py-2`}>
-                        {platforms.map(p => <option key={p} value={p}>{p}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Date</label>
-                      <input type="date" value={iv.date} onChange={updateInterview(iv.id, 'date')} className={`${inputCls(false)} text-xs py-2`} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Time</label>
-                      <input type="time" value={iv.time} onChange={updateInterview(iv.id, 'time')} className={`${inputCls(false)} text-xs py-2`} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Interviewer</label>
-                      <input type="text" value={iv.interviewer} onChange={updateInterview(iv.id, 'interviewer')} placeholder="Name" className={`${inputCls(false)} text-xs py-2`} />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">Meeting Link</label>
-                      <input type="url" value={iv.meetingLink} onChange={updateInterview(iv.id, 'meetingLink')} placeholder="https://..." className={`${inputCls(false)} text-xs py-2`} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <button type="button" onClick={addInterview} className="w-full flex items-center justify-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 border-2 border-dashed border-indigo-200 dark:border-indigo-800 rounded-xl py-3 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200 cursor-pointer">
-                <Plus size={16} /> Add Interview Round
-              </button>
-            </div>
-          )}
         </form>
 
         {/* ---------- FOOTER ---------- */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-2xl">
-          <p className="text-xs text-slate-400 dark:text-slate-500">Step {activeTab + 1} of 4</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Step {activeTab + 1} of 2</p>
           <div className="flex items-center gap-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
               Cancel
             </button>
-            {activeTab < 3 ? (
+            {activeTab > 0 && (
+              <button type="button" onClick={() => setActiveTab(activeTab - 1)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                Back
+              </button>
+            )}
+            {activeTab < 1 ? (
               <button type="button" onClick={() => setActiveTab(activeTab + 1)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20 rounded-lg active:scale-[0.98] transition-all duration-200 cursor-pointer">
                 Next
               </button>
@@ -459,11 +393,10 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               <button
                 type="submit"
                 form="job-form"
-                disabled={submitting || !form.company || !form.role}
+                disabled={!form.company || !form.role}
                 className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer rounded-lg"
               >
-                {submitting ? <Loader2 size={15} className="animate-spin" /> : null}
-                {submitting ? 'Saving...' : editingJob ? 'Save Changes' : 'Add Application'}
+                {editingJob ? 'Save Changes' : 'Add Application'}
               </button>
             )}
           </div>

@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import useLocalStorage from './hooks/useLocalStorage'
-import mockData from './data/mockData'
 import logActivity from './utils/logActivity'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
@@ -15,11 +14,12 @@ import AnalyticsPage from './components/AnalyticsPage'
 import JobModal from './components/JobModal'
 import JobDetailDrawer from './components/JobDetailDrawer'
 import InterviewModal from './components/InterviewModal'
+import { ComposeEmailCard } from './components/ui'
 import confetti from 'canvas-confetti'
 import { exportToJSON, importFromJSON } from './utils/dataExport'
 
 export default function App() {
-  const [applications, setApplications] = useLocalStorage('jobApplications', mockData)
+  const [applications, setApplications] = useLocalStorage('jobApplications', [])
   const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState('board')
   const [activeView, setActiveView] = useState('board')
@@ -27,6 +27,7 @@ export default function App() {
   const [editingJob, setEditingJob] = useState(null)
   const [detailJob, setDetailJob] = useState(null)
   const [pendingInterview, setPendingInterview] = useState(null)
+  const [composeOpen, setComposeOpen] = useState(false)
   const [darkMode, _setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true' || 
@@ -67,7 +68,8 @@ export default function App() {
         if (app.id !== draggableId) return app
         const from = app.status
         if (from === destination.droppableId) return app
-        return logActivity({ ...app, status: destination.droppableId }, 'status_change', `Moved from ${from} to ${destination.droppableId}`)
+        const updated = from === 'interviewing' ? { ...app, interviews: [] } : app
+        return logActivity({ ...updated, status: destination.droppableId }, 'status_change', `Moved from ${from} to ${destination.droppableId}`)
       }))
     }
   }, [setApplications])
@@ -118,9 +120,11 @@ export default function App() {
   }, [setApplications])
 
   const handleStatusChange = useCallback((id, newStatus) => {
-    setApplications(prev => prev.map(app =>
-      app.id === id ? logActivity({ ...app, status: newStatus }, 'status_change', `Moved to ${newStatus}`) : app
-    ))
+    setApplications(prev => prev.map(app => {
+      if (app.id !== id) return app
+      const updated = app.status === 'interviewing' ? { ...app, interviews: [] } : app
+      return logActivity({ ...updated, status: newStatus }, 'status_change', `Moved to ${newStatus}`)
+    }))
   }, [setApplications])
 
   const handleExport = () => exportToJSON(applications)
@@ -156,6 +160,21 @@ export default function App() {
 
   const pendingJob = pendingInterview ? applications.find(a => a.id === pendingInterview.jobId) : null
 
+  const handleComposeEmail = useCallback(() => setComposeOpen(true), [])
+
+  const composeEmailData = {
+    from: {
+      id: 'me',
+      name: 'You',
+      email: 'you@example.com',
+      avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=you',
+    },
+    to: [],
+    subject: '',
+    body: '',
+    attachments: [],
+  }
+
   return (
     <div className={`h-screen flex overflow-hidden ${darkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
       <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} />
@@ -173,6 +192,7 @@ export default function App() {
                   onAdd={openAdd}
                   onExport={handleExport}
                   onImport={handleImport}
+                  onComposeEmail={handleComposeEmail}
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
                 />
@@ -231,6 +251,19 @@ export default function App() {
         onDelete={handleDelete}
         onStatusChange={handleStatusChange}
       />
+
+      {composeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <ComposeEmailCard
+            data={composeEmailData}
+            onSend={(data) => {
+              console.log('Send email:', data)
+              setComposeOpen(false)
+            }}
+            onClose={() => setComposeOpen(false)}
+          />
+        </div>
+      )}
     </div>
   )
 }
