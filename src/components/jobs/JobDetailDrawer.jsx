@@ -1,12 +1,12 @@
 import { X, ExternalLink, Calendar, MapPin, DollarSign, Briefcase, Clock, User, Video, Check, Pencil, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Markdown from 'react-markdown'
-import { Avatar, Button, Heading, Text, Badge } from './ui'
-import { getTagStyle } from '../utils/tagColors'
+import { Avatar, Button, Heading, Text, Badge } from '../ui'
+import { getTagStyle } from '../../utils/tagColors'
 import CompanyLogo from './CompanyLogo'
-import extractDomain from '../utils/extractDomain'
-import getRelativeTime from '../utils/getRelativeTime'
-import formatSalary from '../utils/formatSalary'
+import extractDomain from '../../utils/extractDomain'
+import getRelativeTime from '../../utils/getRelativeTime'
+import formatSalary from '../../utils/formatSalary'
 
 const STAGES = [
   { id: 'wishlist', label: 'Wishlist' },

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { History, ArrowRight, CalendarCheck, XCircle, CheckCircle, PlusCircle, FileText } from 'lucide-react'
-import getRelativeTime from '../utils/getRelativeTime'
+import getRelativeTime from '../../utils/getRelativeTime'
 
 const actionConfig = {
   status_change: { icon: ArrowRight, color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30' },

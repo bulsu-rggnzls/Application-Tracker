@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BarChart3, ChevronDown, ChevronUp, Briefcase, Clock, TrendingUp, Award } from 'lucide-react'
 import AnalyticsChart from './AnalyticsChart'
-import { StatCard } from './ui'
+import { StatCard } from '../ui'
 
 export default function AnalyticsBar({ applications }) {
   const [chartOpen, setChartOpen] = useState(false)

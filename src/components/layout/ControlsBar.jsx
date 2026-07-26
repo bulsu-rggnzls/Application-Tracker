@@ -1,5 +1,5 @@
 import { Search, Plus, Download, Upload, LayoutGrid, Table2, Mail } from 'lucide-react'
-import { Input, Button } from './ui'
+import { Input, Button } from '../ui'
 
 export default function ControlsBar({ search, onSearchChange, onAdd, onExport, onImport, onComposeEmail, viewMode, onViewModeChange }) {
   return (

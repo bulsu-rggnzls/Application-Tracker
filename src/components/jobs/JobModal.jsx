@@ -4,7 +4,7 @@ import {
   CalendarDays, Link, User, Mail, ExternalLink, Hash
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import extractDomain from '../utils/extractDomain'
+import extractDomain from '../../utils/extractDomain'
 
 const TABS = [
   { id: 0, label: 'Basic Info' },

@@ -1,11 +1,11 @@
 import { Edit3, Trash2, ExternalLink, MapPin, DollarSign, Clock, Briefcase, Check, X } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { Badge, Button, Divider, IconButton, Text } from './ui'
-import { getTagStyle } from '../utils/tagColors'
+import { Badge, Button, Divider, IconButton, Text } from '../ui'
+import { getTagStyle } from '../../utils/tagColors'
 import CompanyLogo from './CompanyLogo'
-import getRelativeTime from '../utils/getRelativeTime'
-import extractDomain from '../utils/extractDomain'
-import formatSalary from '../utils/formatSalary'
+import getRelativeTime from '../../utils/getRelativeTime'
+import extractDomain from '../../utils/extractDomain'
+import formatSalary from '../../utils/formatSalary'
 
 export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, onRejectOffer, onSelect, provided, snapshot, statusBorder }) {
   const { company, role, location, salary, employmentType, status, dateApplied, tags, jobUrl, id, interviews } = application

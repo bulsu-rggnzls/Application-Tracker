@@ -1,5 +1,5 @@
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import JobCard from './JobCard'
+import JobCard from '../jobs/JobCard'
 
 const COLUMN_STYLES = {
   wishlist: { label: 'Wishlist', headerBg: 'bg-orange-500', shadow: 'shadow-orange-500/20', border: 'border-orange-300' },
