@@ -8,12 +8,23 @@ const COLOR_MAP = {
 
 export default function SortOrderToggle({ label, currentSort, onSortChange, color = 'indigo' }) {
   const c = COLOR_MAP[color] || COLOR_MAP.indigo
-  const isActive = currentSort?.key === label.toLowerCase()
+  const key = label.toLowerCase()
+  const isActive = currentSort?.key === key
+
+  const handleToggle = () => {
+    if (isActive) {
+      onSortChange(key, currentSort.dir === 'asc' ? 'desc' : 'asc')
+    } else {
+      onSortChange(key, 'asc')
+    }
+  }
 
   return (
     <Popover
       trigger={
-        <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${
+        <button
+          onClick={handleToggle}
+          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer ${
           isActive
             ? `${c.active} border`
             : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
@@ -24,7 +35,7 @@ export default function SortOrderToggle({ label, currentSort, onSortChange, colo
           ) : (
             <ArrowUpAZ size={13} className="opacity-40" />
           )}
-        </div>
+        </button>
       }
     >
       <div className="space-y-1">
