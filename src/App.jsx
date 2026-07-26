@@ -2,18 +2,18 @@ import { useState, useCallback, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import useLocalStorage from './hooks/useLocalStorage'
 import logActivity from './utils/logActivity'
-import Sidebar from './components/Sidebar'
-import TopBar from './components/TopBar'
-import ControlsBar from './components/ControlsBar'
-import AnalyticsBar from './components/AnalyticsBar'
-import KanbanBoard from './components/KanbanBoard'
-import TableView from './components/TableView'
-import CalendarView from './components/CalendarView'
-import TimelineView from './components/TimelineView'
-import AnalyticsPage from './components/AnalyticsPage'
-import JobModal from './components/JobModal'
-import JobDetailDrawer from './components/JobDetailDrawer'
-import InterviewModal from './components/InterviewModal'
+import Sidebar from './components/layout/Sidebar'
+import TopBar from './components/layout/TopBar'
+import ControlsBar from './components/layout/ControlsBar'
+import AnalyticsBar from './components/analytics/AnalyticsBar'
+import KanbanBoard from './components/views/KanbanBoard'
+import TableView from './components/views/TableView'
+import CalendarView from './components/views/CalendarView'
+import TimelineView from './components/views/TimelineView'
+import AnalyticsPage from './components/analytics/AnalyticsPage'
+import JobModal from './components/jobs/JobModal'
+import JobDetailDrawer from './components/jobs/JobDetailDrawer'
+import InterviewModal from './components/jobs/InterviewModal'
 import { ComposeEmailCard } from './components/ui'
 import confetti from 'canvas-confetti'
 import { exportToJSON, importFromJSON } from './utils/dataExport'
@@ -182,7 +182,7 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar />
 
-        <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
           <div className="px-6 py-4">
             {activeView === 'board' || activeView === 'table' ? (
               <>
