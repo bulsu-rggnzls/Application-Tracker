@@ -28,6 +28,7 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onEdit, onDelete
   const domain = extractDomain(job.jobUrl)
   const currentIdx = STAGES.findIndex(s => s.id === job.status)
   const isRejected = job.status === 'rejected'
+  const isOffer = job.status === 'offer'
   const interviews = job.interviews || []
   const upcomingInterviews = interviews
     .filter(iv => new Date(iv.date) >= new Date())
@@ -147,7 +148,7 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onEdit, onDelete
                   </div>
                 </div>
 
-                {nextInterview && (
+                {!isOffer && nextInterview && (
                   <div className="mb-6">
                     <Heading size="xs" className="mb-3">Next Interview</Heading>
                     <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4">
@@ -184,7 +185,7 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onEdit, onDelete
                   </div>
                 )}
 
-                {interviews.length > 0 && !nextInterview && (
+                {!isOffer && interviews.length > 0 && !nextInterview && (
                   <div className="mb-6">
                     <Heading size="xs" className="mb-3">Interviews ({interviews.length})</Heading>
                     <div className="space-y-2.5">
