@@ -1,22 +1,30 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   X, Plus, Building2, Briefcase, MapPin, DollarSign,
-  CalendarDays, Link, User, Mail, ExternalLink, Hash
+  CalendarDays, Link, User, Mail, ExternalLink, Hash, Clock, Video
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import extractDomain from '../../utils/extractDomain'
 
-const TABS = [
-  { id: 0, label: 'Basic Info' },
-  { id: 1, label: 'Compensation & Details' },
-]
+const platforms = ['Zoom', 'Google Meet', 'Microsoft Teams', 'Skype', 'Phone', 'In-person']
+
+function getTabs(status) {
+  const tabs = [
+    { id: 0, label: 'Basic Info' },
+    { id: 1, label: 'Compensation & Details' },
+  ]
+  if (status === 'interviewing') {
+    tabs.push({ id: 2, label: 'Schedule Interview' })
+  }
+  return tabs
+}
 
 const employmentTypes = ['full-time', 'part-time', 'contract', 'internship']
 const currencies = [
+  { label: 'PHP ₱', value: 'PHP' },
   { label: 'USD $', value: 'USD' },
   { label: 'EUR €', value: 'EUR' },
   { label: 'GBP £', value: 'GBP' },
-  { label: 'PHP ₱', value: 'PHP' },
 ]
 const periods = [
   { label: '/yr', value: 'yearly' },
@@ -108,40 +116,65 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
   const [activeTab, setActiveTab] = useState(0)
   const [showRecruiter, setShowRecruiter] = useState(false)
   const [logoDomain, setLogoDomain] = useState('')
+  const initializedRef = useRef(false)
+  const [selectedStatus, setSelectedStatus] = useState('wishlist')
 
   const [form, setForm] = useState({
     company: '', role: '', employmentType: 'full-time', location: '',
-    salary: { min: '', max: '', currency: 'USD', period: 'yearly' },
+    salary: { min: '', max: '', currency: 'PHP', period: 'yearly' },
     status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
     recruiter: { name: '', email: '', linkedin: '' }, notes: '',
+    interview: { date: '', time: '', platform: 'Zoom', interviewer: '', notes: '' },
   })
 
+  const TABS = getTabs(selectedStatus)
+
   useEffect(() => {
-    if (!isOpen) return
+    if (activeTab >= TABS.length) {
+      setActiveTab(TABS.length - 1)
+    }
+  }, [TABS.length, activeTab])
+
+  useEffect(() => {
+    if (!isOpen) {
+      initializedRef.current = false
+      return
+    }
+    if (initializedRef.current) return
+    initializedRef.current = true
     setActiveTab(0)
     if (editingJob) {
       const raw = editingJob.salary
       const salary = typeof raw === 'object' && raw
-        ? { min: raw.min ? Number(raw.min) / 1000 : '', max: raw.max ? Number(raw.max) / 1000 : '', currency: raw.currency || 'USD', period: raw.period || 'yearly' }
-        : { min: '', max: '', currency: 'USD', period: 'yearly' }
+        ? { min: raw.min ? Number(raw.min) / 1000 : '', max: raw.max ? Number(raw.max) / 1000 : '', currency: raw.currency || 'PHP', period: raw.period || 'yearly' }
+        : { min: '', max: '', currency: 'PHP', period: 'yearly' }
+      const lastInterview = editingJob.interviews?.length > 0
+        ? editingJob.interviews[editingJob.interviews.length - 1]
+        : null
       setForm({
         company: editingJob.company || '', role: editingJob.role || '',
         employmentType: editingJob.employmentType || 'full-time', location: editingJob.location || '', salary,
         status: editingJob.status || 'wishlist', dateApplied: editingJob.dateApplied || new Date().toISOString().split('T')[0],
         jobUrl: editingJob.jobUrl || '', tags: editingJob.tags || [],
         recruiter: editingJob.recruiter || { name: '', email: '', linkedin: '' }, notes: editingJob.notes || '',
+        interview: lastInterview
+          ? { date: lastInterview.date?.split('T')[0] || '', time: lastInterview.time || '', platform: lastInterview.platform || 'Zoom', interviewer: lastInterview.interviewer || '', notes: lastInterview.notes || '' }
+          : { date: '', time: '', platform: 'Zoom', interviewer: '', notes: '' },
       })
       setShowRecruiter(!!editingJob.recruiter?.name)
-      setLogoDomain(extractDomain(editingJob.jobUrl) || editingJob.company.toLowerCase().replace(/\s+/g, '') + '.com')
+      setLogoDomain(extractDomain(editingJob.jobUrl) || '')
+      setSelectedStatus(editingJob.status || 'wishlist')
     } else {
       setForm({
         company: '', role: '', employmentType: 'full-time', location: '',
-        salary: { min: '', max: '', currency: 'USD', period: 'yearly' },
+        salary: { min: '', max: '', currency: 'PHP', period: 'yearly' },
         status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
         recruiter: { name: '', email: '', linkedin: '' }, notes: '',
+        interview: { date: '', time: '', platform: 'Zoom', interviewer: '', notes: '' },
       })
       setShowRecruiter(false)
       setLogoDomain('')
+      setSelectedStatus('wishlist')
     }
   }, [editingJob, isOpen])
 
@@ -150,13 +183,11 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
   const update = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }))
   const updateSalary = (sub) => (e) => setForm(prev => ({ ...prev, salary: { ...prev.salary, [sub]: e.target.value } }))
   const updateRecruiter = (sub) => (e) => setForm(prev => ({ ...prev, recruiter: { ...prev.recruiter, [sub]: e.target.value } }))
+  const updateInterview = (sub) => (e) => setForm(prev => ({ ...prev, interview: { ...prev.interview, [sub]: e.target.value } }))
 
   const handleCompanyChange = (e) => {
     const val = e.target.value
     setForm(prev => ({ ...prev, company: val }))
-    if (val && !form.jobUrl) {
-      setLogoDomain(val.toLowerCase().replace(/\s+/g, '') + '.com')
-    }
   }
 
   const handleJobUrlChange = (e) => {
@@ -171,17 +202,27 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (activeTab < TABS.length - 1) {
+      setActiveTab(prev => prev + 1)
+      return
+    }
+
     if (!form.company || !form.role) return
+    const existingInterviews = editingJob?.interviews || []
+    const newInterview = form.interview.date && form.interview.time
+      ? { id: uuidv4(), stageName: 'Interview', date: form.interview.date, time: form.interview.time, platform: form.interview.platform, interviewer: form.interview.interviewer, notes: form.interview.notes }
+      : null
     const job = {
       id: editingJob?.id || uuidv4(),
       company: form.company, role: form.role, employmentType: form.employmentType, location: form.location,
       salary: form.salary.min || form.salary.max
         ? { min: form.salary.min ? Number(form.salary.min) * 1000 : '', max: form.salary.max ? Number(form.salary.max) * 1000 : '', currency: form.salary.currency, period: form.salary.period }
         : '',
-      status: form.status, dateApplied: form.dateApplied || '', tags: form.tags, jobUrl: form.jobUrl,
+      status: selectedStatus, dateApplied: form.dateApplied || '', tags: form.tags, jobUrl: form.jobUrl,
       recruiter: form.recruiter.name ? { ...form.recruiter } : undefined,
       notes: form.notes,
-      interviews: editingJob?.interviews || [],
+      interviews: newInterview ? [...existingInterviews, newInterview] : existingInterviews,
       activityLog: editingJob?.activityLog || [],
     }
     onSave(job)
@@ -220,9 +261,13 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
           <div className="flex bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-6 py-3">
             {TABS.map((tab, i) => (
               <div key={tab.id} className="flex items-center flex-1">
-                <div className={`flex items-center gap-2 text-xs font-medium ${
-                  activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
-                }`}>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 text-xs font-medium transition-colors cursor-pointer ${
+                    activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  }`}
+                >
                   <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
                     activeTab === tab.id
                       ? 'bg-indigo-600 text-white'
@@ -233,7 +278,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                     {activeTab > tab.id ? '✓' : i + 1}
                   </span>
                   <span className="hidden sm:inline">{tab.label}</span>
-                </div>
+                </button>
                 {i < TABS.length - 1 && (
                   <div className={`flex-1 h-px mx-3 ${
                     activeTab > tab.id ? 'bg-indigo-400' : 'bg-slate-200 dark:bg-slate-700'
@@ -245,7 +290,10 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
         </div>
 
         {/* ---------- BODY ---------- */}
-        <form id="job-form" onSubmit={handleSubmit} className="overflow-y-auto px-6 py-5 h-[340px]">
+        <form id="job-form" onSubmit={handleSubmit} onKeyDown={e => { if (e.key === 'Enter' && activeTab < TABS.length - 1) e.preventDefault() }} className="flex flex-col flex-1 overflow-hidden">
+
+          {/* Step content */}
+          <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
 
           {/* Step 1 – Basic Info */}
           {activeTab === 0 && (
@@ -300,14 +348,17 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => setForm(prev => ({ ...prev, status: s.id }))}
+                      onClick={() => {
+                        setSelectedStatus(s.id)
+                        setForm(prev => ({ ...prev, status: s.id }))
+                      }}
                       className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border-2 text-xs font-semibold transition-all duration-200 cursor-pointer ${
-                        form.status === s.id
+                        selectedStatus === s.id
                           ? `${s.bg} ${s.text} ${s.border} ring-2 ${s.ring} scale-105`
                           : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
-                      <span className={`w-2 h-2 rounded-full ${form.status === s.id ? s.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-600'}`} />
+                      <span className={`w-2 h-2 rounded-full ${selectedStatus === s.id ? s.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-600'}`} />
                       {s.label}
                     </button>
                   ))}
@@ -371,36 +422,77 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               </div>
             </div>
           )}
-        </form>
 
-        {/* ---------- FOOTER ---------- */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-2xl">
-          <p className="text-xs text-slate-400 dark:text-slate-500">Step {activeTab + 1} of 2</p>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
-              Cancel
-            </button>
-            {activeTab > 0 && (
-              <button type="button" onClick={() => setActiveTab(activeTab - 1)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                Back
-              </button>
-            )}
-            {activeTab < 1 ? (
-              <button type="button" onClick={() => setActiveTab(activeTab + 1)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20 rounded-lg active:scale-[0.98] transition-all duration-200 cursor-pointer">
-                Next
-              </button>
-            ) : (
-              <button
-                type="submit"
-                form="job-form"
-                disabled={!form.company || !form.role}
-                className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer rounded-lg"
-              >
-                {editingJob ? 'Save Changes' : 'Add Application'}
-              </button>
-            )}
+          {/* Step 3 – Schedule Interview (only for interviewing status) */}
+          {activeTab === 2 && selectedStatus === 'interviewing' && form.interview && (
+            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                    <CalendarDays size={13} /> Interview Date
+                  </label>
+                  <input type="date" value={form.interview.date} onChange={updateInterview('date')} className={inputCls(false)} />
+                </div>
+                <div>
+                  <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                    <Clock size={13} /> Interview Time
+                  </label>
+                  <input type="time" value={form.interview.time} onChange={updateInterview('time')} className={inputCls(false)} />
+                </div>
+              </div>
+              <div>
+                <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                  <Video size={13} /> Platform
+                </label>
+                <input type="text" value={form.interview.platform} onChange={updateInterview('platform')} list="job-modal-platform-list" placeholder="Zoom, Google Meet, etc." className={inputCls(false)} />
+                <datalist id="job-modal-platform-list">
+                  {platforms.map(p => <option key={p} value={p} />)}
+                </datalist>
+              </div>
+              <div>
+                <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                  <User size={13} /> Interviewer
+                </label>
+                <input type="text" value={form.interview.interviewer} onChange={updateInterview('interviewer')} placeholder="e.g. Sarah Chen" className={inputCls(false)} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Interview Notes</label>
+                <textarea rows={2} value={form.interview.notes} onChange={updateInterview('notes')} placeholder="Preparation notes, topics to cover..." className={`${inputCls(false)} resize-none`} />
+              </div>
+            </div>
+          )}
+
           </div>
-        </div>
+
+          {/* ---------- FOOTER ---------- */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-2xl">
+            <p className="text-xs text-slate-400 dark:text-slate-500">Step {activeTab + 1} of {TABS.length}</p>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                Cancel
+              </button>
+              {activeTab > 0 && (
+                <button type="button" onClick={() => setActiveTab(prev => prev - 1)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                  Back
+                </button>
+              )}
+              {activeTab < TABS.length - 1 ? (
+                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab(prev => prev + 1) }} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20 rounded-lg active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                  Next
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  onClick={handleSubmit}
+                  disabled={!form.company || !form.role}
+                  className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer rounded-lg"
+                >
+                  {editingJob ? 'Save Changes' : 'Add Application'}
+                </button>
+              )}
+            </div>
+          </div>
+        </form>
 
       </div>
     </div>

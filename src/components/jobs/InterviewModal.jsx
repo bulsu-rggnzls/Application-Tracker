@@ -59,9 +59,10 @@ export default function InterviewModal({ isOpen, onClose, onConfirm, job }) {
             <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
               <Video size={13} /> Platform
             </label>
-            <select value={platform} onChange={e => setPlatform(e.target.value)} className="input-base">
-              {platforms.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+            <input type="text" value={platform} onChange={e => setPlatform(e.target.value)} list="platform-list" placeholder="Zoom, Google Meet, etc." className="input-base" />
+            <datalist id="platform-list">
+              {platforms.map(p => <option key={p} value={p} />)}
+            </datalist>
           </div>
           <div>
             <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">

@@ -1,8 +1,5 @@
 import { useState, useMemo } from 'react'
-import {
-  BarChart2,
-  Download, Filter
-} from 'lucide-react'
+import { BarChart2, Sparkles, Rocket, Target, TrendingUp, Award, Clock, Briefcase } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart as RechartsPieChart, Pie, Cell,
@@ -55,6 +52,80 @@ const ChartCard = ({ title, children, action }) => (
   </div>
 )
 
+function WarmUpState({ stats, applications }) {
+  return (
+    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/40 rounded-xl border border-indigo-200 dark:border-indigo-800 p-6 text-center">
+      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 mb-3">
+        <Rocket className="text-indigo-600 dark:text-indigo-400" size={22} />
+      </div>
+      <h2 className="text-base font-bold text-slate-900 dark:text-white mb-1">You're just getting started!</h2>
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 max-w-md mx-auto">
+        Add a few more applications to unlock full analytics.
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-w-2xl mx-auto">
+        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+          <Briefcase size={14} className="text-indigo-500 mb-0.5" />
+          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.total}</p>
+          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Applications</p>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+          <TrendingUp size={14} className="text-emerald-500 mb-0.5" />
+          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.responseRate}%</p>
+          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Response Rate</p>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+          <Target size={14} className="text-purple-500 mb-0.5" />
+          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.totalInterviews}</p>
+          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Interviews</p>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+          <Award size={14} className="text-amber-500 mb-0.5" />
+          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.offers}</p>
+          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Offers</p>
+        </div>
+      </div>
+      <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+        <Sparkles size={12} />
+        <span>Drag cards on the Kanban board to track progress</span>
+      </div>
+    </div>
+  )
+}
+
+function FunnelBar({ funnel }) {
+  const colors = ['#6366f1', '#3b82f6', '#8b5cf6', '#10b981']
+  const total = funnel[0]?.count || 1
+  return (
+    <div className="space-y-4">
+      <div className="flex h-10 rounded-lg overflow-hidden bg-slate-100">
+        {funnel.map((f, i) => {
+          const width = (f.count / total) * 100
+          return (
+            <div
+              key={f.stage}
+              style={{ width: `${width}%`, backgroundColor: width > 0 ? colors[i] : 'transparent' }}
+              className="h-full flex items-center justify-center text-[11px] font-semibold text-white transition-all duration-500 first:rounded-l-lg last:rounded-r-lg"
+            >
+              {width > 0 && f.count}
+            </div>
+          )
+        })}
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {funnel.map((f, i) => (
+          <div key={f.stage} className="text-center">
+            <div className="inline-flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[i] }} />
+              <p className="text-xs font-semibold text-slate-700">{f.stage}</p>
+            </div>
+            <p className="text-[11px] text-slate-400">{f.count} ({f.pct}%)</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function AnalyticsPage({ applications }) {
   const [timeRange, setTimeRange] = useState('all')
 
@@ -76,7 +147,6 @@ export default function AnalyticsPage({ applications }) {
     const offerRate = applied > 0 ? Math.round((offers / applied) * 100) : 0
     const avgTimeToOffer = calculateAvgTimeToOffer(filteredApps)
     const totalInterviews = filteredApps.reduce((sum, a) => sum + (a.interviews?.length || 0), 0)
-
     return { total, applied, interviewing, offers, rejected, responseRate, offerRate, avgTimeToOffer, totalInterviews }
   }, [filteredApps])
 
@@ -178,31 +248,45 @@ export default function AnalyticsPage({ applications }) {
     return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({ day, count: days[i] }))
   }, [filteredApps])
 
+  const maxMonthlyCount = Math.max(...monthlyData.map(d => d.count), 1)
+  const yAxisDomain = maxMonthlyCount <= 3 ? [0, 5] : [0, 'auto']
+  const yAxisTicks = maxMonthlyCount <= 3 ? [0, 1, 2, 3, 4, 5] : undefined
+
+  const maxInterviewCount = Math.max(...interviewsByMonth.map(d => d.count), 1)
+  const yAxisDomainInterviews = maxInterviewCount <= 3 ? [0, 5] : [0, 'auto']
+  const yAxisTicksInterviews = maxInterviewCount <= 3 ? [0, 1, 2, 3, 4, 5] : undefined
+
+  const maxWeekdayCount = Math.max(...activityByWeekday.map(d => d.count), 1)
+  const yAxisDomainWeekday = maxWeekdayCount <= 3 ? [0, 5] : [0, 'auto']
+  const yAxisTicksWeekday = maxWeekdayCount <= 3 ? [0, 1, 2, 3, 4, 5] : undefined
+
   if (filteredApps.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-slate-50">
+      <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900">
         <div className="text-center p-12">
-          <BarChart2 size={64} className="mx-auto text-slate-300 mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 mb-2">No data yet</h3>
-          <p className="text-slate-500">Add some applications to see analytics</p>
+          <BarChart2 size={64} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No data yet</h3>
+          <p className="text-slate-500 dark:text-slate-400">Add some applications to see analytics</p>
         </div>
       </div>
     )
   }
 
+  const isWarmUp = filteredApps.length < 5
+
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 p-6">
+    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Analytics</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Track your job search performance</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Analytics</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Track your job search performance</p>
           </div>
           <div className="flex items-center gap-3">
             <select
               value={timeRange}
               onChange={e => setTimeRange(e.target.value)}
-              className="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer"
+              className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer"
             >
               <option value="all">All Time</option>
               <option value="1m">Last Month</option>
@@ -210,78 +294,77 @@ export default function AnalyticsPage({ applications }) {
               <option value="6m">Last 6 Months</option>
               <option value="12m">Last 12 Months</option>
             </select>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
-              <Download size={16} /> Export
-            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard
-            label="Total Applications"
-            value={stats.total}
-            sub={`${stats.applied} actively applied`}
-            variant="total"
-          />
-          <StatCard
-            label="Response Rate"
-            value={`${stats.responseRate}%`}
-            sub={`${prevStats ? `prev ${timeRange === 'all' ? 'period' : timeRange}: ${prevStats.responseRate}%` : 'No prior data'}`}
-            variant="response"
-          />
-          <StatCard
-            label="Offer Rate"
-            value={`${stats.offerRate}%`}
-            sub={`${stats.offers} offers from ${stats.applied} applications`}
-            variant="offer"
-          />
-          <StatCard
-            label="Avg. Time to Offer"
-            value={stats.avgTimeToOffer ? `${stats.avgTimeToOffer}d` : 'N/A'}
-            sub="From application to offer"
-            variant="time"
-          />
-        </div>
+        {isWarmUp && (
+          <WarmUpState stats={stats} applications={filteredApps} />
+        )}
+
+        {!isWarmUp && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard label="Total Applications" value={stats.total} sub={`${stats.applied} actively applied`} variant="total" />
+            <StatCard label="Response Rate" value={`${stats.responseRate}%`} sub={`${prevStats ? `prev ${timeRange === 'all' ? 'period' : timeRange}: ${prevStats.responseRate}%` : 'No prior data'}`} variant="response" />
+            <StatCard label="Offer Rate" value={`${stats.offerRate}%`} sub={`${stats.offers} offers from ${stats.applied} applications`} variant="offer" />
+            <StatCard label="Avg. Time to Offer" value={stats.avgTimeToOffer ? `${stats.avgTimeToOffer}d` : 'N/A'} sub="From application to offer" variant="time" />
+          </div>
+        )}
+
+        {!isWarmUp && (
+          <ChartCard title="Pipeline Funnel">
+            <FunnelBar funnel={conversionFunnel} />
+          </ChartCard>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <ChartCard title="Application Status">
-            <ResponsiveContainer width="100%" height={280}>
-              <RechartsPieChart>
-                <Pie
-                  data={statusData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  innerRadius={50}
-                  label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
-                  labelLine={false}
-                >
-                  {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Pie>
-                <Tooltip formatter={v => [v, 'applications']} />
-              </RechartsPieChart>
-            </ResponsiveContainer>
+            {statusData.length > 0 ? (
+              <div className="overflow-visible">
+                <ResponsiveContainer width="100%" height={280}>
+                  <RechartsPieChart>
+                    <Pie
+                      data={statusData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={45}
+                      label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                      labelLine={true}
+                    >
+                      {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                    </Pie>
+                    <Tooltip formatter={v => [v, 'applications']} />
+                  </RechartsPieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[280px] flex items-center justify-center text-slate-400 text-sm">No data</div>
+            )}
           </ChartCard>
 
           <ChartCard title="Pipeline Funnel">
-            <div className="space-y-3">
-              {conversionFunnel.map((f, i) => (
-                <div key={f.stage} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-700">{f.stage}</span>
-                    <span className="text-slate-500">{f.count} <span className="font-normal">({f.pct}%)</span></span>
+            {isWarmUp ? (
+              <FunnelBar funnel={conversionFunnel} />
+            ) : (
+              <div className="space-y-3">
+                {conversionFunnel.map((f, i) => (
+                  <div key={f.stage} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{f.stage}</span>
+                      <span className="text-slate-500 dark:text-slate-400">{f.count} <span className="font-normal">({f.pct}%)</span></span>
+                    </div>
+                    <div className="h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${f.pct}%`, backgroundColor: i === 0 ? '#6366f1' : STATUS_COLORS[Object.keys(STATUS_LABELS).find(k => STATUS_LABELS[k] === f.stage)?.toLowerCase()] || '#6366f1' }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${f.pct}%`, backgroundColor: i === 0 ? '#6366f1' : STATUS_COLORS[Object.keys(STATUS_LABELS).find(k => STATUS_LABELS[k] === f.stage)?.toLowerCase()] || '#6366f1' }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </ChartCard>
 
           <ChartCard title="Applications Over Time">
@@ -293,8 +376,8 @@ export default function AnalyticsPage({ applications }) {
                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#e2e8f0" tickLine={false} axisLine={false} allowDecimals={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
+                <YAxis domain={yAxisDomain} ticks={yAxisTicks} tick={{ fontSize: 11, fill: '#64748b' }} stroke="#e2e8f0" tickLine={false} axisLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} formatter={v => [v, 'applications']} />
                 <Area type="monotone" dataKey="count" fill="url(#colorApplications)" stroke="#6366f1" strokeWidth={2} />
               </AreaChart>
@@ -303,11 +386,11 @@ export default function AnalyticsPage({ applications }) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <ChartCard title="Interviews Scheduled" action={<Filter size={13} className="text-slate-400 hover:text-slate-600" />}>
+          <ChartCard title="Interviews Scheduled">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={interviewsByMonth.length > 0 ? interviewsByMonth : [{ name: 'No data', count: 0 }]}>
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
+                <YAxis domain={yAxisDomainInterviews} ticks={yAxisTicksInterviews} allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} formatter={v => [v, 'interviews']} />
                 <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarWidth={40} />
               </BarChart>
@@ -315,29 +398,35 @@ export default function AnalyticsPage({ applications }) {
           </ChartCard>
 
           <ChartCard title="Top Technologies & Tags">
-            <div className="space-y-3">
-              {topTags.length > 0 ? (
-                topTags.map((t, i) => (
-                  <div key={t.tag} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-slate-700 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded bg-slate-100 text-slate-600 text-xs flex items-center justify-center font-mono">{i + 1}</span>
-                        {t.tag}
-                      </span>
-                      <span className="text-slate-500">{t.count} applications</span>
-                    </div>
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${(t.count / topTags[0].count) * 100}%`, backgroundColor: STATUS_COLORS[Object.keys(STATUS_COLORS)[i % Object.keys(STATUS_COLORS).length]] }}
-                      />
+            {topTags.length > 0 ? (
+              <div className="space-y-2">
+                {topTags.map((t, i) => (
+                  <div key={t.tag} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <span className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-xs flex items-center justify-center font-mono font-semibold shrink-0">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{t.tag}</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 ml-2 shrink-0">{t.count} app{t.count !== 1 ? 's' : ''}</span>
+                      </div>
+                      <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${(t.count / topTags[0].count) * 100}%`, backgroundColor: STATUS_COLORS[Object.keys(STATUS_COLORS)[i % Object.keys(STATUS_COLORS).length]] }}
+                        />
+                      </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-slate-500 text-center py-8">No tags yet</p>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-3">
+                  <BarChart2 size={24} className="text-slate-400 dark:text-slate-500" />
+                </div>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No technologies tracked yet</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Add tags to your applications to see them here</p>
+              </div>
+            )}
           </ChartCard>
         </div>
 
@@ -345,8 +434,8 @@ export default function AnalyticsPage({ applications }) {
           <ChartCard title="Activity by Day of Week">
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={activityByWeekday}>
-                <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#64748b' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
+                <YAxis domain={yAxisDomainWeekday} ticks={yAxisTicksWeekday} allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} stroke="#e2e8f0" tickLine={false} axisLine={false} />
                 <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} formatter={v => [v, 'applications']} />
                 <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarWidth={30} />
               </BarChart>
@@ -356,30 +445,30 @@ export default function AnalyticsPage({ applications }) {
           <ChartCard title="Conversion Rates">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-2">Application → Interview</p>
-                  <p className="text-3xl font-bold text-indigo-600">{stats.applied > 0 ? Math.round((stats.interviewing / stats.applied) * 100) : 0}%</p>
-                  <p className="text-xs text-slate-400 mt-1">{stats.interviewing} of {stats.applied} applications</p>
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Application → Interview</p>
+                  <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{stats.applied > 0 ? Math.round((stats.interviewing / stats.applied) * 100) : 0}%</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{stats.interviewing} of {stats.applied} applications</p>
                 </div>
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-2">Interview → Offer</p>
-                  <p className="text-3xl font-bold text-emerald-600">{stats.interviewing > 0 ? Math.round((stats.offers / stats.interviewing) * 100) : 0}%</p>
-                  <p className="text-xs text-slate-400 mt-1">{stats.offers} of {stats.interviewing} interviews</p>
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Interview → Offer</p>
+                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.interviewing > 0 ? Math.round((stats.offers / stats.interviewing) * 100) : 0}%</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{stats.offers} of {stats.interviewing} interviews</p>
                 </div>
               </div>
-              <div className="bg-slate-50 rounded-xl p-4">
-                <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-3">Pipeline Health</p>
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Pipeline Health</p>
                 <div className="space-y-3">
                   {pipelineData.map((p) => (
                     <div key={p.stage}>
                       <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="font-medium text-slate-700 flex items-center gap-2">
+                        <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
                           {p.stage}
                         </span>
-                        <span className="text-slate-500">{p.count}</span>
+                        <span className="text-slate-500 dark:text-slate-400">{p.count}</span>
                       </div>
-                      <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full"
                           style={{
