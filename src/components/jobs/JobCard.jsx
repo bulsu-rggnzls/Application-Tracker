@@ -5,6 +5,7 @@ import { getTagStyle } from '../../utils/tagColors'
 import CompanyLogo from './CompanyLogo'
 import getRelativeTime from '../../utils/getRelativeTime'
 import extractDomain from '../../utils/extractDomain'
+import formatTime from '../../utils/formatTime'
 import formatSalary from '../../utils/formatSalary'
 
 export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, onRejectOffer, onSelect, provided, snapshot, statusBorder }) {
@@ -15,7 +16,12 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
     ? [...interviews].sort((a, b) => new Date(a.date) - new Date(b.date)).find(iv => new Date(iv.date) >= new Date())
     : null
 
+  const latestInterview = interviews?.length > 0
+    ? [...interviews].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+    : null
+
   const isOffer = status === 'offer'
+  const isInterviewing = status === 'interviewing'
   const borderClass = statusBorder || 'border-slate-200 dark:border-slate-700'
 
   return (
@@ -32,45 +38,44 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
       whileHover={snapshot.isDragging ? undefined : { scale: 1.02, y: -2 }}
       transition={{ type: 'spring', stiffness: 300, damping: 15 }}
     >
-      <div className="p-3.5">
-        <div className="flex items-start gap-3 mb-2.5">
+      <div className="p-2">
+        <div className="flex items-start gap-1.5 mb-1">
           <CompanyLogo domain={domain} company={company} />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-slate-900 dark:text-white text-sm leading-tight truncate">{company}</p>
-            <Text variant="subtle" className="truncate">{role}</Text>
+            <p className="font-semibold text-slate-900 dark:text-white text-[11px] leading-tight truncate">{company}</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{role}</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5 mb-2.5">
+        <div className="flex flex-wrap gap-0.5 mb-1">
           {location && (
-            <Badge variant="meta"><MapPin size={10} /> {location}</Badge>
+            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><MapPin size={8} /> {location}</Badge>
           )}
           {employmentType && (
-            <Badge variant="meta"><Briefcase size={10} /> {employmentType === 'full-time' ? 'Full-time' : employmentType === 'contract' ? 'Contract' : 'Part-time'}</Badge>
+            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><Briefcase size={8} /> {employmentType === 'full-time' ? 'Full-time' : employmentType === 'contract' ? 'Contract' : 'Part-time'}</Badge>
           )}
           {salary && (
-            <Badge variant="meta"><DollarSign size={10} /> {formatSalary(salary)}</Badge>
+            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><DollarSign size={8} /> {formatSalary(salary)}</Badge>
           )}
           {dateApplied && (
-            <Badge variant="meta"><Clock size={10} /> {getRelativeTime(dateApplied)}</Badge>
+            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><Clock size={8} /> {getRelativeTime(dateApplied)}</Badge>
           )}
         </div>
 
-        {nextInterview && (
-          <div className="mb-2.5 px-2.5 py-1.5 bg-purple-50/70 dark:bg-purple-900/15 border border-purple-100/60 dark:border-purple-800/50 rounded-lg">
-            <Text variant="subtle-sm" className="!text-purple-700 dark:!text-purple-300 !font-medium">
-              {new Date(nextInterview.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {nextInterview.time}
-            </Text>
-            <Text variant="muted-sm" className="!text-purple-500 dark:!text-purple-400">{nextInterview.interviewer ? `with ${nextInterview.interviewer}` : ''}{nextInterview.platform ? ` · ${nextInterview.platform}` : ''}</Text>
+        {isInterviewing && latestInterview && (
+          <div className="mb-1 px-1.5 py-0.5 bg-purple-50/70 dark:bg-purple-900/15 border border-purple-100/60 dark:border-purple-800/50 rounded">
+            <span className="text-[10px] font-medium text-purple-700 dark:text-purple-300">
+              {new Date(latestInterview.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} {formatTime(latestInterview.time)}
+            </span>
           </div>
         )}
 
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-0.5">
             {tags.map(tag => {
               const s = getTagStyle(tag)
               return (
-                <span key={tag} className={`text-xs font-medium ${s.bg} ${s.text} ${s.darkBg} ${s.darkText} px-2 py-0.5 rounded-md`}>{tag}</span>
+                <span key={tag} className={`text-[9px] font-medium ${s.bg} ${s.text} ${s.darkBg} ${s.darkText} px-1 py-px rounded`}>{tag}</span>
               )
             })}
           </div>
@@ -78,23 +83,23 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
       </div>
 
       <Divider />
-      <div className="px-3.5 py-2 flex items-center justify-between">
+      <div className="px-2 py-1 flex items-center justify-between">
         {isOffer ? (
-          <div className="flex items-center gap-2 w-full">
-            <Button variant="accept" onClick={(e) => { e.stopPropagation(); onAcceptOffer(id) }}><Check size={12} /> Accept</Button>
-            <Button variant="reject" onClick={(e) => { e.stopPropagation(); onRejectOffer(id) }}><X size={12} /> Reject</Button>
+          <div className="flex items-center gap-1 w-full">
+            <Button variant="accept" className="!text-[10px] !px-2 !py-1" onClick={(e) => { e.stopPropagation(); onAcceptOffer(id) }}><Check size={10} /> Accept</Button>
+            <Button variant="reject" className="!text-[10px] !px-2 !py-1" onClick={(e) => { e.stopPropagation(); onRejectOffer(id) }}><X size={10} /> Reject</Button>
           </div>
         ) : (
           <div className="flex items-center justify-between w-full">
-            <Text variant="muted">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</Text>
+            <span className="text-[10px] text-slate-400">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</span>
             <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {jobUrl && (
-                <a href={jobUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
-                  <ExternalLink size={12} />
+                <a href={jobUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                  <ExternalLink size={10} />
                 </a>
               )}
-              <IconButton color="slate" onClick={(e) => { e.stopPropagation(); onEdit(application) }}><Edit3 size={12} /></IconButton>
-              <IconButton color="rose" onClick={(e) => { e.stopPropagation(); onDelete(id) }}><Trash2 size={12} /></IconButton>
+              <IconButton color="slate" className="!p-1" onClick={(e) => { e.stopPropagation(); onEdit(application) }}><Edit3 size={10} /></IconButton>
+              <IconButton color="rose" className="!p-1" onClick={(e) => { e.stopPropagation(); onDelete(id) }}><Trash2 size={10} /></IconButton>
             </div>
           </div>
         )}
