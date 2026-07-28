@@ -182,7 +182,7 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar />
 
-          <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
+          <div className="flex-1 overflow-y-auto min-h-0" style={{ scrollbarGutter: 'stable' }}>
           <div className="px-6 py-4">
             {activeView === 'board' || activeView === 'table' ? (
               <>
