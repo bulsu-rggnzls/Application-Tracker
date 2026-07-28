@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import formatTime from '../../utils/formatTime'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -149,13 +150,17 @@ export default function CalendarView({ applications, onSelect }) {
                   </span>
                   <div className="flex flex-col gap-0.5 min-h-0 overflow-hidden">
                     {eventsForDay.slice(0, 3).map((ev, ei) => (
-                      <div
-                        key={ev.id || ei}
-                        className={`px-1.5 py-0.5 rounded-[4px] text-[11px] font-medium flex items-center justify-between gap-1 leading-tight ${categoryStyles[ev.type] || categoryStyles.general}`}
+<div
+                          key={ev.id || ei}
+                          className={`px-1.5 py-0.5 rounded-[4px] text-[11px] font-medium flex items-center justify-between gap-1 leading-tight ${
+                            new Date(ev.date) < new Date(today.getFullYear(), today.getMonth(), today.getDate())
+                              ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                              : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                          }`}
                       >
                         <span className="truncate min-w-0">{ev.company}</span>
                         {ev.time && (
-                          <span className="shrink-0 text-[9px] opacity-75 font-semibold">{ev.time}</span>
+                          <span className="shrink-0 text-[9px] opacity-75 font-semibold">{formatTime(ev.time)}</span>
                         )}
                       </div>
                     ))}
