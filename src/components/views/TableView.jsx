@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Trash2, Edit3, ExternalLink } from 'lucide-react'
-import { Table, Thead, Th, Tbody, Tr, Td, Badge, IconButton, EmptyState } from '../ui'
+import { Table, Thead, Th, Tbody, Tr, Td, Badge, IconButton } from '../ui'
 import CompanyLogo from '../jobs/CompanyLogo'
 import extractDomain from '../../utils/extractDomain'
 import getRelativeTime from '../../utils/getRelativeTime'
@@ -227,7 +227,15 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
           )
         })}
       </Tbody>
-      {filtered.length === 0 && <EmptyState message="No applications match your filters" />}
+      {filtered.length === 0 && (
+        <tbody>
+          <tr>
+            <td colSpan={7} className="text-center py-16 text-slate-400 dark:text-slate-500 text-sm">
+              No applications match your filters
+            </td>
+          </tr>
+        </tbody>
+      )}
     </Table>
   )
 }
