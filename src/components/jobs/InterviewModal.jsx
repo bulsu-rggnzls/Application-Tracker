@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import { X, Calendar, Clock, User, Video } from 'lucide-react'
 
-const platforms = ['Zoom', 'Google Meet', 'Microsoft Teams', 'Skype', 'Phone', 'In-person']
-
 export default function InterviewModal({ isOpen, onClose, onConfirm, job }) {
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
-  const [platform, setPlatform] = useState('Zoom')
+  const [platform, setPlatform] = useState('')
   const [interviewer, setInterviewer] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -14,7 +12,7 @@ export default function InterviewModal({ isOpen, onClose, onConfirm, job }) {
     if (isOpen) {
       setDate('')
       setTime('')
-      setPlatform('Zoom')
+      setPlatform('')
       setInterviewer('')
       setNotes('')
     }
@@ -59,10 +57,7 @@ export default function InterviewModal({ isOpen, onClose, onConfirm, job }) {
             <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
               <Video size={13} /> Platform
             </label>
-            <input type="text" value={platform} onChange={e => setPlatform(e.target.value)} list="platform-list" placeholder="Zoom, Google Meet, etc." className="input-base" />
-            <datalist id="platform-list">
-              {platforms.map(p => <option key={p} value={p} />)}
-            </datalist>
+            <input type="text" value={platform} onChange={e => setPlatform(e.target.value)} placeholder="Zoom, Google Meet, etc." className="input-base" />
           </div>
           <div>
             <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
