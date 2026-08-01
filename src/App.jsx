@@ -180,15 +180,13 @@ export default function App() {
       <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar />
+          <TopBar search={search} onSearchChange={setSearch} applications={applications} />
 
           <div className="flex-1 overflow-y-auto min-h-0" style={{ scrollbarGutter: 'stable' }}>
           <div className="px-6 py-4">
             {activeView === 'board' || activeView === 'table' ? (
-              <>
+              <div className="max-w-[104rem] mx-auto">
                 <ControlsBar
-                  search={search}
-                  onSearchChange={setSearch}
                   onAdd={openAdd}
                   onExport={handleExport}
                   onImport={handleImport}
@@ -217,13 +215,19 @@ export default function App() {
                     onSelect={setDetailJob}
                   />
                 )}
-              </>
+              </div>
             ) : activeView === 'calendar' ? (
-              <CalendarView applications={applications} onSelect={setDetailJob} />
+              <div className="max-w-[96rem] mx-auto h-[calc(100vh-88px)]">
+                <CalendarView applications={applications} onSelect={setDetailJob} />
+              </div>
             ) : activeView === 'timeline' ? (
-              <TimelineView applications={applications} onSelect={setDetailJob} />
+              <div className="max-w-[96rem] mx-auto">
+                <TimelineView applications={applications} onSelect={setDetailJob} />
+              </div>
             ) : activeView === 'analytics' ? (
-              <AnalyticsPage applications={applications} />
+              <div className="max-w-[96rem] mx-auto">
+                <AnalyticsPage applications={applications} />
+              </div>
             ) : null}
           </div>
         </div>
