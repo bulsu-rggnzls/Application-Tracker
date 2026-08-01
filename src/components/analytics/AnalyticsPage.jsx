@@ -5,6 +5,7 @@ import {
   PieChart as RechartsPieChart, Pie, Cell,
   AreaChart, Area,
 } from 'recharts'
+import { StatCard } from '../ui'
 
 const STATUS_COLORS = {
   wishlist: '#f59e0b',
@@ -23,24 +24,6 @@ const STATUS_LABELS = {
 }
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-const CARD_STYLES = {
-  total: { from: 'from-indigo-50', to: 'to-purple-50', border: 'border-indigo-200', darkFrom: 'dark:from-indigo-950/60', darkTo: 'dark:to-purple-950/60', darkBorder: 'dark:border-indigo-700' },
-  response: { from: 'from-cyan-50', to: 'to-emerald-50', border: 'border-emerald-200', darkFrom: 'dark:from-cyan-950/60', darkTo: 'dark:to-emerald-950/60', darkBorder: 'dark:border-emerald-700' },
-  offer: { from: 'from-yellow-50', to: 'to-amber-50', border: 'border-amber-300', darkFrom: 'dark:from-yellow-950/60', darkTo: 'dark:to-amber-950/60', darkBorder: 'dark:border-amber-600' },
-  time: { from: 'from-amber-50', to: 'to-orange-50', border: 'border-orange-200', darkFrom: 'dark:from-amber-950/60', darkTo: 'dark:to-orange-950/60', darkBorder: 'dark:border-orange-700' },
-}
-
-const StatCard = ({ label, value, sub, variant }) => {
-  const s = CARD_STYLES[variant] || CARD_STYLES.total
-  return (
-    <div className={`relative overflow-hidden rounded-lg p-4 shadow-sm border ${s.border} ${s.darkBorder} bg-gradient-to-br ${s.from} ${s.to} ${s.darkFrom} ${s.darkTo} hover:-translate-y-1 hover:shadow-lg transition-all duration-300`}>
-      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="text-xl font-bold text-slate-900 dark:text-white mt-0.5">{value}</p>
-      {sub && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{sub}</p>}
-    </div>
-  )
-}
 
 const ChartCard = ({ title, children, action }) => (
   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -276,7 +259,7 @@ export default function AnalyticsPage({ applications }) {
 
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-[96rem] mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Analytics</h1>
@@ -303,10 +286,10 @@ export default function AnalyticsPage({ applications }) {
 
         {!isWarmUp && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatCard label="Total Applications" value={stats.total} sub={`${stats.applied} actively applied`} variant="total" />
-            <StatCard label="Response Rate" value={`${stats.responseRate}%`} sub={`${prevStats ? `prev ${timeRange === 'all' ? 'period' : timeRange}: ${prevStats.responseRate}%` : 'No prior data'}`} variant="response" />
-            <StatCard label="Offer Rate" value={`${stats.offerRate}%`} sub={`${stats.offers} offers from ${stats.applied} applications`} variant="offer" />
-            <StatCard label="Avg. Time to Offer" value={stats.avgTimeToOffer ? `${stats.avgTimeToOffer}d` : 'N/A'} sub="From application to offer" variant="time" />
+            <StatCard label="Total Applications" value={stats.total} sub={`${stats.applied} actively applied`} icon={Briefcase} color="indigo" />
+            <StatCard label="Response Rate" value={`${stats.responseRate}%`} sub={`${prevStats ? `prev ${timeRange === 'all' ? 'period' : timeRange}: ${prevStats.responseRate}%` : 'No prior data'}`} icon={TrendingUp} color="emerald" />
+            <StatCard label="Offer Rate" value={`${stats.offerRate}%`} sub={`${stats.offers} offers from ${stats.applied} applications`} icon={Award} color="amber" />
+            <StatCard label="Avg. Time to Offer" value={stats.avgTimeToOffer ? `${stats.avgTimeToOffer}d` : 'N/A'} sub="From application to offer" icon={Clock} color="orange" />
           </div>
         )}
 
