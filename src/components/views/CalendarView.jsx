@@ -89,9 +89,9 @@ export default function CalendarView({ applications, onSelect }) {
   const totalEvents = events._total || 0
 
   return (
-    <div className="bg-white border border-slate-200 shadow-sm rounded-xl">
+    <div className="bg-white border border-slate-200 shadow-sm rounded-xl flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+      <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
         <div className="flex items-center gap-3">
           <div className="border border-slate-200 rounded-lg p-2 text-center bg-white shadow-sm">
             <div className="text-[10px] uppercase tracking-wider font-bold text-rose-500">
@@ -115,7 +115,7 @@ export default function CalendarView({ applications, onSelect }) {
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 px-5">
+      <div className="grid grid-cols-7 px-5 shrink-0">
         {WEEKDAYS.map(d => (
           <div key={d} className="text-center text-[11px] font-medium text-slate-400 uppercase tracking-wider py-1 border-b border-slate-100">
             {d}
@@ -124,7 +124,7 @@ export default function CalendarView({ applications, onSelect }) {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-7 px-5 pb-5">
+      <div className="flex-1 grid grid-cols-7 auto-rows-fr min-h-0 px-5 pb-5 pt-1">
         {grid.map((cell, i) => {
           if (!cell) return <div key={i} />
           const { day, current, key: cellKey } = cell
@@ -134,7 +134,7 @@ export default function CalendarView({ applications, onSelect }) {
           return (
             <div
               key={i}
-              className={`min-h-[120px] border-r border-b border-slate-100 p-1.5 flex flex-col gap-1 overflow-hidden transition-colors ${
+              className={`min-h-0 border-r border-b border-slate-100 p-1.5 flex flex-col gap-1 overflow-hidden transition-colors ${
                 current ? 'bg-white' : 'bg-slate-50/50'
               } ${eventsForDay.length > 0 ? 'cursor-pointer hover:bg-indigo-50/30' : ''}`}
               onClick={() => eventsForDay.length > 0 && onSelect?.(

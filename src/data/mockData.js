@@ -8,6 +8,12 @@ function daysAgo(n) {
   return d.toISOString()
 }
 
+function hoursFromNow(h) {
+  const d = new Date(now)
+  d.setHours(d.getHours() + h)
+  return d.toISOString()
+}
+
 const mockData = [
   {
     id: uuidv4(),
@@ -41,6 +47,16 @@ const mockData = [
         platform: 'Google Meet',
         meetingLink: 'https://meet.google.com/abc-defg-hij',
         notes: 'System design round coming up.',
+      },
+      {
+        id: uuidv4(),
+        stageName: 'Behavioral',
+        date: hoursFromNow(5),
+        time: '16:00',
+        interviewer: 'Emily Park',
+        platform: 'Zoom',
+        meetingLink: 'https://zoom.us/j/999',
+        notes: 'Behavioral round with the hiring manager.',
       },
     ],
     activityLog: [

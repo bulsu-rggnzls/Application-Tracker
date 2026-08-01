@@ -17,14 +17,20 @@ export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete,
       <div className="grid grid-cols-5 gap-3 min-h-[500px]">
         {columns.map((colId) => {
           const style = COLUMN_STYLES[colId]
-          const items = applications.filter(a => a.status === colId)
+          const items = applications
+            .filter(a => a.status === colId)
+            .sort((a, b) => {
+              const da = a.dateApplied ? new Date(a.dateApplied).getTime() : 0
+              const db = b.dateApplied ? new Date(b.dateApplied).getTime() : 0
+              return db - da
+            })
           return (
             <div key={colId} className="bg-slate-50 dark:bg-slate-900/40 rounded-lg flex flex-col overflow-hidden">
-              <div className={`${style.headerBg} px-3 py-2.5 flex items-center justify-between shadow-lg ${style.shadow}`}>
-                <span className="text-xs font-bold tracking-wider text-white uppercase">
+              <div className={`${style.headerBg} px-3 py-3 flex items-center justify-between shadow-lg ${style.shadow}`}>
+                <span className="text-sm font-bold tracking-wider text-white uppercase">
                   {style.label}
                 </span>
-                <span className="text-xs text-white/80 font-bold tabular-nums bg-white/20 rounded-full px-1.5 py-0.5 leading-tight">
+                <span className="text-xs text-white/80 font-bold tabular-nums bg-white/20 rounded-full px-2 py-0.5 leading-tight">
                   {items.length}
                 </span>
               </div>
@@ -33,7 +39,7 @@ export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete,
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`flex-1 p-2 space-y-2 transition-all duration-200 ${
+                    className={`flex-1 p-2 space-y-2.5 transition-all duration-200 ${
                       snapshot.isDraggingOver ? 'bg-slate-100 dark:bg-slate-800/40 ring-1 ring-inset ring-indigo-400/20' : ''
                     }`}
                   >

@@ -24,8 +24,8 @@ export default function AppSidebar({ activeView, onViewChange, applications }) {
     <Sidebar open={open} setOpen={setOpen}>
       <SidebarBody className="justify-between gap-10">
         <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
-          {open ? <Logo /> : <LogoIcon />}
-          <div className="mt-8 flex flex-col gap-3">
+          <Logo open={open} />
+          <div className="mt-8 flex flex-col space-y-2">
             {navItems.map((item) => (
               <SidebarLink
                 key={item.id}
@@ -37,8 +37,8 @@ export default function AppSidebar({ activeView, onViewChange, applications }) {
                       <item.icon className={cn(
                         'h-5 w-5 shrink-0',
                         activeView === item.id
-                          ? 'text-indigo-600 dark:text-indigo-400'
-                          : 'text-neutral-700 dark:text-neutral-200'
+                          ? 'text-indigo-400'
+                          : 'text-slate-400'
                       )} />
                       {item.id === 'calendar' && interviewingCount > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] font-bold text-white">
@@ -49,9 +49,10 @@ export default function AppSidebar({ activeView, onViewChange, applications }) {
                   ),
                 }}
                 className={cn(
-                  activeView === item.id && 'bg-neutral-200/60 dark:bg-neutral-700/60 rounded-lg'
+                  activeView === item.id && 'bg-slate-800 text-white font-medium'
                 )}
                 onClick={(e) => { e.preventDefault(); onViewChange(item.id) }}
+                active={activeView === item.id}
               />
             ))}
           </div>
@@ -61,25 +62,15 @@ export default function AppSidebar({ activeView, onViewChange, applications }) {
   )
 }
 
-function Logo() {
+function Logo({ open }) {
   return (
     <div className="flex items-center gap-2 py-1">
       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-[11px] font-bold text-white">
         J
       </div>
-      <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">
+      <span className={`text-sm font-semibold text-white whitespace-nowrap overflow-hidden transition-all duration-200 ${open ? 'opacity-100 w-auto' : 'opacity-0 w-0'}`}>
         Jobs
       </span>
-    </div>
-  )
-}
-
-function LogoIcon() {
-  return (
-    <div className="flex items-center py-1">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-[11px] font-bold text-white">
-        J
-      </div>
     </div>
   )
 }
