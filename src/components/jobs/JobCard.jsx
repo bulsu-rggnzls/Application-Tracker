@@ -38,44 +38,44 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
       whileHover={snapshot.isDragging ? undefined : { scale: 1.02, y: -2 }}
       transition={{ type: 'spring', stiffness: 300, damping: 15 }}
     >
-      <div className="p-2">
-        <div className="flex items-start gap-1.5 mb-1">
+      <div className="p-2.5">
+        <div className="flex items-start gap-2 mb-1.5">
           <CompanyLogo domain={domain} company={company} />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-slate-900 dark:text-white text-[11px] leading-tight truncate">{company}</p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{role}</p>
+            <p className="font-semibold text-slate-900 dark:text-white text-[12px] leading-tight truncate">{company}</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{role}</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-0.5 mb-1">
+        <div className="flex flex-wrap gap-1 mb-1.5">
           {location && (
-            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><MapPin size={8} /> {location}</Badge>
+            <Badge variant="meta" className="!text-[11px] !px-1.5 !py-0.5"><MapPin size={9} /> {location}</Badge>
           )}
           {employmentType && (
-            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><Briefcase size={8} /> {employmentType === 'full-time' ? 'Full-time' : employmentType === 'contract' ? 'Contract' : 'Part-time'}</Badge>
+            <Badge variant="meta" className="!text-[11px] !px-1.5 !py-0.5"><Briefcase size={9} /> {employmentType === 'full-time' ? 'Full-time' : employmentType === 'contract' ? 'Contract' : 'Part-time'}</Badge>
           )}
           {salary && (
-            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><DollarSign size={8} /> {formatSalary(salary)}</Badge>
+            <Badge variant="meta" className="!text-[11px] !px-1.5 !py-0.5"><DollarSign size={9} /> {formatSalary(salary)}</Badge>
           )}
           {dateApplied && (
-            <Badge variant="meta" className="!text-[10px] !px-1 !py-px"><Clock size={8} /> {getRelativeTime(dateApplied)}</Badge>
+            <Badge variant="meta" className="!text-[11px] !px-1.5 !py-0.5"><Clock size={9} /> {getRelativeTime(dateApplied)}</Badge>
           )}
         </div>
 
         {isInterviewing && latestInterview && (
-          <div className="mb-1 px-1.5 py-0.5 bg-purple-50/70 dark:bg-purple-900/15 border border-purple-100/60 dark:border-purple-800/50 rounded">
-            <span className="text-[10px] font-medium text-purple-700 dark:text-purple-300">
+          <div className="mb-1.5 px-2 py-1 bg-purple-50/70 dark:bg-purple-900/15 border border-purple-100/60 dark:border-purple-800/50 rounded">
+            <span className="text-[11px] font-medium text-purple-700 dark:text-purple-300">
               {new Date(latestInterview.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} {formatTime(latestInterview.time)}
             </span>
           </div>
         )}
 
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-0.5">
+          <div className="flex flex-wrap gap-1">
             {tags.map(tag => {
               const s = getTagStyle(tag)
               return (
-                <span key={tag} className={`text-[9px] font-medium ${s.bg} ${s.text} ${s.darkBg} ${s.darkText} px-1 py-px rounded`}>{tag}</span>
+                <span key={tag} className={`text-[10px] font-medium ${s.bg} ${s.text} ${s.darkBg} ${s.darkText} px-1.5 py-0.5 rounded`}>{tag}</span>
               )
             })}
           </div>
@@ -83,23 +83,23 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
       </div>
 
       <Divider />
-      <div className="px-2 py-1 flex items-center justify-between">
+      <div className="px-2.5 py-1.5 flex items-center justify-between">
         {isOffer ? (
-          <div className="flex items-center gap-1 w-full">
-            <Button variant="accept" className="!text-[10px] !px-2 !py-1" onClick={(e) => { e.stopPropagation(); onAcceptOffer(id) }}><Check size={10} /> Accept</Button>
-            <Button variant="reject" className="!text-[10px] !px-2 !py-1" onClick={(e) => { e.stopPropagation(); onRejectOffer(id) }}><X size={10} /> Reject</Button>
+          <div className="flex items-center gap-1.5 w-full">
+            <Button variant="accept" className="!text-[11px] !px-2.5 !py-1" onClick={(e) => { e.stopPropagation(); onAcceptOffer(id) }}><Check size={11} /> Accept</Button>
+            <Button variant="reject" className="!text-[11px] !px-2.5 !py-1" onClick={(e) => { e.stopPropagation(); onRejectOffer(id) }}><X size={11} /> Reject</Button>
           </div>
         ) : (
           <div className="flex items-center justify-between w-full">
-            <span className="text-[10px] text-slate-400">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</span>
-            <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-[11px] text-slate-400">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</span>
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               {jobUrl && (
                 <a href={jobUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
-                  <ExternalLink size={10} />
+                  <ExternalLink size={11} />
                 </a>
               )}
-              <IconButton color="slate" className="!p-1" onClick={(e) => { e.stopPropagation(); onEdit(application) }}><Edit3 size={10} /></IconButton>
-              <IconButton color="rose" className="!p-1" onClick={(e) => { e.stopPropagation(); onDelete(id) }}><Trash2 size={10} /></IconButton>
+              <IconButton color="slate" className="!p-1" onClick={(e) => { e.stopPropagation(); onEdit(application) }}><Edit3 size={11} /></IconButton>
+              <IconButton color="rose" className="!p-1" onClick={(e) => { e.stopPropagation(); onDelete(id) }}><Trash2 size={11} /></IconButton>
             </div>
           </div>
         )}
