@@ -6,8 +6,6 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import extractDomain from '../../utils/extractDomain'
 
-const platforms = ['Zoom', 'Google Meet', 'Microsoft Teams', 'Skype', 'Phone', 'In-person']
-
 function getTabs(status) {
   const tabs = [
     { id: 0, label: 'Basic Info' },
@@ -124,7 +122,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
     salary: { min: '', max: '', currency: 'PHP', period: 'yearly' },
     status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
     recruiter: { name: '', email: '', linkedin: '' }, notes: '',
-    interview: { date: '', time: '', platform: 'Zoom', interviewer: '', notes: '' },
+    interview: { date: '', time: '', platform: '', interviewer: '', notes: '' },
   })
 
   const TABS = getTabs(selectedStatus)
@@ -158,8 +156,8 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
         jobUrl: editingJob.jobUrl || '', tags: editingJob.tags || [],
         recruiter: editingJob.recruiter || { name: '', email: '', linkedin: '' }, notes: editingJob.notes || '',
         interview: lastInterview
-          ? { date: lastInterview.date?.split('T')[0] || '', time: lastInterview.time || '', platform: lastInterview.platform || 'Zoom', interviewer: lastInterview.interviewer || '', notes: lastInterview.notes || '' }
-          : { date: '', time: '', platform: 'Zoom', interviewer: '', notes: '' },
+          ? { date: lastInterview.date?.split('T')[0] || '', time: lastInterview.time || '', platform: lastInterview.platform || '', interviewer: lastInterview.interviewer || '', notes: lastInterview.notes || '' }
+          : { date: '', time: '', platform: '', interviewer: '', notes: '' },
       })
       setShowRecruiter(!!editingJob.recruiter?.name)
       setLogoDomain(extractDomain(editingJob.jobUrl) || '')
@@ -170,7 +168,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
         salary: { min: '', max: '', currency: 'PHP', period: 'yearly' },
         status: 'wishlist', dateApplied: new Date().toISOString().split('T')[0], jobUrl: '', tags: [],
         recruiter: { name: '', email: '', linkedin: '' }, notes: '',
-        interview: { date: '', time: '', platform: 'Zoom', interviewer: '', notes: '' },
+        interview: { date: '', time: '', platform: '', interviewer: '', notes: '' },
       })
       setShowRecruiter(false)
       setLogoDomain('')
@@ -444,10 +442,7 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                 <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
                   <Video size={13} /> Platform
                 </label>
-                <input type="text" value={form.interview.platform} onChange={updateInterview('platform')} list="job-modal-platform-list" placeholder="Zoom, Google Meet, etc." className={inputCls(false)} />
-                <datalist id="job-modal-platform-list">
-                  {platforms.map(p => <option key={p} value={p} />)}
-                </datalist>
+                <input type="text" value={form.interview.platform} onChange={updateInterview('platform')} placeholder="Zoom, Google Meet, etc." className={inputCls(false)} />
               </div>
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
