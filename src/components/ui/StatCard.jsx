@@ -1,4 +1,4 @@
-export default function StatCard({ label, value, icon: Icon, color = 'indigo', className = '' }) {
+export default function StatCard({ label, value, sub, icon: Icon, color = 'indigo', className = '' }) {
   const gradients = {
     indigo: 'from-indigo-50 to-purple-50 dark:from-indigo-950/60 dark:to-purple-950/60 border-indigo-200 dark:border-indigo-700',
     orange: 'from-amber-50 to-orange-50 dark:from-amber-950/60 dark:to-orange-950/60 border-orange-200 dark:border-orange-700',
@@ -21,14 +21,15 @@ export default function StatCard({ label, value, icon: Icon, color = 'indigo', c
   return (
     <div className={`rounded-lg p-3 shadow-sm border bg-gradient-to-br ${gradients[color] || gradients.indigo} hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ${className}`}>
       <div className="flex items-center justify-between">
-        <p className={`text-[11px] font-semibold uppercase tracking-wider ${labelColors[color] || labelColors.indigo}`}>{label}</p>
+        <p className={`text-xs font-semibold uppercase tracking-wider ${labelColors[color] || labelColors.indigo}`}>{label}</p>
         {Icon && (
-          <span className={`flex items-center justify-center w-10 h-10 rounded-xl shadow-sm ${badgeColors[color] || badgeColors.indigo}`}>
-            <Icon size={22} />
+          <span className={`flex items-center justify-center w-11 h-11 rounded-xl shadow-sm ${badgeColors[color] || badgeColors.indigo}`}>
+            <Icon size={24} />
           </span>
         )}
       </div>
-      <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{value}</p>
+      <p className="text-xl font-bold text-slate-900 dark:text-white mt-1">{value}</p>
+      {sub && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{sub}</p>}
     </div>
   )
 }
