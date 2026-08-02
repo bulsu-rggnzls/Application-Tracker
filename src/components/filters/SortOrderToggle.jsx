@@ -19,6 +19,19 @@ export default function SortOrderToggle({ label, currentSort, onSortChange, colo
     }
   }
 
+  if (isActive) {
+    return (
+      <button
+        onClick={handleToggle}
+        title={`Toggle sort order (currently ${currentSort.dir === 'asc' ? 'ascending' : 'descending'})`}
+        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer ${c.active} border`}
+      >
+        {label}
+        {currentSort.dir === 'asc' ? <ArrowUpAZ size={13} /> : <ArrowDownZA size={13} />}
+      </button>
+    )
+  }
+
   return (
     <Popover
       trigger={
