@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Trash2, Edit3, ExternalLink } from 'lucide-react'
-import { Table, Thead, Th, Tbody, Tr, Td, Badge, IconButton } from '../ui'
+import { Table, Thead, Th, Tbody, Tr, Td, Badge, IconButton, Tfoot } from '../ui'
 import CompanyLogo from '../jobs/CompanyLogo'
 import extractDomain from '../../utils/extractDomain'
 import getRelativeTime from '../../utils/getRelativeTime'
@@ -10,6 +10,7 @@ import MultiSelectFilter from '../filters/MultiSelectFilter'
 import TagFilter from '../filters/TagFilter'
 import DateRangeFilter from '../filters/DateRangeFilter'
 import SalaryRangeFilter from '../filters/SalaryRangeFilter'
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '../ui/pagination'
 
 const statusColors = {
   wishlist: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
@@ -35,6 +36,10 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
   const [tagFilter, setTagFilter] = useState([])
   const [dateRange, setDateRange] = useState('all')
   const [salaryRange, setSalaryRange] = useState({ min: '', max: '', sortHigh: false })
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+
+  const resetPage = () => setPage(1)
 
   const locationOptions = useMemo(() => {
     const locs = [...new Set(applications.map(a => a.location).filter(Boolean))]
@@ -106,6 +111,14 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
     return data
   }, [applications, sort, locationFilter, statusFilter, tagFilter, dateRange, salaryRange])
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const currentPage = Math.min(page, totalPages)
+  const pageItems = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  useEffect(() => {
+    resetPage()
+  }, [locationFilter, statusFilter, tagFilter, dateRange, salaryRange, sort, applications])
+
   const handleSort = (key, dir) => {
     setSort({ key, dir })
   }
@@ -141,19 +154,19 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
         </div>
       )}
       <Thead>
-        <th className="w-10 px-4 py-3">
+        <th className="w-10 px-4 py-2">
           <input type="checkbox" checked={selected.size === filtered.length && filtered.length > 0} onChange={toggleAll} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
         </th>
-        <Th className="w-[180px]">
+        <Th className="w-[20%]">
           <SortOrderToggle label="Company" currentSort={sort} onSortChange={handleSort} color="indigo" />
         </Th>
-        <Th>
+        <Th className="w-[24%]">
           <SortOrderToggle label="Role" currentSort={sort} onSortChange={handleSort} color="sky" />
         </Th>
-        <Th>
+        <Th className="w-[13%]">
           <MultiSelectFilter title="Location" options={locationOptions} selectedValues={locationFilter} onChange={setLocationFilter} color="teal" />
         </Th>
-        <Th>
+        <Th className="w-[10%]">
           <SalaryRangeFilter
             minSalary={salaryRange.min}
             maxSalary={salaryRange.max}
@@ -161,19 +174,19 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
             onChange={setSalaryRange}
           />
         </Th>
-        <Th>
+        <Th className="w-[11%]">
           <MultiSelectFilter title="Status" options={statusOptions} selectedValues={statusFilter} onChange={setStatusFilter} color="purple" />
         </Th>
-        <Th>
+        <Th className="w-[9%]">
           <DateRangeFilter value={dateRange} onChange={setDateRange} />
         </Th>
-        <Th>
+        <Th className="w-[13%]">
           <TagFilter availableTags={allTags} selectedTags={tagFilter} onChange={setTagFilter} />
         </Th>
-        <th className="w-24 px-3 py-3 text-right text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Actions</th>
+        <th className="w-20 px-3 py-2 text-right text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Actions</th>
       </Thead>
       <Tbody>
-        {filtered.map((app, index) => {
+        {pageItems.map((app, index) => {
           const domain = extractDomain(app.jobUrl)
           const isEven = index % 2 === 0
           return (
@@ -184,27 +197,27 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                 selected.has(app.id) ? '!bg-indigo-50/60 dark:!bg-indigo-900/30' : ''
               } border-l-2 ${statusBorder[app.status] || 'border-l-transparent'}`}
             >
-              <Td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+              <Td className="px-4" onClick={e => e.stopPropagation()}>
                 <input type="checkbox" checked={selected.has(app.id)} onChange={() => toggleSelect(app.id)} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
               </Td>
-              <Td className="px-3 py-3">
+              <Td className="px-3">
                 <div className="flex items-center gap-2.5">
                   <CompanyLogo domain={domain} company={app.company} />
                   <span className="font-medium text-slate-900 dark:text-white">{app.company}</span>
                 </div>
               </Td>
-              <Td className="px-3 py-3 text-slate-600 dark:text-slate-300">{app.role}</Td>
-              <Td className="px-3 py-3 text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
-              <Td className="px-3 py-3 text-slate-500 dark:text-slate-400">{formatSalary(app.salary) || '-'}</Td>
-              <Td className="px-3 py-3">
+              <Td className="px-3 text-slate-600 dark:text-slate-300">{app.role}</Td>
+              <Td className="px-3 text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
+              <Td className="px-3 text-slate-500 dark:text-slate-400">{formatSalary(app.salary) || '-'}</Td>
+              <Td className="px-3">
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-md border ${statusColors[app.status]}`}>
                   {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                 </span>
               </Td>
-              <Td className="px-3 py-3 text-slate-400 dark:text-slate-500 text-xs whitespace-nowrap">
+              <Td className="px-3 text-slate-400 dark:text-slate-500 text-xs whitespace-nowrap">
                 {app.dateApplied ? getRelativeTime(app.dateApplied) : '-'}
               </Td>
-              <Td className="px-3 py-3">
+              <Td className="px-3">
                 <div className="flex gap-1 flex-wrap">
                   {app.tags.slice(0, 2).map(t => (
                     <Badge key={t} variant="table">{t}</Badge>
@@ -212,7 +225,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                   {app.tags.length > 2 && <span className="text-xs text-slate-400 dark:text-slate-500">+{app.tags.length - 2}</span>}
                 </div>
               </Td>
-              <Td className="px-3 py-3 text-right" onClick={e => e.stopPropagation()}>
+              <Td className="px-3 text-right" onClick={e => e.stopPropagation()}>
                 <div className="flex gap-1 justify-end">
                   {app.jobUrl && (
                     <a href={app.jobUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
@@ -235,6 +248,86 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
             </td>
           </tr>
         </tbody>
+      )}
+      {filtered.length > 0 && (
+        <Tfoot>
+          <tr>
+            <td colSpan={7} className="px-4 py-2">
+              <Pagination>
+                <PaginationContent className="w-full justify-between flex-wrap gap-y-2">
+                  <PaginationItem>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                      Showing{' '}
+                      <span className="font-medium text-slate-700 dark:text-slate-200">
+                        {(currentPage - 1) * pageSize + 1}
+                      </span>
+                      {'-'}
+                      <span className="font-medium text-slate-700 dark:text-slate-200">
+                        {Math.min(currentPage * pageSize, filtered.length)}
+                      </span>{' '}
+                      of{' '}
+                      <span className="font-medium text-slate-700 dark:text-slate-200">{filtered.length}</span>{' '}
+                      applications
+                    </span>
+                  </PaginationItem>
+                  <PaginationItem className="flex items-center gap-1">
+                    <PaginationPrevious
+                      disabled={currentPage === 1}
+                      onClick={() => setPage(currentPage - 1)}
+                    />
+                    {(() => {
+                      const pages = []
+                      const start = Math.max(1, currentPage - 2)
+                      const end = Math.min(totalPages, currentPage + 2)
+                      if (start > 1) {
+                        pages.push(1)
+                        if (start > 2) pages.push('ellipsis-start')
+                      }
+                      for (let i = start; i <= end; i++) pages.push(i)
+                      if (end < totalPages) {
+                        if (end < totalPages - 1) pages.push('ellipsis-end')
+                        pages.push(totalPages)
+                      }
+                      return pages.map((p, i) =>
+                        p === 'ellipsis-start' || p === 'ellipsis-end' ? (
+                          <PaginationItem key={`${p}-${i}`}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        ) : (
+                          <PaginationItem key={p}>
+                            <PaginationLink isActive={p === currentPage} onClick={() => setPage(p)}>
+                              {p}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )
+                      )
+                    })()}
+                    <PaginationNext
+                      disabled={currentPage === totalPages}
+                      onClick={() => setPage(currentPage + 1)}
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <select
+                      value={pageSize}
+                      onChange={e => {
+                        setPageSize(parseInt(e.target.value))
+                        setPage(1)
+                      }}
+                      className="px-2 py-1.5 text-sm text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+                    >
+                      {[10, 25, 50, 100].map(size => (
+                        <option key={size} value={size}>
+                          {size} / page
+                        </option>
+                      ))}
+                    </select>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </td>
+          </tr>
+        </Tfoot>
       )}
     </Table>
   )

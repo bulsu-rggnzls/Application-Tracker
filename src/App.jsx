@@ -16,7 +16,6 @@ import JobDetailDrawer from './components/jobs/JobDetailDrawer'
 import InterviewModal from './components/jobs/InterviewModal'
 import { ComposeEmailCard } from './components/ui'
 import confetti from 'canvas-confetti'
-import { exportToJSON, importFromJSON } from './utils/dataExport'
 
 export default function App() {
   const [applications, setApplications] = useLocalStorage('jobApplications', [])
@@ -127,20 +126,6 @@ export default function App() {
     }))
   }, [setApplications])
 
-  const handleExport = () => exportToJSON(applications)
-
-  const handleImport = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    try {
-      const data = await importFromJSON(file)
-      setApplications(data)
-    } catch {
-      alert('Invalid JSON file')
-    }
-    e.target.value = ''
-  }
-
   const openEdit = (job) => {
     setEditingJob(job)
     setModalOpen(true)
@@ -185,11 +170,9 @@ export default function App() {
           <div className="flex-1 overflow-y-auto min-h-0" style={{ scrollbarGutter: 'stable' }}>
           <div className="px-6 py-4">
             {activeView === 'board' || activeView === 'table' ? (
-              <div className="max-w-[104rem] mx-auto">
+              <div className={`max-w-[104rem] mx-auto ${viewMode === 'table' ? 'h-[calc(100vh-88px)] flex flex-col' : ''}`}>
                 <ControlsBar
                   onAdd={openAdd}
-                  onExport={handleExport}
-                  onImport={handleImport}
                   onComposeEmail={handleComposeEmail}
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}

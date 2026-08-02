@@ -138,8 +138,8 @@ export const SidebarLink = ({
       className={cn(
         "flex items-center h-11 w-full rounded-xl transition-all duration-200 group/sidebar relative",
         active
-          ? "bg-slate-800 text-white font-medium"
-          : "text-slate-400 hover:text-white hover:bg-slate-800",
+          ? "bg-slate-800 text-white font-medium shadow-[0_0_12px_rgba(99,102,241,0.35)] ring-1 ring-indigo-500/40"
+          : "text-slate-400 hover:text-white hover:bg-slate-800 hover:shadow-[0_0_8px_rgba(99,102,241,0.15)]",
         className
       )}
       {...props}>
@@ -154,7 +154,10 @@ export const SidebarLink = ({
         {link.label}
       </span>
       {active && (
-        <span className="absolute left-0 top-2 bottom-2 w-1 bg-indigo-500 rounded-r-full" />
+        <>
+          <span className="absolute left-0 top-2 bottom-2 w-1 bg-indigo-500 rounded-r-full" />
+          <span className="absolute left-0 top-2 bottom-2 w-1 bg-indigo-400/60 rounded-r-full blur-sm" />
+        </>
       )}
     </a>
   );
