@@ -1,7 +1,7 @@
 import { X, ExternalLink, Calendar, MapPin, DollarSign, Briefcase, Clock, User, Video, Check, Pencil, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Markdown from 'react-markdown'
-import { Avatar, Button, Heading, Text, Badge } from '../ui'
+import { Avatar, Button, Heading, IconButton, Text, Badge } from '../ui'
 import { getTagStyle } from '../../utils/tagColors'
 import CompanyLogo from './CompanyLogo'
 import extractDomain from '../../utils/extractDomain'
@@ -64,9 +64,7 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onEdit, onDelete
               <div className="p-6 pb-4">
                 <div className="flex items-center justify-between mb-6">
                   <Heading size="md">Job Details</Heading>
-                  <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                    <X size={20} />
-                  </button>
+                  <IconButton type="button" onClick={onClose} aria-label="Close"><X size={20} /></IconButton>
                 </div>
 
                 <div className="flex items-center gap-4 mb-5">
@@ -74,7 +72,7 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onEdit, onDelete
                     <CompanyLogo domain={domain} company={job.company} />
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-slate-900 dark:text-white truncate">{job.company}</p>
+                    <Text variant="body" className="!font-semibold !text-slate-900 dark:!text-white truncate">{job.company}</Text>
                     <Text variant="subtle" className="truncate">{job.role}</Text>
                   </div>
                 </div>
@@ -169,14 +167,16 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onEdit, onDelete
                         )}
                       </div>
                       {nextInterview.meetingLink && (
-                        <a
+                        <Button
+                          as="a"
                           href={nextInterview.meetingLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                          variant="indigo"
+                          className="!px-3 !py-1.5 !text-xs !rounded-lg"
                         >
                           <ExternalLink size={12} /> Join Meeting
-                        </a>
+                        </Button>
                       )}
                       {nextInterview.notes && (
                         <Text variant="subtle-sm" className="text-purple-500 dark:text-purple-400 mt-2 italic border-t border-purple-200 dark:border-purple-700 pt-2">{nextInterview.notes}</Text>
@@ -250,14 +250,16 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onEdit, onDelete
             <div className="border-t border-slate-200 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900 shrink-0">
               <div className="flex gap-2">
                 {job.jobUrl && (
-                  <a
+                  <Button
+                    as="a"
                     href={job.jobUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    variant="indigo"
+                    className="flex-1"
                   >
                     <ExternalLink size={15} /> View Original Job Post
-                  </a>
+                  </Button>
                 )}
                 <Button variant="indigo-outline" onClick={() => { onEdit(job); onClose() }}><Pencil size={14} /> Edit</Button>
                 <Button variant="destructive" onClick={() => { onDelete(job.id); onClose() }}><Trash2 size={14} /> Delete</Button>
