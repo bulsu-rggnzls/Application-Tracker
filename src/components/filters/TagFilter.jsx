@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
+import { Button, Heading, Input, Text } from '../ui'
 import Popover from './Popover'
 
 export default function TagFilter({ availableTags, selectedTags, onChange }) {
@@ -36,41 +37,40 @@ export default function TagFilter({ availableTags, selectedTags, onChange }) {
     >
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tags</p>
+          <Heading size="xs">Tags</Heading>
           {hasSelection && (
-            <button onClick={() => onChange([])} className="text-pink-600 dark:text-pink-400 hover:underline text-[11px] font-medium">
+            <Button variant="ghost" onClick={() => onChange([])} className="!p-0 !h-auto !text-[11px] !font-medium !text-pink-600 dark:!text-pink-400 hover:!underline">
               Clear
-            </button>
+            </Button>
           )}
         </div>
-        <div className="relative">
-          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search tags..."
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            className="w-full pl-7 pr-2 py-1.5 text-xs text-slate-600 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md placeholder-slate-400 focus:outline-none focus:border-pink-400 dark:focus:border-pink-500 transition-colors"
-          />
-        </div>
+        <Input
+          containerClassName="relative w-full"
+          icon={<Search size={12} />}
+          type="text"
+          placeholder="Search tags..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+        />
         <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto">
           {filtered.length === 0 && (
-            <p className="text-slate-400 dark:text-slate-500 text-[11px] py-1">No tags match</p>
+            <Text variant="muted-sm" className="py-1">No tags match</Text>
           )}
           {filtered.map(tag => {
             const active = selectedTags.includes(tag)
             return (
-              <button
+              <Button
                 key={tag}
+                variant="secondary"
                 onClick={() => toggleTag(tag)}
-                className={`text-xs px-2 py-1 rounded-md font-medium transition-colors ${
+                className={`!text-xs !px-2 !py-1 !rounded-md !font-medium ${
                   active
-                    ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-700'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-transparent hover:border-pink-200 dark:hover:border-pink-700'
+                    ? '!bg-pink-100 dark:!bg-pink-900/40 !text-pink-700 dark:!text-pink-300 !border-pink-200 dark:!border-pink-700'
+                    : 'hover:!border-pink-200 dark:hover:!border-pink-700'
                 }`}
               >
                 {tag}
-              </button>
+              </Button>
             )
           })}
         </div>
