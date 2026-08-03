@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { Button, Heading, Text } from '../ui'
 import Popover from './Popover'
 
 const COLOR_MAP = {
@@ -35,11 +36,11 @@ export default function MultiSelectFilter({ title, options, selectedValues, onCh
     >
       <div className="space-y-1">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{title}</p>
+          <Heading size="xs">{title}</Heading>
           {hasSelection && (
-            <button onClick={() => onChange([])} className={`${c.text} hover:underline text-[11px] font-medium`}>
+            <Button variant="ghost" onClick={() => onChange([])} className={`${c.text} !p-0 !h-auto !text-[11px] !font-medium hover:!underline`}>
               Clear
-            </button>
+            </Button>
           )}
         </div>
         <div className="max-h-48 overflow-y-auto space-y-0.5">
@@ -67,19 +68,20 @@ export default function MultiSelectFilter({ title, options, selectedValues, onCh
                 {opt.badge ? (
                   <span className={opt.badge}>{opt.label}</span>
                 ) : (
-                  <span className="text-slate-700 dark:text-slate-300">{opt.label}</span>
+                  <Text variant="subtle" className="!text-slate-700 dark:!text-slate-300">{opt.label}</Text>
                 )}
               </label>
             )
           })}
         </div>
         {options.length > 1 && (
-          <button
+          <Button
+            variant="ghost"
             onClick={() => onChange(selectedValues.length === options.length ? [] : options.map(o => o.value))}
-            className={`w-full text-center text-[11px] font-medium ${c.text} hover:underline pt-2 mt-1 border-t border-slate-100 dark:border-slate-800`}
+            className={`!w-full !text-center !text-[11px] !font-medium ${c.text} hover:!underline !rounded-none !pt-2 !mt-1 !border-t !border-slate-100 dark:!border-slate-800 !h-auto`}
           >
             {selectedValues.length === options.length ? 'Deselect All' : 'Select All'}
-          </button>
+          </Button>
         )}
       </div>
     </Popover>
