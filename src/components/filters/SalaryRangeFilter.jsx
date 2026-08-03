@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ArrowUpDown } from 'lucide-react'
+import { Button, Heading, Input, Text } from '../ui'
 import Popover from './Popover'
 
 const PRESETS = [
@@ -54,46 +55,42 @@ export default function SalaryRangeFilter({ minSalary, maxSalary, sortHigh, onCh
       }
     >
       <div className="space-y-2">
-        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Salary</p>
+        <Heading size="xs">Salary</Heading>
         <div className="space-y-0.5">
           {PRESETS.map(p => (
-            <button
+            <Button
               key={p.value}
+              variant="secondary"
               onClick={() => applyPreset(p.value)}
-              className={`w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors ${
+              className={`!w-full !text-left !px-2 !py-1.5 !rounded-md !text-xs ${
                 (!hasSelection && !p.value) || (p.value && minSalary === p.value.split('-')[0] && !sortHigh)
-                  ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-medium'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10'
+                  ? '!bg-emerald-50 dark:!bg-emerald-900/30 !text-emerald-600 dark:!text-emerald-400 !font-medium'
+                  : 'hover:!bg-emerald-50/50 dark:hover:!bg-emerald-900/10'
               }`}
             >
               {p.label}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="border-t border-slate-100 dark:border-slate-800 pt-2 space-y-2">
-          <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">Custom Range</p>
+          <Text variant="muted-sm" className="!font-medium">Custom Range</Text>
           <div className="flex items-center gap-1.5">
-            <input
+            <Input
+              containerClassName="relative flex-1"
               type="number"
               placeholder="Min"
               value={localMin}
               onChange={e => setLocalMin(e.target.value)}
-              className="w-full px-2 py-1 text-xs text-slate-600 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition-colors"
             />
-            <span className="text-slate-300 dark:text-slate-600">–</span>
-            <input
+            <Text variant="muted-sm" className="text-slate-300 dark:text-slate-600">–</Text>
+            <Input
+              containerClassName="relative flex-1"
               type="number"
               placeholder="Max"
               value={localMax}
               onChange={e => setLocalMax(e.target.value)}
-              className="w-full px-2 py-1 text-xs text-slate-600 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition-colors"
             />
-            <button
-              onClick={applyCustom}
-              className="px-2 py-1 text-xs font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 transition-colors"
-            >
-              Go
-            </button>
+            <Button variant="indigo" onClick={applyCustom} className="!px-2 !py-1 !text-xs !rounded-md">Go</Button>
           </div>
         </div>
         <div className="border-t border-slate-100 dark:border-slate-800 pt-2">
@@ -105,7 +102,7 @@ export default function SalaryRangeFilter({ minSalary, maxSalary, sortHigh, onCh
               className="rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500/20 cursor-pointer"
             />
             <ArrowUpDown size={12} className="text-emerald-400" />
-            <span className="text-xs text-slate-600 dark:text-slate-300">Sort by highest</span>
+            <Text variant="subtle" className="!text-xs">Sort by highest</Text>
           </label>
         </div>
       </div>

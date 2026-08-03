@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { Button, Card } from '../ui'
 
 const COLORS = {
   wishlist: '#f59e0b',
@@ -36,20 +37,22 @@ export default function AnalyticsChart({ applications }) {
   }, [applications])
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+    <Card className="!rounded-xl !p-5">
       <div className="flex items-center gap-2 mb-4">
-        <button
+        <Button
           onClick={() => setTab('status')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${tab === 'status' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+          variant={tab === 'status' ? 'indigo' : 'secondary'}
+          className="!rounded-lg !text-xs"
         >
           By Status
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setTab('monthly')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${tab === 'monthly' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+          variant={tab === 'monthly' ? 'indigo' : 'secondary'}
+          className="!rounded-lg !text-xs"
         >
           Over Time
-        </button>
+        </Button>
       </div>
 
       {tab === 'status' ? (
@@ -75,6 +78,6 @@ export default function AnalyticsChart({ applications }) {
           </BarChart>
         </ResponsiveContainer>
       )}
-    </div>
+    </Card>
   )
 }

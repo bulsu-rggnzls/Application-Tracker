@@ -5,7 +5,7 @@ import {
   PieChart as RechartsPieChart, Pie, Cell,
   AreaChart, Area,
 } from 'recharts'
-import { StatCard } from '../ui'
+import { Button, Card, Heading, StatCard, Text } from '../ui'
 
 const STATUS_COLORS = {
   wishlist: '#f59e0b',
@@ -26,13 +26,13 @@ const STATUS_LABELS = {
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const ChartCard = ({ title, children, action }) => (
-  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+  <Card className="overflow-hidden !shadow-sm">
     <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-      <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-      {action && <button className="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">{action}</button>}
+      <Heading size="sm">{title}</Heading>
+      {action && <Button variant="ghost" className="!text-xs !text-indigo-600 hover:!text-indigo-700 !p-1"><span className="flex items-center gap-1">{action}</span></Button>}
     </div>
     <div className="p-5">{children}</div>
-  </div>
+  </Card>
 )
 
 function WarmUpState({ stats, applications }) {
@@ -41,31 +41,31 @@ function WarmUpState({ stats, applications }) {
       <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 mb-3">
         <Rocket className="text-indigo-600 dark:text-indigo-400" size={22} />
       </div>
-      <h2 className="text-base font-bold text-slate-900 dark:text-white mb-1">You're just getting started!</h2>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 max-w-md mx-auto">
+      <Heading size="md" className="mb-1">You're just getting started!</Heading>
+      <Text variant="subtle" className="mb-4 max-w-md mx-auto">
         Add a few more applications to unlock full analytics.
-      </p>
+      </Text>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+        <Card className="!rounded-lg !p-2.5 !shadow-none">
           <Briefcase size={14} className="text-indigo-500 mb-0.5" />
-          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.total}</p>
-          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Applications</p>
-        </div>
-        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+          <Heading size="sm" className="!text-base !font-bold">{stats.total}</Heading>
+          <Text variant="muted-sm" className="!uppercase !tracking-wider">Applications</Text>
+        </Card>
+        <Card className="!rounded-lg !p-2.5 !shadow-none">
           <TrendingUp size={14} className="text-emerald-500 mb-0.5" />
-          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.responseRate}%</p>
-          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Response Rate</p>
-        </div>
-        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+          <Heading size="sm" className="!text-base !font-bold">{stats.responseRate}%</Heading>
+          <Text variant="muted-sm" className="!uppercase !tracking-wider">Response Rate</Text>
+        </Card>
+        <Card className="!rounded-lg !p-2.5 !shadow-none">
           <Target size={14} className="text-purple-500 mb-0.5" />
-          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.totalInterviews}</p>
-          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Interviews</p>
-        </div>
-        <div className="bg-white dark:bg-slate-800 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700">
+          <Heading size="sm" className="!text-base !font-bold">{stats.totalInterviews}</Heading>
+          <Text variant="muted-sm" className="!uppercase !tracking-wider">Interviews</Text>
+        </Card>
+        <Card className="!rounded-lg !p-2.5 !shadow-none">
           <Award size={14} className="text-amber-500 mb-0.5" />
-          <p className="text-base font-bold text-slate-900 dark:text-white">{stats.offers}</p>
-          <p className="text-[10px] text-slate-500 uppercase tracking-wider">Offers</p>
-        </div>
+          <Heading size="sm" className="!text-base !font-bold">{stats.offers}</Heading>
+          <Text variant="muted-sm" className="!uppercase !tracking-wider">Offers</Text>
+        </Card>
       </div>
       <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
         <Sparkles size={12} />
@@ -99,9 +99,9 @@ function FunnelBar({ funnel }) {
           <div key={f.stage} className="text-center">
             <div className="inline-flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[i] }} />
-              <p className="text-xs font-semibold text-slate-700">{f.stage}</p>
+              <Text variant="body" className="!font-semibold !text-slate-700">{f.stage}</Text>
             </div>
-            <p className="text-[11px] text-slate-400">{f.count} ({f.pct}%)</p>
+            <Text variant="muted-sm">{f.count} ({f.pct}%)</Text>
           </div>
         ))}
       </div>
@@ -248,8 +248,8 @@ export default function AnalyticsPage({ applications }) {
       <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900">
         <div className="text-center p-12">
           <BarChart2 size={64} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No data yet</h3>
-          <p className="text-slate-500 dark:text-slate-400">Add some applications to see analytics</p>
+          <Heading size="md" className="mb-2 !font-medium">No data yet</Heading>
+          <Text variant="body" className="text-slate-500 dark:text-slate-400">Add some applications to see analytics</Text>
         </div>
       </div>
     )
@@ -262,8 +262,8 @@ export default function AnalyticsPage({ applications }) {
       <div className="max-w-[96rem] mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Analytics</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Track your job search performance</p>
+            <Heading size="lg">Analytics</Heading>
+            <Text variant="body" className="mt-0.5 !text-slate-500 dark:!text-slate-400">Track your job search performance</Text>
           </div>
           <div className="flex items-center gap-3">
             <select
@@ -323,7 +323,9 @@ export default function AnalyticsPage({ applications }) {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="h-[280px] flex items-center justify-center text-slate-400 text-sm">No data</div>
+              <div className="h-[280px] flex items-center justify-center">
+                <Text variant="body" className="!text-slate-400">No data</Text>
+              </div>
             )}
           </ChartCard>
 
@@ -406,8 +408,8 @@ export default function AnalyticsPage({ applications }) {
                 <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-3">
                   <BarChart2 size={24} className="text-slate-400 dark:text-slate-500" />
                 </div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No technologies tracked yet</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Add tags to your applications to see them here</p>
+                <Text variant="body" className="!font-medium !text-slate-600 dark:!text-slate-400">No technologies tracked yet</Text>
+                <Text variant="muted-sm" className="mt-1">Add tags to your applications to see them here</Text>
               </div>
             )}
           </ChartCard>
@@ -428,19 +430,19 @@ export default function AnalyticsPage({ applications }) {
           <ChartCard title="Conversion Rates">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
-                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Application → Interview</p>
-                  <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{stats.applied > 0 ? Math.round((stats.interviewing / stats.applied) * 100) : 0}%</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{stats.interviewing} of {stats.applied} applications</p>
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
-                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Interview → Offer</p>
-                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.interviewing > 0 ? Math.round((stats.offers / stats.interviewing) * 100) : 0}%</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{stats.offers} of {stats.interviewing} interviews</p>
-                </div>
+                <Card className="!rounded-xl !p-4 !shadow-none !bg-slate-50 dark:!bg-slate-800/50">
+                  <Text variant="muted-sm" className="!uppercase !tracking-wider mb-2">Application → Interview</Text>
+                  <Heading size="sm" className="!text-3xl !font-bold !text-indigo-600 dark:!text-indigo-400">{stats.applied > 0 ? Math.round((stats.interviewing / stats.applied) * 100) : 0}%</Heading>
+                  <Text variant="muted-sm" className="mt-1">{stats.interviewing} of {stats.applied} applications</Text>
+                </Card>
+                <Card className="!rounded-xl !p-4 !shadow-none !bg-slate-50 dark:!bg-slate-800/50">
+                  <Text variant="muted-sm" className="!uppercase !tracking-wider mb-2">Interview → Offer</Text>
+                  <Heading size="sm" className="!text-3xl !font-bold !text-emerald-600 dark:!text-emerald-400">{stats.interviewing > 0 ? Math.round((stats.offers / stats.interviewing) * 100) : 0}%</Heading>
+                  <Text variant="muted-sm" className="mt-1">{stats.offers} of {stats.interviewing} interviews</Text>
+                </Card>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
-                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Pipeline Health</p>
+              <Card className="!rounded-xl !p-4 !shadow-none !bg-slate-50 dark:!bg-slate-800/50">
+                <Text variant="muted-sm" className="!uppercase !tracking-wider mb-3">Pipeline Health</Text>
                 <div className="space-y-3">
                   {pipelineData.map((p) => (
                     <div key={p.stage}>
@@ -463,7 +465,7 @@ export default function AnalyticsPage({ applications }) {
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             </div>
           </ChartCard>
         </div>

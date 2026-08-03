@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Zap, Inbox, Award, CalendarClock, CalendarDays, CalendarRange, List } from 'lucide-react'
+import { Badge, Button, Card, Heading, IconButton, Text } from '../ui'
 import formatTime from '../../utils/formatTime'
 import extractDomain from '../../utils/extractDomain'
 
@@ -68,8 +69,9 @@ function EventPill({ ev, todayRef }) {
   const s = categoryStyles[ev.type] || categoryStyles.general
   const isPast = new Date(ev.date) < todayRef
   return (
-    <div
-      className={`px-1.5 py-0.5 rounded-[4px] text-[10px] font-medium flex items-center gap-1 leading-tight transition-all duration-150 hover:shadow-sm hover:-translate-y-px cursor-pointer ${s.pill} ${isPast ? 'opacity-60' : ''}`}
+    <Badge
+      variant="status"
+      className={`!text-[10px] !px-1.5 !py-0.5 !rounded-[4px] !leading-tight flex items-center gap-1 transition-all duration-150 hover:shadow-sm hover:-translate-y-px cursor-pointer ${s.pill} ${isPast ? 'opacity-60' : ''}`}
       onClick={(e) => e.stopPropagation()}
       title={`${s.label}: ${ev.company}${ev.time ? ` at ${formatTime(ev.time)}` : ''}`}
     >
@@ -86,7 +88,7 @@ function EventPill({ ev, todayRef }) {
       {ev.time && (
         <span className="shrink-0 text-[8px] opacity-75 font-semibold ml-auto">{formatTime(ev.time)}</span>
       )}
-    </div>
+    </Badge>
   )
 }
 
@@ -131,15 +133,16 @@ function MonthGrid({ grid, events, todayKey, todayStart, applications, onSelect 
                     <EventPill key={ev.id || ei} ev={ev} todayRef={todayStart} />
                   ))}
                   {eventsForDay.length > 3 && (
-                    <button
+                    <Button
+                      variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation()
                         onSelect?.(applications.find(a => a.id === eventsForDay[0].applicationId))
                       }}
-                      className="text-slate-500 hover:text-indigo-600 text-[10px] font-medium text-left transition-colors"
+                      className="!p-0 !h-auto !text-[10px] !font-medium text-left !text-slate-500 hover:!text-indigo-600"
                     >
                       +{eventsForDay.length - 3} more...
-                    </button>
+                    </Button>
                   )}
                 </div>
               </>
@@ -197,15 +200,15 @@ function DayView({ date, events, todayStart, applications, onSelect }) {
   return (
     <div className="flex-1 min-h-0 px-5 pb-5 pt-2 overflow-y-auto">
       <div className="mb-3 flex items-center gap-2">
-        <h3 className="text-sm font-bold text-slate-800 capitalize">
+        <Heading size="sm" className="capitalize">
           {date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </h3>
+        </Heading>
         {isToday && (
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5">Today</span>
+          <Badge variant="count-pill" className="!text-[10px] !font-bold !uppercase !tracking-wider !text-indigo-600 !bg-indigo-50 !border !border-indigo-200">Today</Badge>
         )}
       </div>
       {eventsForDay.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-slate-400 text-sm">No events scheduled for this day</div>
+        <Text variant="body" className="flex items-center justify-center h-full text-slate-400">No events scheduled for this day</Text>
       ) : (
         <div className="space-y-1.5">
           {eventsForDay.map((ev, ei) => (
@@ -223,11 +226,11 @@ function DayView({ date, events, todayStart, applications, onSelect }) {
                 />
               )}
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{ev.company}</p>
-                <p className="text-xs text-slate-500 truncate">{ev.stageName || ev.role}</p>
+                <Text variant="body" className="!font-semibold !text-slate-900 truncate">{ev.company}</Text>
+                <Text variant="subtle" className="truncate">{ev.stageName || ev.role}</Text>
               </div>
               {ev.time && (
-                <span className="text-xs font-semibold text-slate-600 shrink-0">{formatTime(ev.time)}</span>
+                <Text variant="body" className="!font-semibold !text-slate-600 shrink-0">{formatTime(ev.time)}</Text>
               )}
             </div>
           ))}
@@ -251,7 +254,7 @@ function AgendaView({ allEvents, todayStart, applications, onSelect }) {
   return (
     <div className="flex-1 min-h-0 px-5 pb-5 pt-2 overflow-y-auto">
       {grouped.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-slate-400 text-sm">No events scheduled</div>
+        <Text variant="body" className="flex items-center justify-center h-full text-slate-400">No events scheduled</Text>
       ) : (
         <div className="space-y-4">
           {grouped.map(([dateKey, evs]) => {
@@ -259,9 +262,9 @@ function AgendaView({ allEvents, todayStart, applications, onSelect }) {
             const date = new Date(y, m - 1, d)
             return (
               <div key={dateKey}>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                <Heading size="xs" className="mb-1.5">
                   {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                </h4>
+                </Heading>
                 <div className="space-y-1">
                   {evs.map((ev, ei) => (
                     <div
@@ -278,10 +281,10 @@ function AgendaView({ allEvents, todayStart, applications, onSelect }) {
                           className="w-5 h-5 rounded-md object-contain shrink-0"
                         />
                       )}
-                      <span className="text-sm font-medium text-slate-800 truncate">{ev.company}</span>
-                      <span className="text-xs text-slate-500 truncate">{ev.stageName || ev.role}</span>
+                      <Text variant="body" className="truncate">{ev.company}</Text>
+                      <Text variant="subtle" className="truncate">{ev.stageName || ev.role}</Text>
                       {ev.time && (
-                        <span className="text-xs font-semibold text-slate-600 ml-auto shrink-0">{formatTime(ev.time)}</span>
+                        <Text variant="body" className="!font-semibold !text-slate-600 ml-auto shrink-0">{formatTime(ev.time)}</Text>
                       )}
                     </div>
                   ))}
@@ -373,65 +376,58 @@ export default function CalendarView({ applications, onSelect }) {
   const totalEvents = events._total || 0
 
   return (
-    <div className="bg-white border border-slate-200 shadow-sm rounded-xl flex flex-col h-full">
+    <Card className="flex flex-col h-full !shadow-sm !rounded-xl">
       {/* Hero header */}
       <div className="shrink-0 px-5 pt-5 pb-4 bg-gradient-to-br from-indigo-50 via-white to-amber-50/40 rounded-t-xl">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-wider font-bold text-indigo-500 mb-0.5">Job Search Calendar</p>
-            <h2 className="text-xl font-bold text-slate-900">{viewTitle}</h2>
+            <Text variant="muted-sm" className="!uppercase !tracking-wider !font-bold !text-indigo-500 mb-0.5">Job Search Calendar</Text>
+            <Heading size="md" className="!text-xl">{viewTitle}</Heading>
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden md:flex border border-slate-200 bg-white rounded-lg overflow-hidden shadow-sm">
               {viewButtons.map(vb => (
-                <button
+                <Button
                   key={vb.id}
+                  variant={view === vb.id ? 'indigo' : 'ghost'}
                   onClick={() => setView(vb.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
-                    view === vb.id
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                  }`}
+                  className="!rounded-none !px-3 !py-1.5"
                 >
                   <vb.icon size={13} />
                   <span className="hidden lg:inline">{vb.label}</span>
-                </button>
+                </Button>
               ))}
             </div>
             <div className="flex gap-1">
-              <button onClick={() => handleNav(-1)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg transition-colors cursor-pointer border border-transparent hover:border-slate-200">
-                <ChevronLeft size={16} />
-              </button>
-              <button onClick={() => handleNav(1)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg transition-colors cursor-pointer border border-transparent hover:border-slate-200">
-                <ChevronRight size={16} />
-              </button>
+              <IconButton onClick={() => handleNav(-1)} className="border border-transparent hover:border-slate-200" title="Previous"><ChevronLeft size={16} /></IconButton>
+              <IconButton onClick={() => handleNav(1)} className="border border-transparent hover:border-slate-200" title="Next"><ChevronRight size={16} /></IconButton>
             </div>
           </div>
         </div>
 
         {/* Quick stats */}
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <div className="flex items-center gap-2.5 bg-white/80 border border-indigo-100 rounded-lg px-3 py-2 shadow-sm">
+          <Card className="!rounded-lg !p-3 flex items-center gap-2.5 bg-white/80 !border-indigo-100">
             <span className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0"><Zap size={15} /></span>
             <div>
-              <p className="text-base font-bold text-slate-900 leading-none">{interviewingCount}</p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">Interviews Scheduled</p>
+              <Heading size="sm" className="!text-base !leading-none">{interviewingCount}</Heading>
+              <Text variant="muted-sm" className="!uppercase !tracking-wider">Interviews Scheduled</Text>
             </div>
-          </div>
-          <div className="flex items-center gap-2.5 bg-white/80 border border-blue-100 rounded-lg px-3 py-2 shadow-sm">
+          </Card>
+          <Card className="!rounded-lg !p-3 flex items-center gap-2.5 bg-white/80 !border-blue-100">
             <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><Inbox size={15} /></span>
             <div>
-              <p className="text-base font-bold text-slate-900 leading-none">{awaitingCount}</p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">Awaiting Response</p>
+              <Heading size="sm" className="!text-base !leading-none">{awaitingCount}</Heading>
+              <Text variant="muted-sm" className="!uppercase !tracking-wider">Awaiting Response</Text>
             </div>
-          </div>
-          <div className="flex items-center gap-2.5 bg-white/80 border border-emerald-100 rounded-lg px-3 py-2 shadow-sm">
+          </Card>
+          <Card className="!rounded-lg !p-3 flex items-center gap-2.5 bg-white/80 !border-emerald-100">
             <span className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0"><Award size={15} /></span>
             <div>
-              <p className="text-base font-bold text-slate-900 leading-none">{offersCount}</p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">Offers</p>
+              <Heading size="sm" className="!text-base !leading-none">{offersCount}</Heading>
+              <Text variant="muted-sm" className="!uppercase !tracking-wider">Offers</Text>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
 
@@ -439,9 +435,9 @@ export default function CalendarView({ applications, onSelect }) {
       {view === 'month' && (
         <div className="grid grid-cols-7 px-5 shrink-0">
           {WEEKDAYS.map(d => (
-            <div key={d} className="text-center text-[11px] font-medium text-slate-400 uppercase tracking-wider py-1.5 border-b border-slate-100">
+            <Text key={d} variant="muted-sm" className="!uppercase !tracking-wider text-center py-1.5 border-b border-slate-100">
               {d}
-            </div>
+            </Text>
           ))}
         </div>
       )}
@@ -459,6 +455,6 @@ export default function CalendarView({ applications, onSelect }) {
       {view === 'agenda' && (
         <AgendaView allEvents={allEvents} todayStart={todayStart} applications={applications} onSelect={onSelect} />
       )}
-    </div>
+    </Card>
   )
 }

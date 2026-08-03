@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { Button, Heading } from '../ui'
 import Popover from './Popover'
 
 const PRESETS = [
@@ -29,19 +30,20 @@ export default function DateRangeFilter({ value, onChange }) {
       }
     >
       <div className="space-y-1">
-        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Date Range</p>
+        <Heading size="xs" className="mb-1">Date Range</Heading>
         {PRESETS.map(preset => (
-          <button
+          <Button
             key={preset.value}
+            variant="secondary"
             onClick={() => onChange(preset.value)}
-            className={`w-full text-left px-2 py-1.5 rounded-md text-xs transition-colors ${
+            className={`!w-full !text-left !px-2 !py-1.5 !rounded-md !text-xs ${
               value === preset.value
-                ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-amber-50/50 dark:hover:bg-amber-900/10'
+                ? '!bg-amber-50 dark:!bg-amber-900/30 !text-amber-600 dark:!text-amber-400 !font-medium'
+                : 'hover:!bg-amber-50/50 dark:hover:!bg-amber-900/10'
             }`}
           >
             {preset.label}
-          </button>
+          </Button>
         ))}
       </div>
     </Popover>

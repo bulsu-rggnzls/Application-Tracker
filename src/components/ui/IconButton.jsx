@@ -5,13 +5,13 @@ const colorStyles = {
   'rose-600': 'text-slate-400 hover:text-rose-600 dark:hover:text-rose-400',
 }
 
-export default function IconButton({ color = 'slate', className = '', children, ...props }) {
+export default function IconButton({ as: Tag = 'button', color = 'slate', className = '', children, ...props }) {
   return (
-    <button
+    <Tag
       className={`p-1.5 ${colorStyles[color] || colorStyles.slate} rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors cursor-pointer ${className}`}
       {...props}
     >
       {children}
-    </button>
+    </Tag>
   )
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BarChart3, ChevronDown, ChevronUp, Briefcase, Clock, TrendingUp, Award } from 'lucide-react'
 import AnalyticsChart from './AnalyticsChart'
-import { StatCard } from '../ui'
+import { Button, StatCard } from '../ui'
 
 export default function AnalyticsBar({ applications }) {
   const [chartOpen, setChartOpen] = useState(false)
@@ -20,14 +20,15 @@ export default function AnalyticsBar({ applications }) {
         <StatCard label="Response Rate" value={`${responseRate}%`} icon={TrendingUp} color="emerald" />
         <StatCard label="Offers" value={offers} icon={Award} color="amber" />
       </div>
-      <button
+      <Button
+        variant="ghost"
         onClick={() => setChartOpen(prev => !prev)}
-        className="flex items-center gap-1 mt-2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+        className="mt-2 !p-0 !h-auto !text-xs !text-slate-400 hover:!text-slate-600 dark:hover:!text-slate-300"
       >
         <BarChart3 size={13} />
         {chartOpen ? 'Hide charts' : 'Show charts'}
         {chartOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-      </button>
+      </Button>
       {chartOpen && (
         <div className="mt-2">
           <AnalyticsChart applications={applications} />

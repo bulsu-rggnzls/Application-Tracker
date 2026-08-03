@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import getRelativeTime from '../../utils/getRelativeTime'
 import extractDomain from '../../utils/extractDomain'
+import { Badge, Button, Card, Heading, IconButton, Text } from '../ui'
 
 const STATUS_COLORS = {
   wishlist: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800',
@@ -180,59 +181,60 @@ export default function TimelineView({ applications, onSelect }) {
 
   if (entries.length === 0) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-12 text-center">
+      <Card className="p-12 text-center">
         <History size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-        <p className="text-sm text-slate-400 dark:text-slate-500">No activity yet. Start tracking your applications!</p>
-      </div>
+        <Text variant="body" className="text-slate-400 dark:text-slate-500">No activity yet. Start tracking your applications!</Text>
+      </Card>
     )
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-6">
+    <Card className="rounded-2xl p-6">
       <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <span className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <History className="w-4.5 h-4.5" />
           </span>
           <div>
-            <h2 className="text-lg font-bold text-slate-800 dark:text-white leading-tight">Activity Timeline</h2>
-            <p className="text-xs text-slate-400 dark:text-slate-500">Track every move in your job search</p>
+            <Heading size="md" className="leading-tight">Activity Timeline</Heading>
+            <Text variant="muted-sm">Track every move in your job search</Text>
           </div>
         </div>
-        <span className="text-xs font-semibold px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800 rounded-full">
+        <Badge variant="count-pill" className="!bg-indigo-50 dark:!bg-indigo-900/30 !text-indigo-600 dark:!text-indigo-300 !border !border-indigo-100 dark:!border-indigo-800">
           {entries.length} Activities
-        </span>
+        </Badge>
       </div>
 
       {/* Filter chips */}
       <div className="flex flex-wrap items-center gap-1.5 mb-5">
         {filterChips.map(chip => (
-          <button
+          <Button
             key={chip.id}
+            variant="secondary"
             onClick={() => { setFilter(chip.id); setVisibleCount(15) }}
-            className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer ${
+            className={`!rounded-full !text-xs ${
               filter === chip.id
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                ? '!bg-slate-900 dark:!bg-white !text-white dark:!text-slate-900 !border-slate-900 dark:!border-white shadow-sm'
+                : ''
             }`}
           >
             {chip.label}
             <span className={`ml-1.5 ${filter === chip.id ? 'text-white/70 dark:text-slate-900/60' : 'text-slate-400 dark:text-slate-500'}`}>
               ({filterCounts[chip.id] || 0})
             </span>
-          </button>
+          </Button>
         ))}
       </div>
 
       <div className="max-h-[calc(100vh-320px)] overflow-y-auto pr-2 space-y-6 scrollbar-thin">
         {groups.map(group => (
           <div key={group.key}>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 sticky top-0 z-10 py-1">
+            <Heading size="xs" className="mb-3 sticky top-0 z-10 py-1">
               <span className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2.5 py-1 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                 {group.label}
               </span>
-            </h3>
+            </Heading>
 
             <div className="relative pl-9">
               <div className="absolute left-[15px] top-2 bottom-2 w-[2px] bg-slate-200 dark:bg-slate-700" />
@@ -262,12 +264,12 @@ export default function TimelineView({ applications, onSelect }) {
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-slate-900 dark:text-white truncate">{entry.company}</span>
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${config.chip}`}>
+                            <Text variant="body" className="!font-bold !text-slate-900 dark:!text-white truncate">{entry.company}</Text>
+                            <Badge variant="status" className={`!text-[10px] !px-2 !py-0.5 !rounded-full !border ${config.chip}`}>
                               {config.label}
-                            </span>
+                            </Badge>
                             {entry.role && (
-                              <span className="text-xs text-slate-400 dark:text-slate-500 truncate">· {entry.role}</span>
+                              <Text variant="muted-sm" className="truncate">· {entry.role}</Text>
                             )}
                           </div>
 
@@ -275,39 +277,40 @@ export default function TimelineView({ applications, onSelect }) {
                             {transition ? (
                               <>
                                 {transition.from && (
-                                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${STATUS_COLORS[transition.from]}`}>
+                                  <Badge variant="status" className={`!text-[10px] !px-2 !py-0.5 !rounded-md !border ${STATUS_COLORS[transition.from]}`}>
                                     {STATUS_LABELS[transition.from] || transition.from}
-                                  </span>
+                                  </Badge>
                                 )}
                                 {transition.from && <ArrowRight size={11} className="text-slate-400 dark:text-slate-500 shrink-0" />}
-                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${STATUS_COLORS[transition.to]}`}>
+                                <Badge variant="status" className={`!text-[10px] !px-2 !py-0.5 !rounded-md !border ${STATUS_COLORS[transition.to]}`}>
                                   {STATUS_LABELS[transition.to] || transition.to}
-                                </span>
+                                </Badge>
                               </>
                             ) : (
-                              <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug">
+                              <Text variant="subtle" className="leading-snug">
                                 {entry.details || 'Activity logged'}
-                              </p>
+                              </Text>
                             )}
                           </div>
                         </div>
 
                         <div className="flex items-center gap-1.5 shrink-0">
                           {entry.jobUrl && (
-                            <a
+                            <IconButton
+                              as="a"
                               href={entry.jobUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={e => e.stopPropagation()}
-                              className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors opacity-0 group-hover/row:opacity-100"
+                              className="opacity-0 group-hover/row:opacity-100"
                               title="Open job posting"
                             >
                               <ExternalLink size={13} />
-                            </a>
+                            </IconButton>
                           )}
-                          <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 whitespace-nowrap tabular-nums">
+                          <Text variant="muted-sm" className="whitespace-nowrap tabular-nums">
                             {new Date(entry.timestamp).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
-                          </span>
+                          </Text>
                         </div>
                       </div>
                     </div>
@@ -319,14 +322,15 @@ export default function TimelineView({ applications, onSelect }) {
         ))}
 
         {filteredEntries.length > visibleCount && (
-          <button
+          <Button
+            variant="ghost"
             onClick={() => setVisibleCount(prev => prev + 20)}
-            className="w-full py-2.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors cursor-pointer"
+            className="!w-full !text-indigo-600 dark:!text-indigo-400 !rounded-xl !border !border-dashed !border-slate-200 dark:!border-slate-700 hover:!bg-indigo-50 dark:hover:!bg-indigo-950/30"
           >
             Load More Activities ({filteredEntries.length - visibleCount} remaining)
-          </button>
+          </Button>
         )}
       </div>
-    </div>
+    </Card>
   )
 }
