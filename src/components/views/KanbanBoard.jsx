@@ -1,4 +1,5 @@
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { Badge, Card, Heading } from '../ui'
 import JobCard from '../jobs/JobCard'
 
 const COLUMN_STYLES = {
@@ -25,14 +26,10 @@ export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete,
               return db - da
             })
           return (
-            <div key={colId} className="bg-slate-50 dark:bg-slate-900/40 rounded-lg flex flex-col overflow-hidden">
+            <Card key={colId} className="!bg-slate-50 dark:!bg-slate-900/40 !rounded-lg flex flex-col overflow-hidden !shadow-none">
               <div className={`${style.headerBg} px-3 py-3 flex items-center justify-between shadow-lg ${style.shadow}`}>
-                <span className="text-sm font-bold tracking-wider text-white uppercase">
-                  {style.label}
-                </span>
-                <span className="text-xs text-white/80 font-bold tabular-nums bg-white/20 rounded-full px-2 py-0.5 leading-tight">
-                  {items.length}
-                </span>
+                <Heading size="xs" className="!text-white">{style.label}</Heading>
+                <Badge variant="count">{items.length}</Badge>
               </div>
               <Droppable droppableId={colId}>
                 {(provided, snapshot) => (
@@ -64,7 +61,7 @@ export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete,
                   </div>
                 )}
               </Droppable>
-            </div>
+            </Card>
           )
         })}
       </div>
