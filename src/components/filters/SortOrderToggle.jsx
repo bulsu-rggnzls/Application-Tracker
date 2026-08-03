@@ -1,4 +1,5 @@
 import { ArrowUpAZ, ArrowDownZA } from 'lucide-react'
+import { Button, Heading } from '../ui'
 import Popover from './Popover'
 
 const COLOR_MAP = {
@@ -21,58 +22,55 @@ export default function SortOrderToggle({ label, currentSort, onSortChange, colo
 
   if (isActive) {
     return (
-      <button
+      <Button
+        variant="secondary"
         onClick={handleToggle}
         title={`Toggle sort order (currently ${currentSort.dir === 'asc' ? 'ascending' : 'descending'})`}
-        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer ${c.active} border`}
+        className={`!px-2 !py-1 !rounded-md ${c.active} !border`}
       >
         {label}
         {currentSort.dir === 'asc' ? <ArrowUpAZ size={13} /> : <ArrowDownZA size={13} />}
-      </button>
+      </Button>
     )
   }
 
   return (
     <Popover
       trigger={
-        <button
+        <Button
+          variant="secondary"
           onClick={handleToggle}
-          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer ${
-          isActive
-            ? `${c.active} border`
-            : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
-        }`}>
+          className="!px-2 !py-1 !rounded-md !border-0 text-slate-400 dark:text-slate-500 hover:!text-slate-600 dark:hover:!text-slate-300"
+        >
           {label}
-          {isActive ? (
-            currentSort.dir === 'asc' ? <ArrowUpAZ size={13} /> : <ArrowDownZA size={13} />
-          ) : (
-            <ArrowUpAZ size={13} className="opacity-40" />
-          )}
-        </button>
+          <ArrowUpAZ size={13} className="opacity-40" />
+        </Button>
       }
     >
       <div className="space-y-1">
-        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Sort by {label}</p>
-        <button
+        <Heading size="xs" className="mb-2">Sort by {label}</Heading>
+        <Button
+          variant="secondary"
           onClick={() => onSortChange(label.toLowerCase(), 'asc')}
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors ${
+          className={`!w-full !justify-start !px-2 !py-1.5 !rounded-md !text-left ${
             isActive && currentSort.dir === 'asc'
-              ? `${c.active} font-medium`
-              : `text-slate-600 dark:text-slate-300 ${c.hover}`
+              ? `${c.active} !font-medium`
+              : `!text-slate-600 dark:!text-slate-300 ${c.hover}`
           }`}
         >
           <ArrowUpAZ size={14} className={c.icon} /> A → Z
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
           onClick={() => onSortChange(label.toLowerCase(), 'desc')}
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors ${
+          className={`!w-full !justify-start !px-2 !py-1.5 !rounded-md !text-left ${
             isActive && currentSort.dir === 'desc'
-              ? `${c.active} font-medium`
-              : `text-slate-600 dark:text-slate-300 ${c.hover}`
+              ? `${c.active} !font-medium`
+              : `!text-slate-600 dark:!text-slate-300 ${c.hover}`
           }`}
         >
           <ArrowDownZA size={14} className={c.icon} /> Z → A
-        </button>
+        </Button>
       </div>
     </Popover>
   )
