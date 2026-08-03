@@ -42,8 +42,8 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
         <div className="flex items-start gap-2 mb-1.5">
           <CompanyLogo domain={domain} company={company} />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-slate-900 dark:text-white text-[12px] leading-tight truncate">{company}</p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{role}</p>
+            <Text variant="body" className="!text-[12px] !font-semibold !text-slate-900 dark:!text-white leading-tight truncate">{company}</Text>
+            <Text variant="muted-sm" className="truncate">{role}</Text>
           </div>
         </div>
 
@@ -91,12 +91,20 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
           </div>
         ) : (
           <div className="flex items-center justify-between w-full">
-            <span className="text-[11px] text-slate-400">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</span>
+            <Text variant="muted-sm" className="!text-[11px] !text-slate-400">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</Text>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               {jobUrl && (
-                <a href={jobUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                <IconButton
+                  as="a"
+                  href={jobUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="!p-1"
+                  title="Open job posting"
+                >
                   <ExternalLink size={11} />
-                </a>
+                </IconButton>
               )}
               <IconButton color="slate" className="!p-1" onClick={(e) => { e.stopPropagation(); onEdit(application) }}><Edit3 size={11} /></IconButton>
               <IconButton color="rose" className="!p-1" onClick={(e) => { e.stopPropagation(); onDelete(id) }}><Trash2 size={11} /></IconButton>
