@@ -9,10 +9,10 @@ const variants = {
   destructive: 'flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/60 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors cursor-pointer',
 }
 
-export default function Button({ variant = 'primary', className = '', children, ...props }) {
+export default function Button({ as: Tag = 'button', variant = 'primary', className = '', children, ...props }) {
   return (
-    <button className={`${variants[variant] || variants.primary} ${className}`} {...props}>
+    <Tag className={`${variants[variant] || variants.primary} ${className}`} {...props}>
       {children}
-    </button>
+    </Tag>
   )
 }
