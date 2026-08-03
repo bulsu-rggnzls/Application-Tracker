@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Search, Bell, Calendar, Clock, Check } from 'lucide-react'
+import { Badge, Heading, IconButton, Input, Text } from '../ui'
 import formatTime from '../../utils/formatTime'
 
 function parseInterviewDate(iv) {
@@ -47,52 +48,46 @@ export default function TopBar({ search, onSearchChange, applications }) {
   return (
     <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0">
       <div className="flex items-center gap-3 shrink-0">
-        <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Applications</h2>
+        <Heading size="sm">Applications</Heading>
       </div>
       <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
-        <div className="relative w-full max-w-xs min-w-0">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search company, role, or tag..."
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
-          />
-        </div>
+        <Input
+          containerClassName="relative w-full max-w-xs min-w-0"
+          icon={<Search size={14} />}
+          type="text"
+          placeholder="Search company, role, or tag..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
         <div className="relative">
-          <button
+          <IconButton
             onClick={() => setNotifOpen(prev => !prev)}
-            className={`relative p-2 rounded-lg transition-colors cursor-pointer ${
-              notifOpen
-                ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
+            className={notifOpen ? '!bg-slate-100 dark:!bg-slate-800 !text-slate-700 dark:!text-slate-200' : '!text-slate-500 dark:!text-slate-400 hover:!text-slate-700 dark:hover:!text-slate-200'}
             title="Notifications"
           >
             <Bell size={18} />
             {upcoming.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <Badge variant="count" className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 !bg-rose-500">
                 {upcoming.length}
-              </span>
+              </Badge>
             )}
-          </button>
+          </IconButton>
           {notifOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
               <div className="absolute right-0 top-full mt-2 z-50 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</h3>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                  <Heading size="sm">Notifications</Heading>
                   {upcoming.length > 0 && (
-                    <span className="text-[11px] font-medium text-rose-600 dark:text-rose-400">Upcoming 24h</span>
+                    <Badge variant="count-pill" className="!text-[11px] !font-medium !text-rose-600 dark:!text-rose-400 !bg-rose-50 dark:!bg-rose-900/20">Upcoming 24h</Badge>
                   )}
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {upcoming.length === 0 ? (
                     <div className="px-4 py-8 text-center">
                       <Check size={20} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-                      <p className="text-sm text-slate-500 dark:text-slate-400">No interviews in the next 24 hours</p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">You're all caught up!</p>
+                      <Text variant="body">No interviews in the next 24 hours</Text>
+                      <Text variant="muted-sm" className="mt-0.5">You're all caught up!</Text>
                     </div>
                   ) : (
                     upcoming.map(iv => (
@@ -101,10 +96,10 @@ export default function TopBar({ search, onSearchChange, applications }) {
                           <Calendar size={15} />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                          <Text variant="body" className="!font-medium !text-slate-800 dark:!text-slate-200 truncate">
                             Interview at {iv.company}
-                          </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{iv.role}{iv.stageName ? ` · ${iv.stageName}` : ''}</p>
+                          </Text>
+                          <Text variant="subtle" className="truncate">{iv.role}{iv.stageName ? ` · ${iv.stageName}` : ''}</Text>
                           <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-400 dark:text-slate-500">
                             <span className="flex items-center gap-1">
                               <Clock size={11} />
