@@ -4,6 +4,7 @@ import {
   CalendarDays, Link, User, Mail, ExternalLink, Hash, Clock, Video
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
+import { Button, IconButton, Heading, Text, Input } from '../ui'
 import extractDomain from '../../utils/extractDomain'
 
 function getTabs(status) {
@@ -45,10 +46,6 @@ function inputCls(hasIcon) {
 
 function selectCls() {
   return 'w-full px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all duration-200 appearance-none cursor-pointer'
-}
-
-function InputIcon({ icon }) {
-  return <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">{icon}</span>
 }
 
 function PillInput({ tags, onAdd, onRemove, placeholder }) {
@@ -244,14 +241,14 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                 <span className={logoDomain ? 'hidden' : ''}><Briefcase size={18} /></span>
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-base font-semibold text-slate-900 dark:text-white">{editingJob ? 'Edit Application' : 'New Application'}</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                <Heading size="md">{editingJob ? 'Edit Application' : 'New Application'}</Heading>
+                <Text variant="subtle" className="truncate mt-0.5">
                   {form.company || form.role ? `${form.company || 'Company'}${form.company && form.role ? ' — ' : ''}${form.role || 'Role'}` : 'Enter company and role to get started'}
-                </p>
+                </Text>
               </div>
-              <button type="button" onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-white/60 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+              <IconButton type="button" onClick={onClose} className="hover:bg-white/60 dark:hover:bg-slate-800" aria-label="Close">
                 <X size={18} />
-              </button>
+              </IconButton>
             </div>
           </div>
 
@@ -299,17 +296,11 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Company Name</label>
-                  <div className="relative">
-                    <InputIcon icon={<Building2 size={15} />} />
-                    <input type="text" value={form.company} onChange={handleCompanyChange} required placeholder="e.g. Stripe" className={inputCls(true)} />
-                  </div>
+                  <Input containerClassName="relative w-full" icon={<Building2 size={15} />} type="text" value={form.company} onChange={handleCompanyChange} required placeholder="e.g. Stripe" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Role Title</label>
-                  <div className="relative">
-                    <InputIcon icon={<Briefcase size={15} />} />
-                    <input type="text" value={form.role} onChange={update('role')} required placeholder="e.g. Senior Frontend" className={inputCls(true)} />
-                  </div>
+                  <Input containerClassName="relative w-full" icon={<Briefcase size={15} />} type="text" value={form.role} onChange={update('role')} required placeholder="e.g. Senior Frontend" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -323,21 +314,12 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Location Type</label>
-                  <div className="relative">
-                    <InputIcon icon={<MapPin size={15} />} />
-                    <input type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid, On-site" className={inputCls(true)} />
-                  </div>
+                  <Input containerClassName="relative w-full" icon={<MapPin size={15} />} type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid, On-site" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="relative">
-                  <InputIcon icon={<CalendarDays size={15} />} />
-                  <input type="date" value={form.dateApplied} onChange={update('dateApplied')} className={inputCls(true)} />
-                </div>
-                <div className="relative">
-                  <InputIcon icon={<Link size={15} />} />
-                  <input type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/..." className={inputCls(true)} />
-                </div>
+                <Input containerClassName="relative w-full" icon={<CalendarDays size={15} />} type="date" value={form.dateApplied} onChange={update('dateApplied')} />
+                <Input containerClassName="relative w-full" icon={<Link size={15} />} type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/..." />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Status</label>
@@ -371,14 +353,8 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Salary</label>
                 <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2">
-                  <div className="relative">
-                    <InputIcon icon={<DollarSign size={15} />} />
-                    <input type="number" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min ($k)" className={inputCls(true)} />
-                  </div>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">–</span>
-                    <input type="number" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max ($k)" className={inputCls(true)} />
-                  </div>
+                  <Input containerClassName="relative w-full" icon={<DollarSign size={15} />} type="number" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min ($k)" />
+                  <Input containerClassName="relative w-full" icon={<span>–</span>} type="number" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max ($k)" />
                   <select value={form.salary.period} onChange={updateSalary('period')} className={`${selectCls()} w-24`}>
                     {periods.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </select>
@@ -392,25 +368,16 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                 <PillInput tags={form.tags} onAdd={addTag} onRemove={removeTag} placeholder="Type a tag and press Enter..." />
               </div>
               <div>
-                <button type="button" onClick={() => setShowRecruiter(!showRecruiter)} className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
+                <Button type="button" variant="ghost" onClick={() => setShowRecruiter(!showRecruiter)} className="!p-0 !h-auto !text-xs !font-medium !text-slate-500 dark:!text-slate-400 hover:!text-indigo-600 dark:hover:!text-indigo-400">
                   <User size={13} />
                   {showRecruiter ? 'Hide recruiter info' : 'Add recruiter info'}
                   <span className="text-slate-300 dark:text-slate-600">(optional)</span>
-                </button>
+                </Button>
                 {showRecruiter && (
                   <div className="mt-2 grid grid-cols-3 gap-2 animate-in fade-in-0 slide-in-from-top-1 duration-150">
-                    <div className="relative">
-                      <InputIcon icon={<User size={14} />} />
-                      <input type="text" value={form.recruiter.name} onChange={updateRecruiter('name')} placeholder="Name" className={inputCls(true)} />
-                    </div>
-                    <div className="relative">
-                      <InputIcon icon={<Mail size={14} />} />
-                      <input type="email" value={form.recruiter.email} onChange={updateRecruiter('email')} placeholder="Email" className={inputCls(true)} />
-                    </div>
-                    <div className="relative">
-                      <InputIcon icon={<ExternalLink size={14} />} />
-                      <input type="url" value={form.recruiter.linkedin} onChange={updateRecruiter('linkedin')} placeholder="LinkedIn URL" className={inputCls(true)} />
-                    </div>
+                    <Input containerClassName="relative w-full" icon={<User size={14} />} type="text" value={form.recruiter.name} onChange={updateRecruiter('name')} placeholder="Name" />
+                    <Input containerClassName="relative w-full" icon={<Mail size={14} />} type="email" value={form.recruiter.email} onChange={updateRecruiter('email')} placeholder="Email" />
+                    <Input containerClassName="relative w-full" icon={<ExternalLink size={14} />} type="url" value={form.recruiter.linkedin} onChange={updateRecruiter('linkedin')} placeholder="LinkedIn URL" />
                   </div>
                 )}
               </div>
@@ -429,26 +396,26 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                   <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
                     <CalendarDays size={13} /> Interview Date
                   </label>
-                  <input type="date" value={form.interview.date} onChange={updateInterview('date')} className={inputCls(false)} />
+                  <Input containerClassName="relative w-full" type="date" value={form.interview.date} onChange={updateInterview('date')} />
                 </div>
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
                     <Clock size={13} /> Interview Time
                   </label>
-                  <input type="time" value={form.interview.time} onChange={updateInterview('time')} className={inputCls(false)} />
+                  <Input containerClassName="relative w-full" type="time" value={form.interview.time} onChange={updateInterview('time')} />
                 </div>
               </div>
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
                   <Video size={13} /> Platform
                 </label>
-                <input type="text" value={form.interview.platform} onChange={updateInterview('platform')} placeholder="Zoom, Google Meet, etc." className={inputCls(false)} />
+                <Input containerClassName="relative w-full" type="text" value={form.interview.platform} onChange={updateInterview('platform')} placeholder="Zoom, Google Meet, etc." />
               </div>
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
                   <User size={13} /> Interviewer
                 </label>
-                <input type="text" value={form.interview.interviewer} onChange={updateInterview('interviewer')} placeholder="e.g. Sarah Chen" className={inputCls(false)} />
+                <Input containerClassName="relative w-full" type="text" value={form.interview.interviewer} onChange={updateInterview('interviewer')} placeholder="e.g. Sarah Chen" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Interview Notes</label>
@@ -461,29 +428,30 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
 
           {/* ---------- FOOTER ---------- */}
           <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-2xl">
-            <p className="text-xs text-slate-400 dark:text-slate-500">Step {activeTab + 1} of {TABS.length}</p>
+            <Text variant="muted-sm">Step {activeTab + 1} of {TABS.length}</Text>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
+              <Button type="button" variant="secondary" onClick={onClose}>
                 Cancel
-              </button>
+              </Button>
               {activeTab > 0 && (
-                <button type="button" onClick={() => setActiveTab(prev => prev - 1)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <Button type="button" variant="secondary" onClick={() => setActiveTab(prev => prev - 1)}>
                   Back
-                </button>
+                </Button>
               )}
               {activeTab < TABS.length - 1 ? (
-                <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab(prev => prev + 1) }} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20 rounded-lg active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                <Button type="button" variant="indigo" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab(prev => prev + 1) }} className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20">
                   Next
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   type="submit"
+                  variant="indigo"
                   onClick={handleSubmit}
                   disabled={!form.company || !form.role}
-                  className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer rounded-lg"
+                  className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
                 >
                   {editingJob ? 'Save Changes' : 'Add Application'}
-                </button>
+                </Button>
               )}
             </div>
           </div>
