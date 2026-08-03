@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Trash2, Edit3, ExternalLink } from 'lucide-react'
-import { Table, Thead, Th, Tbody, Tr, Td, Badge, IconButton, Tfoot } from '../ui'
+import { Table, Thead, Th, Tbody, Tr, Td, Badge, Button, IconButton, Text, Tfoot } from '../ui'
 import CompanyLogo from '../jobs/CompanyLogo'
 import extractDomain from '../../utils/extractDomain'
 import getRelativeTime from '../../utils/getRelativeTime'
@@ -149,14 +149,14 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
     <Table>
       {selected.size > 0 && (
         <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50/70 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/40">
-          <span className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">{selected.size} selected</span>
-          <button onClick={handleBulkDelete} className="text-sm text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium cursor-pointer">Delete all</button>
+          <Text variant="body" className="!text-indigo-700 dark:!text-indigo-300 !font-medium">{selected.size} selected</Text>
+          <Button variant="ghost" onClick={handleBulkDelete} className="!text-sm !text-rose-600 dark:!text-rose-400 hover:!text-rose-700 dark:hover:!text-rose-300 !font-medium !p-0 !h-auto">Delete all</Button>
         </div>
       )}
       <Thead>
-        <th className="w-10 px-4 py-2">
+        <Th className="w-10 px-4 py-2">
           <input type="checkbox" checked={selected.size === filtered.length && filtered.length > 0} onChange={toggleAll} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
-        </th>
+        </Th>
         <Th className="w-[20%]">
           <SortOrderToggle label="Company" currentSort={sort} onSortChange={handleSort} color="indigo" />
         </Th>
@@ -183,7 +183,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
         <Th className="w-[13%]">
           <TagFilter availableTags={allTags} selectedTags={tagFilter} onChange={setTagFilter} />
         </Th>
-        <th className="w-20 px-3 py-2 text-right text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Actions</th>
+        <Th className="w-20 !px-3 !py-2 !text-right">Actions</Th>
       </Thead>
       <Tbody>
         {pageItems.map((app, index) => {
@@ -203,16 +203,16 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
               <Td className="px-3">
                 <div className="flex items-center gap-2.5">
                   <CompanyLogo domain={domain} company={app.company} />
-                  <span className="font-medium text-slate-900 dark:text-white">{app.company}</span>
+                  <Text variant="body" className="!font-medium !text-slate-900 dark:!text-white">{app.company}</Text>
                 </div>
               </Td>
               <Td className="px-3 text-slate-600 dark:text-slate-300">{app.role}</Td>
               <Td className="px-3 text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
               <Td className="px-3 text-slate-500 dark:text-slate-400">{formatSalary(app.salary) || '-'}</Td>
               <Td className="px-3">
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-md border ${statusColors[app.status]}`}>
+                <Badge variant="status" className={`!border ${statusColors[app.status]}`}>
                   {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                </span>
+                </Badge>
               </Td>
               <Td className="px-3 text-slate-400 dark:text-slate-500 text-xs whitespace-nowrap">
                 {app.dateApplied ? getRelativeTime(app.dateApplied) : '-'}
@@ -222,7 +222,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                   {app.tags.slice(0, 2).map(t => (
                     <Badge key={t} variant="table">{t}</Badge>
                   ))}
-                  {app.tags.length > 2 && <span className="text-xs text-slate-400 dark:text-slate-500">+{app.tags.length - 2}</span>}
+                  {app.tags.length > 2 && <Text variant="muted-sm">+{app.tags.length - 2}</Text>}
                 </div>
               </Td>
               <Td className="px-3 text-right" onClick={e => e.stopPropagation()}>
@@ -256,7 +256,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
               <Pagination>
                 <PaginationContent className="w-full justify-between flex-wrap gap-y-2">
                   <PaginationItem>
-                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                    <Text variant="body" className="!text-slate-500 dark:!text-slate-400">
                       Showing{' '}
                       <span className="font-medium text-slate-700 dark:text-slate-200">
                         {(currentPage - 1) * pageSize + 1}
@@ -268,7 +268,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                       of{' '}
                       <span className="font-medium text-slate-700 dark:text-slate-200">{filtered.length}</span>{' '}
                       applications
-                    </span>
+                    </Text>
                   </PaginationItem>
                   <PaginationItem className="flex items-center gap-1">
                     <PaginationPrevious
