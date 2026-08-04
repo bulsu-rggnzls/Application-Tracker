@@ -353,8 +353,8 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Salary</label>
                 <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2">
-                  <Input containerClassName="relative w-full" icon={<DollarSign size={15} />} type="number" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min ($k)" />
-                  <Input containerClassName="relative w-full" icon={<span>–</span>} type="number" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max ($k)" />
+                  <Input containerClassName="relative w-full" icon={<DollarSign size={15} />} type="number" min="0" max="100000" step="1" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min (k)" />
+                  <Input containerClassName="relative w-full" icon={<span>–</span>} type="number" min="0" max="100000" step="1" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max (k)" />
                   <select value={form.salary.period} onChange={updateSalary('period')} className={`${selectCls()} w-24`}>
                     {periods.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </select>
