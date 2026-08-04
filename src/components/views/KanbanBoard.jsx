@@ -26,7 +26,7 @@ export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete,
               return db - da
             })
           return (
-            <Card key={colId} className="!bg-slate-50 dark:!bg-slate-900/40 !rounded-lg flex flex-col overflow-hidden !shadow-none">
+            <Card key={colId} className="!bg-slate-50 dark:!bg-slate-900/40 !rounded-lg flex flex-col overflow-hidden !shadow-none !border !border-slate-200/50 dark:!border-slate-700/40">
               <div className={`${style.headerBg} px-3 py-3 flex items-center justify-between shadow-lg ${style.shadow}`}>
                 <Heading size="xs" className="!text-white">{style.label}</Heading>
                 <Badge variant="count">{items.length}</Badge>
