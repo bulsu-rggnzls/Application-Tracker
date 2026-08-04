@@ -91,8 +91,10 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
           </div>
         ) : (
           <div className="flex items-center justify-between w-full">
-            <Text variant="muted-sm" className="!text-[11px] !text-slate-400">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</Text>
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {isInterviewing && (
+              <Text variant="muted-sm" className="!text-[11px] !text-slate-400">{interviews?.length || 0} interview{(interviews?.length || 0) !== 1 ? 's' : ''}</Text>
+            )}
+            <div className={`flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${isInterviewing ? '' : 'ml-auto'}`}>
               {jobUrl && (
                 <IconButton
                   as="a"

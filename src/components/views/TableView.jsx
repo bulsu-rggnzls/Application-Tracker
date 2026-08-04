@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Trash2, Edit3, ExternalLink } from 'lucide-react'
-import { Table, Thead, Th, Tbody, Tr, Td, Badge, Button, IconButton, Text, Tfoot } from '../ui'
+import { Table, Thead, Th, Tbody, Tr, Td, Badge, Button, IconButton, Text } from '../ui'
 import CompanyLogo from '../jobs/CompanyLogo'
 import extractDomain from '../../utils/extractDomain'
 import getRelativeTime from '../../utils/getRelativeTime'
@@ -146,7 +146,8 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
   }
 
   return (
-    <Table>
+    <div className="flex flex-col flex-1 min-h-0">
+      <Table className={filtered.length > 0 ? '!rounded-b-none' : ''}>
       {selected.size > 0 && (
         <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50/70 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/40">
           <Text variant="body" className="!text-indigo-700 dark:!text-indigo-300 !font-medium">{selected.size} selected</Text>
@@ -154,19 +155,19 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
         </div>
       )}
       <Thead>
-        <Th className="w-10 px-4 py-2">
+        <Th className="w-10 !px-4">
           <input type="checkbox" checked={selected.size === filtered.length && filtered.length > 0} onChange={toggleAll} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
         </Th>
-        <Th className="w-[20%]">
+        <Th className="w-[18%]">
           <SortOrderToggle label="Company" currentSort={sort} onSortChange={handleSort} color="indigo" />
         </Th>
-        <Th className="w-[24%]">
+        <Th className="w-[22%]">
           <SortOrderToggle label="Role" currentSort={sort} onSortChange={handleSort} color="sky" />
         </Th>
-        <Th className="w-[13%]">
+        <Th className="w-[12%]">
           <MultiSelectFilter title="Location" options={locationOptions} selectedValues={locationFilter} onChange={setLocationFilter} color="teal" />
         </Th>
-        <Th className="w-[10%]">
+        <Th className="w-[12%]">
           <SalaryRangeFilter
             minSalary={salaryRange.min}
             maxSalary={salaryRange.max}
@@ -174,16 +175,16 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
             onChange={setSalaryRange}
           />
         </Th>
-        <Th className="w-[11%]">
+        <Th className="w-[10%]">
           <MultiSelectFilter title="Status" options={statusOptions} selectedValues={statusFilter} onChange={setStatusFilter} color="purple" />
         </Th>
         <Th className="w-[9%]">
           <DateRangeFilter value={dateRange} onChange={setDateRange} />
         </Th>
-        <Th className="w-[13%]">
+        <Th className="w-[14%]">
           <TagFilter availableTags={allTags} selectedTags={tagFilter} onChange={setTagFilter} />
         </Th>
-        <Th className="w-20 !px-3 !py-2 !text-right">Actions</Th>
+        <Th className="w-28 !px-4 !text-right">Actions</Th>
       </Thead>
       <Tbody>
         {pageItems.map((app, index) => {
@@ -197,27 +198,27 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                 selected.has(app.id) ? '!bg-indigo-50/60 dark:!bg-indigo-900/30' : ''
               } border-l-2 ${statusBorder[app.status] || 'border-l-transparent'}`}
             >
-              <Td className="px-4" onClick={e => e.stopPropagation()}>
+              <Td onClick={e => e.stopPropagation()}>
                 <input type="checkbox" checked={selected.has(app.id)} onChange={() => toggleSelect(app.id)} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
               </Td>
-              <Td className="px-3">
+              <Td>
                 <div className="flex items-center gap-2.5">
                   <CompanyLogo domain={domain} company={app.company} />
                   <Text variant="body" className="!font-medium !text-slate-900 dark:!text-white">{app.company}</Text>
                 </div>
               </Td>
-              <Td className="px-3 text-slate-600 dark:text-slate-300">{app.role}</Td>
-              <Td className="px-3 text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
-              <Td className="px-3 text-slate-500 dark:text-slate-400">{formatSalary(app.salary) || '-'}</Td>
-              <Td className="px-3">
+              <Td className="font-medium text-slate-900 dark:text-white">{app.role}</Td>
+              <Td className="text-sm text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
+              <Td className="text-sm text-slate-500 dark:text-slate-400">{formatSalary(app.salary) || '-'}</Td>
+              <Td>
                 <Badge variant="status" className={`!border ${statusColors[app.status]}`}>
                   {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                 </Badge>
               </Td>
-              <Td className="px-3 text-slate-400 dark:text-slate-500 text-xs whitespace-nowrap">
+              <Td className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">
                 {app.dateApplied ? getRelativeTime(app.dateApplied) : '-'}
               </Td>
-              <Td className="px-3">
+              <Td>
                 <div className="flex gap-1 flex-wrap">
                   {app.tags.slice(0, 2).map(t => (
                     <Badge key={t} variant="table">{t}</Badge>
@@ -225,7 +226,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                   {app.tags.length > 2 && <Text variant="muted-sm">+{app.tags.length - 2}</Text>}
                 </div>
               </Td>
-              <Td className="px-3 text-right" onClick={e => e.stopPropagation()}>
+              <Td className="text-right" onClick={e => e.stopPropagation()}>
                 <div className="flex gap-1 justify-end">
                   {app.jobUrl && (
                     <a href={app.jobUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
@@ -243,17 +244,16 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
       {filtered.length === 0 && (
         <tbody>
           <tr>
-            <td colSpan={7} className="text-center py-16 text-slate-400 dark:text-slate-500 text-sm">
+            <td colSpan={9} className="text-center py-16 text-slate-400 dark:text-slate-500 text-sm">
               No applications match your filters
             </td>
           </tr>
         </tbody>
       )}
+      </Table>
       {filtered.length > 0 && (
-        <Tfoot>
-          <tr>
-            <td colSpan={7} className="px-4 py-2">
-              <Pagination>
+        <div className="shrink-0 bg-white dark:bg-slate-900 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-xl shadow-sm px-4 py-2">
+          <Pagination>
                 <PaginationContent className="w-full justify-between flex-wrap gap-y-2">
                   <PaginationItem>
                     <Text variant="body" className="!text-slate-500 dark:!text-slate-400">
@@ -324,11 +324,9 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                     </select>
                   </PaginationItem>
                 </PaginationContent>
-              </Pagination>
-            </td>
-          </tr>
-        </Tfoot>
+          </Pagination>
+        </div>
       )}
-    </Table>
+    </div>
   )
 }

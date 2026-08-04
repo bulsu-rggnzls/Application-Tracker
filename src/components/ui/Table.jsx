@@ -30,7 +30,7 @@ export function Th({ children, className = '', sortable, onClick, ...props }) {
   return (
     <th
       onClick={onClick}
-      className={`px-3 py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-200 select-none' : ''} ${className}`}
+      className={`px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-200 select-none' : ''} ${className}`}
       {...props}
     >
       <div className="flex items-center gap-1">{children}</div>
@@ -56,7 +56,7 @@ export function Tr({ children, className = '', onClick, ...props }) {
 
 export function Td({ children, className = '', ...props }) {
   return (
-    <td className={`px-3 py-1.5 ${className}`} {...props}>
+    <td className={`px-4 py-3.5 ${className}`} {...props}>
       {children}
     </td>
   )
