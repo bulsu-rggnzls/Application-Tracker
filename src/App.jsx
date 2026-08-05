@@ -16,10 +16,10 @@ import JobDetailDrawer from './components/jobs/JobDetailDrawer'
 import InterviewModal from './components/jobs/InterviewModal'
 import { ComposeEmailCard } from './components/ui'
 import confetti from 'canvas-confetti'
+wimport { exportToJSON, importFromJSON } from './utils/dataExport'
 
 export default function App() {
   const [applications, setApplications] = useLocalStorage('jobApplications', [])
-  const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState('board')
   const [activeView, setActiveView] = useState('board')
   const [modalOpen, setModalOpen] = useState(false)
@@ -39,11 +39,6 @@ export default function App() {
     localStorage.setItem('darkMode', darkMode)
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
-
-  const filtered = applications.filter(app => {
-    const q = search.toLowerCase()
-    return !q || app.company.toLowerCase().includes(q) || app.role.toLowerCase().includes(q) || app.tags.some(t => t.toLowerCase().includes(q))
-  })
 
   const handleDragEnd = useCallback((result) => {
     if (!result.destination) return
@@ -124,6 +119,26 @@ export default function App() {
       const updated = app.status === 'interviewing' ? { ...app, interviews: [] } : app
       return logActivity({ ...updated, status: newStatus }, 'status_change', `Moved to ${newStatus}`)
     }))
+    setDetailJob(prev => prev && prev.id === id ? { ...prev, status: newStatus } : prev)
+  }, [setApplications])
+
+  const handleUpdateJob = useCallback((updates) => {
+    setApplications(prev => prev.map(app => app.id === updates.id ? { ...app, ...updates } : app))
+    setDetailJob(prev => prev && prev.id === updates.id ? { ...prev, ...updates } : prev)
+  }, [setApplications])
+
+  const handleExport = useCallback(() => {
+    exportToJSON(applications)
+  }, [applications])
+
+  const handleImport = useCallback(async (file) => {
+    if (!file) return
+    try {
+      const data = await importFromJSON(file)
+      setApplications(data)
+    } catch (err) {
+      console.error('Import failed:', err)
+    }
   }, [setApplications])
 
   const openEdit = (job) => {
@@ -165,7 +180,7 @@ export default function App() {
       <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} />
 
       <div className="flex-1 flex flex-col min-w-0">
-          <TopBar search={search} onSearchChange={setSearch} applications={applications} />
+          <TopBar applications={applications} />
 
           <div className="flex-1 overflow-y-auto min-h-0" style={{ scrollbarGutter: 'stable' }}>
           <div className="px-6 py-4">
@@ -176,13 +191,15 @@ export default function App() {
                   onComposeEmail={handleComposeEmail}
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
+                  onExport={handleExport}
+                  onImport={handleImport}
                 />
                 <div className="mt-4">
-                  <AnalyticsBar applications={filtered} />
+                  <AnalyticsBar applications={applications} />
                 </div>
                 {viewMode === 'board' ? (
                   <KanbanBoard
-                    applications={filtered}
+                    applications={applications}
                     onDragEnd={handleDragEnd}
                     onEdit={openEdit}
                     onDelete={handleDelete}
@@ -192,7 +209,7 @@ export default function App() {
                   />
                 ) : (
                   <TableView
-                    applications={filtered}
+                    applications={applications}
                     onEdit={openEdit}
                     onDelete={handleDelete}
                     onSelect={setDetailJob}
@@ -237,6 +254,7 @@ export default function App() {
         onEdit={openEdit}
         onDelete={handleDelete}
         onStatusChange={handleStatusChange}
+        onUpdate={handleUpdateJob}
       />
 
       {composeOpen && (

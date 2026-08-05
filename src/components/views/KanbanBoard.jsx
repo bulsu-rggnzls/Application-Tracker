@@ -1,6 +1,9 @@
+import { useState, useMemo } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { Badge, Card, Heading } from '../ui'
 import JobCard from '../jobs/JobCard'
+import BoardToolbar from './BoardToolbar'
+import { getSalaryNumeric } from '../../utils/formatSalary'
 
 const COLUMN_STYLES = {
   wishlist: { label: 'Wishlist', headerBg: 'bg-orange-500', shadow: 'shadow-orange-500/20', border: 'border-orange-300' },
@@ -12,19 +15,46 @@ const COLUMN_STYLES = {
 
 const columns = ['wishlist', 'applied', 'interviewing', 'offer', 'rejected']
 
+function compareItems(a, b, sort) {
+  if (sort === 'salary') {
+    return getSalaryNumeric(b.salary) - getSalaryNumeric(a.salary)
+  }
+  const da = a.dateApplied ? new Date(a.dateApplied).getTime() : 0
+  const db = b.dateApplied ? new Date(b.dateApplied).getTime() : 0
+  return db - da
+}
+
 export default function KanbanBoard({ applications, onDragEnd, onEdit, onDelete, onAcceptOffer, onRejectOffer, onSelect }) {
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [sort, setSort] = useState('newest')
+
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return applications.filter(app => {
+      if (q && !app.company.toLowerCase().includes(q) && !app.role.toLowerCase().includes(q)) return false
+      if (filter === 'remote' && !app.location?.toLowerCase().includes('remote')) return false
+      if (filter === 'starred' && !app.starred) return false
+      return true
+    })
+  }, [applications, search, filter])
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <BoardToolbar
+        search={search}
+        onSearchChange={setSearch}
+        filter={filter}
+        onFilterChange={setFilter}
+        sort={sort}
+        onSortChange={setSort}
+      />
       <div className="grid grid-cols-5 gap-3 min-h-[500px]">
         {columns.map((colId) => {
           const style = COLUMN_STYLES[colId]
-          const items = applications
+          const items = visible
             .filter(a => a.status === colId)
-            .sort((a, b) => {
-              const da = a.dateApplied ? new Date(a.dateApplied).getTime() : 0
-              const db = b.dateApplied ? new Date(b.dateApplied).getTime() : 0
-              return db - da
-            })
+            .sort((a, b) => compareItems(a, b, sort))
           return (
             <Card key={colId} className="!bg-slate-50 dark:!bg-slate-900/40 !rounded-lg flex flex-col overflow-hidden !shadow-none !border !border-slate-200/50 dark:!border-slate-700/40">
               <div className={`${style.headerBg} px-3 py-3 flex items-center justify-between shadow-lg ${style.shadow}`}>
