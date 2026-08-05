@@ -16,7 +16,7 @@ import JobDetailDrawer from './components/jobs/JobDetailDrawer'
 import InterviewModal from './components/jobs/InterviewModal'
 import { ComposeEmailCard } from './components/ui'
 import confetti from 'canvas-confetti'
-import { exportToJSON, importFromJSON } from './utils/dataExport'
+wimport { exportToJSON, importFromJSON } from './utils/dataExport'
 
 export default function App() {
   const [applications, setApplications] = useLocalStorage('jobApplications', [])
