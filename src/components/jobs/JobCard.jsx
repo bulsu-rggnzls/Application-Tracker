@@ -1,4 +1,4 @@
-import { Edit3, Trash2, ExternalLink, MapPin, DollarSign, Clock, Briefcase, Check, X } from 'lucide-react'
+import { Edit3, Trash2, ExternalLink, MapPin, DollarSign, Clock, Briefcase, Check, X, Star, BellRing } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Badge, Button, Divider, IconButton, Text } from '../ui'
 import { getTagStyle } from '../../utils/tagColors'
@@ -12,10 +12,6 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
   const { company, role, location, salary, employmentType, status, dateApplied, tags, jobUrl, id, interviews } = application
   const domain = extractDomain(jobUrl)
 
-  const nextInterview = interviews?.length > 0
-    ? [...interviews].sort((a, b) => new Date(a.date) - new Date(b.date)).find(iv => new Date(iv.date) >= new Date())
-    : null
-
   const latestInterview = interviews?.length > 0
     ? [...interviews].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
     : null
@@ -23,6 +19,9 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
   const isOffer = status === 'offer'
   const isInterviewing = status === 'interviewing'
   const borderClass = statusBorder || 'border-slate-200 dark:border-slate-700'
+
+  const isStaleApplied = status === 'applied' && !!dateApplied &&
+    (Date.now() - new Date(dateApplied).getTime()) > 10 * 24 * 60 * 60 * 1000
 
   return (
     <motion.div
@@ -45,6 +44,9 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
             <Text variant="body" className="!text-[12px] !font-semibold !text-slate-900 dark:!text-white leading-tight truncate">{company}</Text>
             <Text variant="muted-sm" className="truncate">{role}</Text>
           </div>
+          {application.starred && (
+            <Star size={13} className="text-amber-400 fill-amber-400 shrink-0 mt-0.5" />
+          )}
         </div>
 
         <div className="flex flex-wrap gap-1 mb-1.5">
@@ -61,6 +63,13 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
             <Badge variant="meta" className="!text-[11px] !px-1.5 !py-0.5"><Clock size={9} /> {getRelativeTime(dateApplied)}</Badge>
           )}
         </div>
+
+        {isStaleApplied && (
+          <div className="mb-1.5 px-2 py-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200/70 dark:border-amber-700/50 rounded flex items-center gap-1.5">
+            <BellRing size={11} className="text-amber-500 dark:text-amber-400 shrink-0" />
+            <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400">Follow Up Needed</span>
+          </div>
+        )}
 
         {isInterviewing && latestInterview && (
           <div className="mb-1.5 px-2 py-1 bg-purple-50/70 dark:bg-purple-900/15 border border-purple-100/60 dark:border-purple-800/50 rounded">
