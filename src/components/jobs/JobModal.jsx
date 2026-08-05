@@ -215,8 +215,10 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
         ? { min: form.salary.min ? Number(form.salary.min) * 1000 : '', max: form.salary.max ? Number(form.salary.max) * 1000 : '', currency: form.salary.currency, period: form.salary.period }
         : '',
       status: selectedStatus, dateApplied: form.dateApplied || '', tags: form.tags, jobUrl: form.jobUrl,
+      starred: editingJob?.starred || false,
       recruiter: form.recruiter.name ? { ...form.recruiter } : undefined,
       notes: form.notes,
+      checklist: editingJob?.checklist || [],
       interviews: newInterview ? [...existingInterviews, newInterview] : existingInterviews,
       activityLog: editingJob?.activityLog || [],
     }
