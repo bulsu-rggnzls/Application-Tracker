@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Search, Bell, Calendar, Clock, Check } from 'lucide-react'
-import { Badge, Heading, IconButton, Input, Text } from '../ui'
+import { Bell, Calendar, Clock, Check } from 'lucide-react'
+import { Badge, Heading, IconButton, Text } from '../ui'
 import formatTime from '../../utils/formatTime'
 
 function parseInterviewDate(iv) {
@@ -40,7 +40,7 @@ function formatTimeLeft(dt) {
   return `${Math.floor(hrs / 24)}d left`
 }
 
-export default function TopBar({ search, onSearchChange, applications }) {
+export default function TopBar({ applications }) {
   const [notifOpen, setNotifOpen] = useState(false)
 
   const upcoming = getUpcomingInterviews(applications || [])
@@ -51,14 +51,6 @@ export default function TopBar({ search, onSearchChange, applications }) {
         <Heading size="sm">Applications</Heading>
       </div>
       <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
-        <Input
-          containerClassName="relative w-full max-w-xs min-w-0"
-          icon={<Search size={14} />}
-          type="text"
-          placeholder="Search company, role, or tag..."
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
         <div className="relative">
           <IconButton
             onClick={() => setNotifOpen(prev => !prev)}
