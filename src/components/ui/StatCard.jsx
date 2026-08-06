@@ -30,6 +30,6 @@ export default function StatCard({ label, value, sub, icon: Icon, color = 'indig
       </div>
       <p className="text-xl font-bold text-slate-900 dark:text-white mt-1">{value}</p>
       {sub && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{sub}</p>}
-w    </div>
+    </div>
   )
 }
