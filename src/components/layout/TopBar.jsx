@@ -112,12 +112,6 @@ export default function TopBar({ applications }) {
             </>
           )}
         </div>
-        <button
-          className="w-8 h-8 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer shrink-0"
-          title="Profile"
-        >
-          RG
-        </button>
       </div>
     </header>
   )
