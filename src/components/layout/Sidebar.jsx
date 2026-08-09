@@ -64,9 +64,14 @@ export default function AppSidebar({ activeView, onViewChange, applications }) {
 
 function Logo({ open }) {
   return (
-    <div className="flex items-center gap-2 py-1">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-[11px] font-bold text-white">
-        J
+    <div className={cn(
+      'flex items-center py-1',
+      open ? 'gap-2' : 'justify-center'
+    )}>
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
+        <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-600 text-[11px] font-bold text-white">
+          J
+        </div>
       </div>
       <span className={`text-sm font-semibold text-white whitespace-nowrap overflow-hidden transition-all duration-200 ${open ? 'opacity-100 w-auto' : 'opacity-0 w-0'}`}>
         Jobs
