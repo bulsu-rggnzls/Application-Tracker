@@ -138,6 +138,7 @@ export const SidebarLink = ({
       href={link.href}
       className={cn(
         "flex items-center h-11 w-full rounded-xl transition-all duration-200 group/sidebar relative",
+        !open && "justify-center",
         active
           ? "bg-slate-800 text-white font-medium shadow-[0_0_12px_rgba(99,102,241,0.35)] ring-1 ring-indigo-500/40"
           : "text-slate-400 hover:text-white hover:bg-slate-800 hover:shadow-[0_0_8px_rgba(99,102,241,0.15)]",
