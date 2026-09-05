@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import {
-  X, Plus, Building2, Briefcase, MapPin, DollarSign,
-  CalendarDays, Link, User, Mail, ExternalLink, Hash, Clock, Video
-} from 'lucide-react'
+import { X, Briefcase, User, Hash } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import { Button, IconButton, Heading, Text, Input } from '../ui'
+import { Button, IconButton, Heading, Text } from '../ui'
 import extractDomain from '../../utils/extractDomain'
 
 function getTabs(status) {
@@ -40,12 +37,24 @@ const STATUSES = [
   { id: 'rejected', label: 'Rejected', bg: 'bg-rose-100 dark:bg-rose-900/40', text: 'text-rose-700 dark:text-rose-300', border: 'border-rose-200 dark:border-rose-700', ring: 'ring-rose-400/30', activeBg: 'bg-rose-50 dark:bg-rose-900/20' },
 ]
 
-function inputCls(hasIcon) {
-  return `w-full ${hasIcon ? 'pl-9' : 'pl-3'} pr-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all duration-200`
+function inputCls() {
+  return 'w-full px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-xl placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200'
 }
 
 function selectCls() {
-  return 'w-full px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all duration-200 appearance-none cursor-pointer'
+  return `${inputCls()} appearance-none cursor-pointer pr-8`
+}
+
+function Field({ label, hint, children }) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-1.5">
+        <label className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</label>
+        {hint && <span className="text-[11px] text-slate-400 dark:text-slate-500">{hint}</span>}
+      </div>
+      {children}
+    </div>
+  )
 }
 
 function PillInput({ tags, onAdd, onRemove, placeholder }) {
@@ -79,7 +88,7 @@ function PillInput({ tags, onAdd, onRemove, placeholder }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 dark:focus-within:border-indigo-400 transition-all duration-200 min-h-[42px] cursor-text" onClick={() => inputRef.current?.focus()}>
+    <div className="flex flex-wrap items-center gap-1.5 px-2 py-1.5 bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 rounded-xl focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:border-indigo-400 dark:focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-200 min-h-[42px] cursor-text" onClick={() => inputRef.current?.focus()}>
       {tags.map(tag => (
         <span
           key={tag}
@@ -229,59 +238,48 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
   const logoInitial = form.company ? form.company[0].toUpperCase() : '?'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-xl mx-4 max-h-[90vh] flex flex-col animate-fade-in" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-[3px] p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-slate-950/20 border border-slate-200/70 dark:border-slate-700/70 w-full max-w-lg max-h-[90vh] flex flex-col animate-fade-in" onClick={e => e.stopPropagation()}>
 
         {/* ---------- HEADER ---------- */}
-        <div className="relative shrink-0 overflow-hidden rounded-t-2xl">
-          <div className="bg-gradient-to-r from-indigo-50/80 via-purple-50/50 to-slate-50 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-slate-900 px-6 py-5 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20 flex items-center justify-center text-lg font-bold shrink-0 overflow-hidden">
+        <div className="shrink-0 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 flex items-center justify-center shrink-0 overflow-hidden">
                 {logoDomain ? (
-                  <img src={`https://www.google.com/s2/favicons?domain=${logoDomain}&sz=64`} alt="" className="w-5 h-5" onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = '' }} />
+                  <img src={`https://www.google.com/s2/favicons?domain=${logoDomain}&sz=64`} alt="" className="w-6 h-6" onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = '' }} />
                 ) : null}
-                <span className={logoDomain ? 'hidden' : ''}><Briefcase size={18} /></span>
+                <span className={logoDomain ? 'hidden' : ''}>
+                  {form.company ? logoInitial : <Briefcase size={20} />}
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <Heading size="md">{editingJob ? 'Edit Application' : 'New Application'}</Heading>
+              <div className="min-w-0">
+                <Heading size="md" className="truncate">{editingJob ? 'Edit application' : 'New application'}</Heading>
                 <Text variant="subtle" className="truncate mt-0.5">
-                  {form.company || form.role ? `${form.company || 'Company'}${form.company && form.role ? ' — ' : ''}${form.role || 'Role'}` : 'Enter company and role to get started'}
+                  {form.company ? `${form.company} · ${form.role || 'Role'}` : 'The essentials first — you can refine later'}
                 </Text>
               </div>
-              <IconButton type="button" onClick={onClose} className="hover:bg-white/60 dark:hover:bg-slate-800" aria-label="Close">
-                <X size={18} />
-              </IconButton>
             </div>
+            <IconButton type="button" onClick={onClose} aria-label="Close" className="shrink-0">
+              <X size={18} />
+            </IconButton>
           </div>
 
-          {/* Progress stepper */}
-          <div className="flex bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-6 py-3">
-            {TABS.map((tab, i) => (
-              <div key={tab.id} className="flex items-center flex-1">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 text-xs font-medium transition-colors cursor-pointer ${
-                    activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                  }`}
-                >
-                  <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
-                    activeTab === tab.id
-                      ? 'bg-indigo-600 text-white'
-                      : activeTab > tab.id
-                        ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
-                        : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
-                  }`}>
-                    {activeTab > tab.id ? '✓' : i + 1}
-                  </span>
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-                {i < TABS.length - 1 && (
-                  <div className={`flex-1 h-px mx-3 ${
-                    activeTab > tab.id ? 'bg-indigo-400' : 'bg-slate-200 dark:bg-slate-700'
-                  }`} />
-                )}
-              </div>
+          {/* Segmented step tabs */}
+          <div className="mt-5 flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl gap-1">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                  activeTab === tab.id
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {tab.label}
+              </button>
             ))}
           </div>
         </div>
@@ -294,38 +292,37 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
 
           {/* Step 1 – Basic Info */}
           {activeTab === 0 && (
-            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Company Name</label>
-                  <Input containerClassName="relative w-full" icon={<Building2 size={15} />} type="text" value={form.company} onChange={handleCompanyChange} required placeholder="e.g. Stripe" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Role Title</label>
-                  <Input containerClassName="relative w-full" icon={<Briefcase size={15} />} type="text" value={form.role} onChange={update('role')} required placeholder="e.g. Senior Frontend" />
-                </div>
+            <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label="Company name">
+                  <input className={inputCls()} type="text" value={form.company} onChange={handleCompanyChange} required placeholder="e.g. Stripe" autoFocus />
+                </Field>
+                <Field label="Role title">
+                  <input className={inputCls()} type="text" value={form.role} onChange={update('role')} required placeholder="e.g. Senior Frontend" />
+                </Field>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Employment Type</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label="Employment type">
                   <select value={form.employmentType} onChange={update('employmentType')} className={selectCls()}>
                     {employmentTypes.map(t => (
                       <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1).replace('-', ' ')}</option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Location Type</label>
-                  <Input containerClassName="relative w-full" icon={<MapPin size={15} />} type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid, On-site" />
-                </div>
+                </Field>
+                <Field label="Location">
+                  <input className={inputCls()} type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid (NYC), On-site" />
+                </Field>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Input containerClassName="relative w-full" icon={<CalendarDays size={15} />} type="date" value={form.dateApplied} onChange={update('dateApplied')} />
-                <Input containerClassName="relative w-full" icon={<Link size={15} />} type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/..." />
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Date applied">
+                  <input className={inputCls()} type="date" value={form.dateApplied} onChange={update('dateApplied')} />
+                </Field>
+                <Field label="Job posting URL">
+                  <input className={inputCls()} type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/…" />
+                </Field>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Status</label>
-                <div className="flex flex-wrap gap-2">
+              <Field label="Status">
+                <div className="flex flex-wrap gap-1.5 pt-0.5">
                   {STATUSES.map(s => (
                     <button
                       key={s.id}
@@ -334,107 +331,120 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                         setSelectedStatus(s.id)
                         setForm(prev => ({ ...prev, status: s.id }))
                       }}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border-2 text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-colors duration-150 cursor-pointer ${
                         selectedStatus === s.id
-                          ? `${s.bg} ${s.text} ${s.border} ring-2 ${s.ring} scale-105`
-                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? `${s.bg} ${s.text} ring-2 ${s.ring}`
+                          : 'bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
-                      <span className={`w-2 h-2 rounded-full ${selectedStatus === s.id ? s.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-600'}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${selectedStatus === s.id ? s.bg.split(' ')[0] : 'bg-slate-300 dark:bg-slate-600'}`} />
                       {s.label}
                     </button>
                   ))}
                 </div>
-              </div>
+              </Field>
             </div>
           )}
 
           {/* Step 2 – Compensation & Details */}
           {activeTab === 1 && (
-            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Salary</label>
-                <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2">
-                  <Input containerClassName="relative w-full" icon={<DollarSign size={15} />} type="number" min="0" max="100000" step="1" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min (k)" />
-                  <Input containerClassName="relative w-full" icon={<span>–</span>} type="number" min="0" max="100000" step="1" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max (k)" />
-                  <select value={form.salary.period} onChange={updateSalary('period')} className={`${selectCls()} w-24`}>
+            <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              <Field label="Salary" hint="enter amounts in thousands (k)">
+                <div className="flex items-center rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 overflow-hidden focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:border-indigo-400 dark:focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-200">
+                  <input type="number" min="0" max="100000" step="1" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min" className="flex-1 min-w-0 px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-transparent placeholder-slate-400 focus:outline-none" />
+                  <span className="text-slate-300 dark:text-slate-600 font-medium select-none">–</span>
+                  <input type="number" min="0" max="100000" step="1" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max" className="flex-1 min-w-0 px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-transparent placeholder-slate-400 focus:outline-none" />
+                  <span className="pr-3.5 text-xs font-semibold text-slate-400 select-none shrink-0">k</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <select value={form.salary.period} onChange={updateSalary('period')} className={selectCls()}>
                     {periods.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </select>
-                  <select value={form.salary.currency} onChange={updateSalary('currency')} className={`${selectCls()} w-22`}>
+                  <select value={form.salary.currency} onChange={updateSalary('currency')} className={selectCls()}>
                     {currencies.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                 </div>
-              </div>
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Tags</label>
-                <PillInput tags={form.tags} onAdd={addTag} onRemove={removeTag} placeholder="Type a tag and press Enter..." />
-              </div>
+              </Field>
+
+              <Field label="Tags">
+                <PillInput tags={form.tags} onAdd={addTag} onRemove={removeTag} placeholder="Type a tag and press Enter…" />
+              </Field>
+
               <div>
-                <Button type="button" variant="ghost" onClick={() => setShowRecruiter(!showRecruiter)} className="!p-0 !h-auto !text-xs !font-medium !text-slate-500 dark:!text-slate-400 hover:!text-indigo-600 dark:hover:!text-indigo-400">
+                <button
+                  type="button"
+                  onClick={() => setShowRecruiter(!showRecruiter)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer"
+                >
                   <User size={13} />
                   {showRecruiter ? 'Hide recruiter info' : 'Add recruiter info'}
-                  <span className="text-slate-300 dark:text-slate-600">(optional)</span>
-                </Button>
+                  <span className="text-slate-300 dark:text-slate-600 font-medium">(optional)</span>
+                </button>
                 {showRecruiter && (
-                  <div className="mt-2 grid grid-cols-3 gap-2 animate-in fade-in-0 slide-in-from-top-1 duration-150">
-                    <Input containerClassName="relative w-full" icon={<User size={14} />} type="text" value={form.recruiter.name} onChange={updateRecruiter('name')} placeholder="Name" />
-                    <Input containerClassName="relative w-full" icon={<Mail size={14} />} type="email" value={form.recruiter.email} onChange={updateRecruiter('email')} placeholder="Email" />
-                    <Input containerClassName="relative w-full" icon={<ExternalLink size={14} />} type="url" value={form.recruiter.linkedin} onChange={updateRecruiter('linkedin')} placeholder="LinkedIn URL" />
+                  <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2.5 animate-in fade-in-0 slide-in-from-top-1 duration-150">
+                    <input className={inputCls()} type="text" value={form.recruiter.name} onChange={updateRecruiter('name')} placeholder="Name" />
+                    <input className={inputCls()} type="email" value={form.recruiter.email} onChange={updateRecruiter('email')} placeholder="Email" />
+                    <input className={inputCls()} type="url" value={form.recruiter.linkedin} onChange={updateRecruiter('linkedin')} placeholder="LinkedIn URL" />
                   </div>
                 )}
               </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Notes</label>
-                <textarea rows={2} value={form.notes} onChange={update('notes')} placeholder="Any additional notes..." className={`${inputCls(false)} resize-none`} />
-              </div>
+
+              <Field label="Notes">
+                <textarea rows={2} value={form.notes} onChange={update('notes')} placeholder="Anything worth remembering about this application…" className={`${inputCls()} resize-none`} />
+              </Field>
             </div>
           )}
 
           {/* Step 3 – Schedule Interview (only for interviewing status) */}
           {activeTab === 2 && selectedStatus === 'interviewing' && form.interview && (
-            <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                    <CalendarDays size={13} /> Interview Date
-                  </label>
-                  <Input containerClassName="relative w-full" type="date" value={form.interview.date} onChange={updateInterview('date')} />
-                </div>
-                <div>
-                  <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                    <Clock size={13} /> Interview Time
-                  </label>
-                  <Input containerClassName="relative w-full" type="time" value={form.interview.time} onChange={updateInterview('time')} />
-                </div>
+            <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+              <div className="rounded-xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/20 px-4 py-3 text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
+                This interview will be attached to <span className="font-semibold">{form.company || 'this application'}</span> once you save.
               </div>
-              <div>
-                <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                  <Video size={13} /> Platform
-                </label>
-                <Input containerClassName="relative w-full" type="text" value={form.interview.platform} onChange={updateInterview('platform')} placeholder="Zoom, Google Meet, etc." />
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Interview date">
+                  <input className={inputCls()} type="date" value={form.interview.date} onChange={updateInterview('date')} />
+                </Field>
+                <Field label="Time">
+                  <input className={inputCls()} type="time" value={form.interview.time} onChange={updateInterview('time')} />
+                </Field>
               </div>
-              <div>
-                <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                  <User size={13} /> Interviewer
-                </label>
-                <Input containerClassName="relative w-full" type="text" value={form.interview.interviewer} onChange={updateInterview('interviewer')} placeholder="e.g. Sarah Chen" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label="Platform">
+                  <input className={inputCls()} type="text" value={form.interview.platform} onChange={updateInterview('platform')} placeholder="Zoom, Google Meet, onsite…" />
+                </Field>
+                <Field label="Interviewer">
+                  <input className={inputCls()} type="text" value={form.interview.interviewer} onChange={updateInterview('interviewer')} placeholder="e.g. Sarah Chen" />
+                </Field>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Interview Notes</label>
-                <textarea rows={2} value={form.interview.notes} onChange={updateInterview('notes')} placeholder="Preparation notes, topics to cover..." className={`${inputCls(false)} resize-none`} />
-              </div>
+              <Field label="Interview notes">
+                <textarea rows={2} value={form.interview.notes} onChange={updateInterview('notes')} placeholder="Topics to cover, preparation reminders…" className={`${inputCls()} resize-none`} />
+              </Field>
             </div>
           )}
 
           </div>
 
           {/* ---------- FOOTER ---------- */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-2xl">
-            <Text variant="muted-sm">Step {activeTab + 1} of {TABS.length}</Text>
+          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/60 dark:bg-slate-900/60 rounded-b-3xl">
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-1.5">
+                {TABS.map((t, i) => (
+                  <span
+                    key={t.id}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === activeTab
+                        ? 'w-7 bg-indigo-500'
+                        : i < activeTab
+                          ? 'w-3 bg-indigo-300'
+                          : 'w-3 bg-slate-200 dark:bg-slate-700'
+                    }`}
+                  />
+                ))}
+              </div>
+              <Text variant="muted-sm">{activeTab + 1} / {TABS.length}</Text>
+            </div>
             <div className="flex items-center gap-2">
-              <Button type="button" variant="secondary" onClick={onClose}>
-                Cancel
-              </Button>
               {activeTab > 0 && (
                 <Button type="button" variant="secondary" onClick={() => setActiveTab(prev => prev - 1)}>
                   Back
@@ -448,11 +458,10 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                 <Button
                   type="submit"
                   variant="indigo"
-                  onClick={handleSubmit}
                   disabled={!form.company || !form.role}
-                  className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
+                  className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-300 disabled:to-slate-300 dark:disabled:from-slate-700 dark:disabled:to-slate-700 disabled:shadow-none disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
                 >
-                  {editingJob ? 'Save Changes' : 'Add Application'}
+                  {editingJob ? 'Save changes' : 'Add application'}
                 </Button>
               )}
             </div>
