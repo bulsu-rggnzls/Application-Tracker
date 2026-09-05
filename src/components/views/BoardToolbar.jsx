@@ -1,4 +1,4 @@
-import { Search, Star, Globe, ArrowDownWideNarrow } from 'lucide-react'
+import { Search, Star, Globe, ArrowDownWideNarrow, Rows3, LayoutGrid } from 'lucide-react'
 import { Input } from '../ui'
 
 const FILTERS = [
@@ -7,7 +7,7 @@ const FILTERS = [
   { id: 'starred', label: 'Starred Only', icon: Star },
 ]
 
-export default function BoardToolbar({ search, onSearchChange, filter, onFilterChange, sort, onSortChange }) {
+export default function BoardToolbar({ search, onSearchChange, filter, onFilterChange, sort, onSortChange, compact, onCompactChange }) {
   return (
     <div className="flex items-center gap-2 flex-wrap mb-3">
       <Input
@@ -35,6 +35,33 @@ export default function BoardToolbar({ search, onSearchChange, filter, onFilterC
             {label}
           </button>
         ))}
+      </div>
+
+      <div className="flex items-center rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" title="Toggle card density">
+        <button
+          type="button"
+          onClick={() => onCompactChange(false)}
+          title="Comfortable cards"
+          className={`flex items-center px-2.5 py-2 transition-colors cursor-pointer ${
+            !compact
+              ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300'
+              : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/40'
+          }`}
+        >
+          <LayoutGrid size={13} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onCompactChange(true)}
+          title="Compact cards — fits more applications"
+          className={`flex items-center px-2.5 py-2 transition-colors cursor-pointer border-l border-slate-200 dark:border-slate-700 ${
+            compact
+              ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300'
+              : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/40'
+          }`}
+        >
+          <Rows3 size={13} />
+        </button>
       </div>
 
       <label className="flex items-center gap-1.5 ml-auto">
