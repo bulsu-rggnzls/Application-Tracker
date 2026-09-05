@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LayoutDashboard, BarChart2, Calendar, History } from 'lucide-react'
+import { LayoutDashboard, BarChart2, Calendar, History, Briefcase } from 'lucide-react'
 import {
   IconBriefcase,
   IconChartBar,
@@ -66,15 +66,15 @@ function Logo({ open }) {
   return (
     <div className={cn(
       'flex items-center py-1',
-      open ? 'gap-2' : 'justify-center'
+      open ? 'gap-2.5' : 'gap-2.5 justify-center'
     )}>
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
-        <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-600 text-[11px] font-bold text-white">
-          J
+      <div className="flex h-10 w-8 flex-shrink-0 items-center justify-center">
+        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/30 flex items-center justify-center">
+          <Briefcase size={15} />
         </div>
       </div>
-      <span className={`text-sm font-semibold text-white whitespace-nowrap overflow-hidden transition-all duration-200 ${open ? 'opacity-100 w-auto' : 'opacity-0 w-0'}`}>
-        Jobs
+      <span className={`text-sm font-bold text-white tracking-tight whitespace-nowrap transition-all duration-200 ${open ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
+        AppTracker
       </span>
     </div>
   )
