@@ -6,6 +6,7 @@ import {
   AreaChart, Area, CartesianGrid,
 } from 'recharts'
 import { Button, Card, Heading, Text } from '../ui'
+import WelcomeEmpty from '../ui/WelcomeEmpty'
 
 const STATUS_COLORS = {
   wishlist: '#f59e0b',
@@ -76,7 +77,7 @@ function FunnelBar({ funnel }) {
   )
 }
 
-export default function AnalyticsPage({ applications }) {
+export default function AnalyticsPage({ applications, onAdd }) {
   const [timeRange, setTimeRange] = useState('all')
 
   const filteredApps = useMemo(() => {
@@ -160,13 +161,32 @@ export default function AnalyticsPage({ applications }) {
     return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({ day, count: days[i] }))
   }, [filteredApps])
 
+  if (applications.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <div>
+          <WelcomeEmpty
+            icon={BarChart2}
+            title="Your analytics will build themselves"
+            description="Charts, funnel, and response rates appear here as you add applications and move them along the pipeline."
+            actionLabel="+ Add your first application"
+            onAction={onAdd}
+          />
+        </div>
+      </div>
+    )
+  }
+
   if (filteredApps.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <div className="text-center p-12">
-          <BarChart2 size={64} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-          <Heading size="md" className="mb-2 !font-medium">No data yet</Heading>
-          <Text variant="body" className="text-slate-500 dark:text-slate-400">Add some applications to see analytics</Text>
+        <div>
+          <WelcomeEmpty
+            icon={BarChart2}
+            title="Nothing in this time range"
+            description="No applications were added in the selected period. Try switching back to All time."
+            compact
+          />
         </div>
       </div>
     )

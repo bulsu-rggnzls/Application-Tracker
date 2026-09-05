@@ -1,11 +1,8 @@
 import { useState } from 'react'
-import { BarChart3, ChevronDown, ChevronUp, Briefcase, Clock, TrendingUp, Award } from 'lucide-react'
-import AnalyticsChart from './AnalyticsChart'
-import { Button, StatCard } from '../ui'
+import { Briefcase, Clock, TrendingUp, Award } from 'lucide-react'
+import { StatCard } from '../ui'
 
 export default function AnalyticsBar({ applications }) {
-  const [chartOpen, setChartOpen] = useState(false)
-
   const total = applications.length
   const totalApplied = applications.filter(a => a.status !== 'wishlist').length
   const interviews = applications.filter(a => a.status === 'interviewing').length
@@ -13,27 +10,13 @@ export default function AnalyticsBar({ applications }) {
   const responseRate = totalApplied > 0 ? Math.round(((interviews + offers) / totalApplied) * 100) : 0
 
   return (
-    <div className="mb-4">
-      <div className="grid grid-cols-4 gap-3">
+    <div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="Total" value={total} icon={Briefcase} color="indigo" />
         <StatCard label="Interviews" value={interviews} icon={Clock} color="orange" />
         <StatCard label="Response Rate" value={`${responseRate}%`} icon={TrendingUp} color="emerald" />
         <StatCard label="Offers" value={offers} icon={Award} color="amber" />
       </div>
-      <Button
-        variant="ghost"
-        onClick={() => setChartOpen(prev => !prev)}
-        className="mt-2 !p-0 !h-auto !text-xs !text-slate-400 hover:!text-slate-600 dark:hover:!text-slate-300"
-      >
-        <BarChart3 size={13} />
-        {chartOpen ? 'Hide charts' : 'Show charts'}
-        {chartOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-      </Button>
-      {chartOpen && (
-        <div className="mt-2">
-          <AnalyticsChart applications={applications} />
-        </div>
-      )}
     </div>
   )
 }

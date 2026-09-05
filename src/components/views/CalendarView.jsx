@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Zap, Inbox, Award, CalendarClock, CalendarDays, CalendarRange, List } from 'lucide-react'
 import { Badge, Button, Card, Heading, IconButton, Text } from '../ui'
+import WelcomeEmpty from '../ui/WelcomeEmpty'
 import formatTime from '../../utils/formatTime'
 import extractDomain from '../../utils/extractDomain'
 
@@ -208,7 +209,12 @@ function DayView({ date, events, todayStart, applications, onSelect }) {
         )}
       </div>
       {eventsForDay.length === 0 ? (
-        <Text variant="body" className="flex items-center justify-center h-full text-slate-400">No events scheduled for this day</Text>
+        <WelcomeEmpty
+          icon={Inbox}
+          title="Nothing scheduled this day"
+          description="Interviews you book will show up here."
+          compact
+        />
       ) : (
         <div className="space-y-1.5">
           {eventsForDay.map((ev, ei) => (
@@ -240,7 +246,7 @@ function DayView({ date, events, todayStart, applications, onSelect }) {
   )
 }
 
-function AgendaView({ allEvents, todayStart, applications, onSelect }) {
+function AgendaView({ allEvents, todayStart, applications, onSelect, onAdd }) {
   const grouped = useMemo(() => {
     const map = {}
     allEvents.forEach(ev => {
@@ -254,7 +260,22 @@ function AgendaView({ allEvents, todayStart, applications, onSelect }) {
   return (
     <div className="flex-1 min-h-0 px-5 pb-5 pt-2 overflow-y-auto">
       {grouped.length === 0 ? (
-        <Text variant="body" className="flex items-center justify-center h-full text-slate-400">No events scheduled</Text>
+        applications.length === 0 ? (
+          <WelcomeEmpty
+            icon={CalendarDays}
+            title="No interviews scheduled yet"
+            description="Once you add applications and schedule interviews, they’ll appear here so you never miss a round."
+            actionLabel="+ Add your first application"
+            onAction={onAdd}
+          />
+        ) : (
+          <WelcomeEmpty
+            icon={CalendarDays}
+            title="Nothing on the agenda"
+            description="No interviews in this period. Schedule one by dragging a card into the Interviewing column."
+            compact
+          />
+        )
       ) : (
         <div className="space-y-4">
           {grouped.map(([dateKey, evs]) => {
@@ -298,7 +319,7 @@ function AgendaView({ allEvents, todayStart, applications, onSelect }) {
   )
 }
 
-export default function CalendarView({ applications, onSelect }) {
+export default function CalendarView({ applications, onSelect, onAdd }) {
   const today = new Date()
   const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
@@ -453,7 +474,7 @@ export default function CalendarView({ applications, onSelect }) {
         <DayView date={cursor} events={events} todayStart={todayStart} applications={applications} onSelect={onSelect} />
       )}
       {view === 'agenda' && (
-        <AgendaView allEvents={allEvents} todayStart={todayStart} applications={applications} onSelect={onSelect} />
+        <AgendaView allEvents={allEvents} todayStart={todayStart} applications={applications} onSelect={onSelect} onAdd={onAdd} />
       )}
     </Card>
   )

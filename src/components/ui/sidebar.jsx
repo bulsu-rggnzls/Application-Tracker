@@ -61,22 +61,24 @@ export const DesktopSidebar = ({
 }) => {
   const { open, setOpen, animate } = useSidebar();
   return (
-    <>
-      <motion.div
-        className={cn(
-          "h-full py-4 hidden md:flex md:flex-col bg-[#0F172A] shrink-0",
-          open ? "w-[300px] px-4" : "w-16 px-2",
-          className
-        )}
-        animate={{
-          width: animate ? (open ? "300px" : "64px") : "300px",
-        }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        {...props}>
-        {children}
-      </motion.div>
-    </>
+    <motion.div
+      className={cn(
+        "h-full py-4 px-3 hidden md:flex md:flex-col bg-[#0F172A] shrink-0 overflow-hidden",
+        className
+      )}
+      initial={false}
+      animate={{
+        width: animate ? (open ? 300 : 64) : 300,
+      }}
+      transition={{
+        duration: 0.3,
+        ease: [0.32, 0.72, 0, 1],
+      }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      {...props}>
+      {children}
+    </motion.div>
   );
 };
 
@@ -137,20 +139,20 @@ export const SidebarLink = ({
     <a
       href={link.href}
       className={cn(
-        "flex items-center h-11 w-full rounded-xl transition-all duration-200 group/sidebar relative",
-        !open && "justify-center",
+        "flex items-center h-11 w-full rounded-xl transition-colors duration-200 group/sidebar relative",
+        open ? "justify-start" : "justify-center",
         active
-          ? "bg-slate-800 text-white font-medium shadow-[0_0_12px_rgba(99,102,241,0.35)] ring-1 ring-indigo-500/40"
-          : "text-slate-400 hover:text-white hover:bg-slate-800 hover:shadow-[0_0_8px_rgba(99,102,241,0.15)]",
+          ? "bg-white/10 text-white font-medium"
+          : "text-slate-400 hover:text-white hover:bg-white/5",
         className
       )}
       {...props}>
-      <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center">
+      <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
         {link.icon}
       </div>
       <span
-        className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${
-          open ? "opacity-100 w-auto" : "opacity-0 w-0"
+        className={`text-sm whitespace-nowrap transition-all duration-200 ${
+          open ? "opacity-100 ml-1" : "opacity-0 ml-0 w-0 overflow-hidden"
         } ${active ? "text-white" : "text-slate-400 group-hover/sidebar:text-white"}`}
       >
         {link.label}

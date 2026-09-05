@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Calendar, Clock, Check } from 'lucide-react'
+import { Bell, Calendar, Clock, Check, LogOut, Briefcase } from 'lucide-react'
 import { Badge, Heading, IconButton, Text } from '../ui'
 import formatTime from '../../utils/formatTime'
 
@@ -40,15 +40,21 @@ function formatTimeLeft(dt) {
   return `${Math.floor(hrs / 24)}d left`
 }
 
-export default function TopBar({ applications }) {
+export default function TopBar({ applications, onSignOut }) {
   const [notifOpen, setNotifOpen] = useState(false)
 
   const upcoming = getUpcomingInterviews(applications || [])
 
   return (
-    <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0">
+    <header className="h-14 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800 flex items-center justify-between px-6 shrink-0">
       <div className="flex items-center gap-3 shrink-0">
-        <Heading size="sm">Applications</Heading>
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 flex items-center justify-center">
+          <Briefcase size={15} />
+        </div>
+        <div className="leading-tight">
+          <Heading size="sm">AppTracker</Heading>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Your job hunt, one board</p>
+        </div>
       </div>
       <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
         <div className="relative">
@@ -112,6 +118,13 @@ export default function TopBar({ applications }) {
             </>
           )}
         </div>
+        <IconButton
+          onClick={onSignOut}
+          className="!text-slate-500 dark:!text-slate-400 hover:!text-rose-600 dark:hover:!text-rose-400"
+          title="Sign out"
+        >
+          <LogOut size={18} />
+        </IconButton>
       </div>
     </header>
   )

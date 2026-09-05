@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Trash2, Edit3, ExternalLink } from 'lucide-react'
+import { Trash2, Edit3, ExternalLink, Briefcase } from 'lucide-react'
 import { Table, Thead, Th, Tbody, Tr, Td, Badge, Button, IconButton, Text } from '../ui'
+import WelcomeEmpty from '../ui/WelcomeEmpty'
 import CompanyLogo from '../jobs/CompanyLogo'
 import extractDomain from '../../utils/extractDomain'
 import getRelativeTime from '../../utils/getRelativeTime'
@@ -28,7 +29,7 @@ const statusBorder = {
   rejected: 'border-l-rose-400',
 }
 
-export default function TableView({ applications, onEdit, onDelete, onSelect }) {
+export default function TableView({ applications, onEdit, onDelete, onSelect, onAdd }) {
   const [selected, setSelected] = useState(new Set())
   const [sort, setSort] = useState({ key: 'company', dir: 'asc' })
   const [locationFilter, setLocationFilter] = useState([])
@@ -146,8 +147,8 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
-      <Table className={filtered.length > 0 ? '!rounded-b-none' : ''}>
+    <div className="flex flex-col flex-1 min-h-0 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm overflow-hidden shadow-sm">
+      <Table className="!border-0 !shadow-none !bg-transparent">
       {selected.size > 0 && (
         <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50/70 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/40">
           <Text variant="body" className="!text-indigo-700 dark:!text-indigo-300 !font-medium">{selected.size} selected</Text>
@@ -194,24 +195,32 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
             <Tr
               key={app.id}
               onClick={() => onSelect(app)}
-              className={`${isEven ? 'bg-slate-50/40 dark:bg-slate-800/20' : ''} ${
+              className={`group ${isEven ? 'bg-slate-50/40 dark:bg-slate-800/20' : ''} ${
                 selected.has(app.id) ? '!bg-indigo-50/60 dark:!bg-indigo-900/30' : ''
-              } border-l-2 ${statusBorder[app.status] || 'border-l-transparent'}`}
+              } border-l-2 ${statusBorder[app.status] || 'border-l-transparent'} hover:!bg-indigo-50/40 dark:hover:!bg-indigo-900/20 transition-colors`}
             >
               <Td onClick={e => e.stopPropagation()}>
                 <input type="checkbox" checked={selected.has(app.id)} onChange={() => toggleSelect(app.id)} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
               </Td>
               <Td>
-                <div className="flex items-center gap-2.5">
-                  <CompanyLogo domain={domain} company={app.company} />
-                  <Text variant="body" className="!font-medium !text-slate-900 dark:!text-white">{app.company}</Text>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <CompanyLogo domain={domain} company={app.company} size="sm" />
+                  <div className="min-w-0 leading-tight">
+                    <div className="flex items-center gap-1.5">
+                      <Text variant="body" className="!font-semibold !text-slate-900 dark:!text-white truncate">{app.company}</Text>
+                      {app.starred && <span className="text-amber-400 text-[10px]">★</span>}
+                    </div>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block truncate">{app.employmentType || ''}</span>
+                  </div>
                 </div>
               </Td>
-              <Td className="font-medium text-slate-900 dark:text-white">{app.role}</Td>
+              <Td className="!py-2.5">
+                <Text variant="body" className="!text-slate-700 dark:!text-slate-200 truncate max-w-[220px]">{app.role}</Text>
+              </Td>
               <Td className="text-sm text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
-              <Td className="text-sm text-slate-500 dark:text-slate-400">{formatSalary(app.salary) || '-'}</Td>
+              <Td className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 whitespace-nowrap">{formatSalary(app.salary) || '-'}</Td>
               <Td>
-                <Badge variant="status" className={`!border ${statusColors[app.status]}`}>
+                <Badge variant="status" className={`!border !text-[11px] ${statusColors[app.status]}`}>
                   {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                 </Badge>
               </Td>
@@ -227,7 +236,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
                 </div>
               </Td>
               <Td className="text-right" onClick={e => e.stopPropagation()}>
-                <div className="flex gap-1 justify-end">
+                <div className="flex gap-0.5 justify-end opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                   {app.jobUrl && (
                     <a href={app.jobUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
                       <ExternalLink size={14} />
@@ -244,15 +253,30 @@ export default function TableView({ applications, onEdit, onDelete, onSelect }) 
       {filtered.length === 0 && (
         <tbody>
           <tr>
-            <td colSpan={9} className="text-center py-16 text-slate-400 dark:text-slate-500 text-sm">
-              No applications match your filters
+            <td colSpan={9} className="py-10">
+              {applications.length === 0 ? (
+                <WelcomeEmpty
+                  icon={Briefcase}
+                  title="No applications yet"
+                  description="Add your first one and it will show up here as a sortable, filterable table."
+                  actionLabel="+ Add your first application"
+                  onAction={onAdd}
+                />
+              ) : (
+                <WelcomeEmpty
+                  icon={Briefcase}
+                  title="No applications match your filters"
+                  description="Try clearing a filter or changing the search."
+                  compact
+                />
+              )}
             </td>
           </tr>
         </tbody>
       )}
       </Table>
       {filtered.length > 0 && (
-        <div className="shrink-0 bg-white dark:bg-slate-900 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-xl shadow-sm px-4 py-2">
+        <div className="shrink-0 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm border-t border-slate-200/70 dark:border-slate-700/60 px-4 py-2">
           <Pagination>
                 <PaginationContent className="w-full justify-between flex-wrap gap-y-2">
                   <PaginationItem>
