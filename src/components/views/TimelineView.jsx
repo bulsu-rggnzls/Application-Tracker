@@ -13,6 +13,7 @@ import {
 import getRelativeTime from '../../utils/getRelativeTime'
 import extractDomain from '../../utils/extractDomain'
 import { Badge, Button, Card, Heading, IconButton, Text } from '../ui'
+import WelcomeEmpty from '../ui/WelcomeEmpty'
 
 const STATUS_COLORS = {
   wishlist: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800',
@@ -126,7 +127,7 @@ function Favicon({ domain }) {
   )
 }
 
-export default function TimelineView({ applications, onSelect }) {
+export default function TimelineView({ applications, onSelect, onAdd }) {
   const [visibleCount, setVisibleCount] = useState(15)
   const [filter, setFilter] = useState('all')
 
@@ -179,12 +180,30 @@ export default function TimelineView({ applications, onSelect }) {
     { id: 'updates', label: 'Updates' },
   ]
 
+  if (entries.length === 0 && applications.length === 0) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <WelcomeEmpty
+          icon={History}
+          title="Your story starts with the first application"
+          description="Every move you make — adding a job, scheduling an interview, landing an offer — shows up here as a timeline."
+          actionLabel="+ Add your first application"
+          onAction={onAdd}
+        />
+      </div>
+    )
+  }
+
   if (entries.length === 0) {
     return (
-      <Card className="p-12 text-center">
-        <History size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-        <Text variant="body" className="text-slate-400 dark:text-slate-500">No activity yet. Start tracking your applications!</Text>
-      </Card>
+      <div className="flex items-center justify-center py-10">
+        <WelcomeEmpty
+          icon={History}
+          title="No activity in this filter"
+          description="Try another filter, or add a new application to get things moving."
+          compact
+        />
+      </div>
     )
   }
 
