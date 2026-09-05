@@ -1,7 +1,7 @@
 export function Table({ className = '', children, ...props }) {
   return (
     <div className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 ${className}`} {...props}>
-      <div className="overflow-auto flex-1 min-h-0" style={{ scrollbarGutter: 'stable' }}>
+      <div className="overflow-auto flex-1 min-h-0 scrollbar-thin" style={{ scrollbarGutter: 'stable' }}>
         <table className="w-full table-fixed text-sm">{children}</table>
       </div>
     </div>
