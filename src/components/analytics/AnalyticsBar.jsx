@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import { Briefcase, Clock, TrendingUp, Award } from 'lucide-react'
-import { StatCard } from '../ui'
+import { StatStrip } from '../ui'
 
 export default function AnalyticsBar({ applications }) {
   const total = applications.length
@@ -10,13 +8,13 @@ export default function AnalyticsBar({ applications }) {
   const responseRate = totalApplied > 0 ? Math.round(((interviews + offers) / totalApplied) * 100) : 0
 
   return (
-    <div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Total" value={total} icon={Briefcase} color="indigo" />
-        <StatCard label="Interviews" value={interviews} icon={Clock} color="orange" />
-        <StatCard label="Response Rate" value={`${responseRate}%`} icon={TrendingUp} color="emerald" />
-        <StatCard label="Offers" value={offers} icon={Award} color="amber" />
-      </div>
-    </div>
+    <StatStrip
+      items={[
+        { label: 'Total', value: total, sub: `${totalApplied} applied`, color: 'indigo' },
+        { label: 'Interviews', value: interviews, color: 'violet' },
+        { label: 'Response Rate', value: `${responseRate}%`, color: 'emerald' },
+        { label: 'Offers', value: offers, color: 'amber' },
+      ]}
+    />
   )
 }
