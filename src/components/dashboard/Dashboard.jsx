@@ -281,7 +281,7 @@ export default function Dashboard() {
         ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900'
         : 'bg-gradient-to-br from-slate-50 via-indigo-50/60 to-purple-50/40'
     }`}>
-      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} />
+      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onSignOut={signOut} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <TopBar applications={applications} onSignOut={signOut} />
@@ -344,7 +344,7 @@ export default function Dashboard() {
               </div>
             ) : activeView === 'analytics' ? (
               <div className="max-w-[96rem] mx-auto w-full flex-1 min-h-0 flex flex-col">
-                <AnalyticsPage applications={applications} onAdd={openAdd} />
+                <AnalyticsPage applications={applications} onAdd={openAdd} dark={darkMode} />
               </div>
             ) : null}
           </div>
