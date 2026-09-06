@@ -16,8 +16,8 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
             title="Board view"
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 cursor-pointer ${
               viewMode === 'board'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+                : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-200'
             }`}
           >
             <LayoutGrid size={13} />
@@ -29,8 +29,8 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
             title="Table view"
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 cursor-pointer ${
               viewMode === 'table'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+                : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-200'
             }`}
           >
             <Table2 size={13} />
@@ -89,7 +89,7 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold px-3.5 py-2 shadow-sm transition-all duration-150 hover:bg-slate-800 dark:hover:bg-slate-100 hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-semibold px-3.5 py-2 shadow-md shadow-indigo-500/25 transition-all duration-150 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           <Plus size={14} strokeWidth={2.5} />
           New application
