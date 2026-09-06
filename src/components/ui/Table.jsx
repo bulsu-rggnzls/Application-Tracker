@@ -1,8 +1,8 @@
-export function Table({ className = '', children, ...props }) {
+export function Table({ className = '', fill = false, children, ...props }) {
   return (
     <div className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 ${className}`} {...props}>
       <div className="overflow-auto flex-1 min-h-0 scrollbar-thin" style={{ scrollbarGutter: 'stable' }}>
-        <table className="w-full table-fixed text-sm">{children}</table>
+        <table className={`w-full table-fixed text-sm ${fill ? 'h-full' : ''}`}>{children}</table>
       </div>
     </div>
   )
@@ -11,7 +11,7 @@ export function Table({ className = '', children, ...props }) {
 export function Thead({ children }) {
   return (
     <thead className="sticky top-0 z-10">
-      <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+      <tr className="border-b border-slate-200 dark:border-slate-700 bg-indigo-50/50 dark:bg-indigo-950/30">
         {children}
       </tr>
     </thead>
@@ -30,7 +30,7 @@ export function Th({ children, className = '', sortable, onClick, ...props }) {
   return (
     <th
       onClick={onClick}
-      className={`px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-200 select-none' : ''} ${className}`}
+      className={`px-4 py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-200 select-none' : ''} ${className}`}
       {...props}
     >
       <div className="flex items-center gap-1">{children}</div>
@@ -56,7 +56,7 @@ export function Tr({ children, className = '', onClick, ...props }) {
 
 export function Td({ children, className = '', ...props }) {
   return (
-    <td className={`px-4 py-3.5 ${className}`} {...props}>
+    <td className={`px-4 py-2 h-[1px] ${className}`} {...props}>
       {children}
     </td>
   )

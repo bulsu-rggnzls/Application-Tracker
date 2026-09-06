@@ -63,7 +63,7 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full py-4 px-3 hidden md:flex md:flex-col bg-[#0F172A] shrink-0 overflow-hidden",
+        "h-full py-4 px-3 hidden md:flex md:flex-col bg-[#090D16] shrink-0 overflow-hidden relative border-r border-white/[0.04]",
         className
       )}
       initial={false}
@@ -77,6 +77,8 @@ export const DesktopSidebar = ({
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}>
+      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -left-20 w-72 h-72 rounded-full bg-indigo-600/10 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -right-20 w-72 h-72 rounded-full bg-violet-600/[0.07] blur-3xl" />
       {children}
     </motion.div>
   );
@@ -141,9 +143,9 @@ export const SidebarLink = ({
       className={cn(
         "flex items-center h-11 w-full rounded-xl transition-colors duration-200 group/sidebar relative",
         open ? "justify-start" : "justify-center",
-        active
-          ? "bg-white/10 text-white font-medium"
-          : "text-slate-400 hover:text-white hover:bg-white/5",
+      active
+        ? "bg-white/10 text-white font-medium"
+        : "text-slate-400 hover:text-white hover:bg-white/5",
         className
       )}
       {...props}>
@@ -158,10 +160,7 @@ export const SidebarLink = ({
         {link.label}
       </span>
       {active && (
-        <>
-          <span className="absolute left-0 top-2 bottom-2 w-1 bg-indigo-500 rounded-r-full" />
-          <span className="absolute left-0 top-2 bottom-2 w-1 bg-indigo-400/60 rounded-r-full blur-sm" />
-        </>
+        <span className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-indigo-400 to-violet-500 rounded-r-full" />
       )}
     </a>
   );

@@ -46,14 +46,14 @@ export default function TopBar({ applications, onSignOut }) {
   const upcoming = getUpcomingInterviews(applications || [])
 
   return (
-    <header className="h-14 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800 flex items-center justify-between px-6 shrink-0">
+    <header className="h-14 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0 relative z-40">
       <div className="flex items-center gap-3 shrink-0">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 flex items-center justify-center">
           <Briefcase size={15} />
         </div>
         <div className="leading-tight">
-          <Heading size="sm">AppTracker</Heading>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Your job hunt, one board</p>
+          <Heading size="sm" className="!tracking-tight">AppTracker</Heading>
+          <p className="text-[11px] font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-400">Your job hunt, one board</p>
         </div>
       </div>
       <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
