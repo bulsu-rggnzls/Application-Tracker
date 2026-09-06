@@ -1,20 +1,21 @@
 import { useState, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Zap, Inbox, Award, CalendarClock, CalendarDays, CalendarRange, List } from 'lucide-react'
-import { Badge, Button, Card, Heading, IconButton, Text } from '../ui'
+import { ChevronLeft, ChevronRight, Inbox, CalendarDays, CalendarClock, CalendarRange, List } from 'lucide-react'
+import { Badge, Card, Heading, IconButton, Text } from '../ui'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
+import StatStrip from '../ui/StatStrip'
 import formatTime from '../../utils/formatTime'
 import extractDomain from '../../utils/extractDomain'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const categoryStyles = {
-  interview: { pill: 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100', dot: 'bg-emerald-500', label: 'Interview' },
-  offer: { pill: 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100', dot: 'bg-emerald-600', label: 'Offer' },
-  application: { pill: 'bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100', dot: 'bg-blue-500', label: 'Applied' },
-  deadline: { pill: 'bg-orange-50 text-orange-800 border border-orange-200 hover:bg-orange-100', dot: 'bg-orange-500', label: 'Deadline' },
-  followup: { pill: 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100', dot: 'bg-amber-500', label: 'Follow-up' },
-  rejection: { pill: 'bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100', dot: 'bg-rose-500', label: 'Rejection' },
-  general: { pill: 'bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100', dot: 'bg-purple-500', label: 'General' },
+  interview: { pill: 'bg-violet-50 text-violet-800 border-violet-200 dark:bg-violet-950/50 dark:text-violet-300 dark:border-violet-800/60', dot: 'bg-violet-500', label: 'Interview' },
+  offer: { pill: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800/60', dot: 'bg-emerald-500', label: 'Offer' },
+  application: { pill: 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800/60', dot: 'bg-blue-500', label: 'Applied' },
+  deadline: { pill: 'bg-orange-50 text-orange-800 border-orange-200 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800/60', dot: 'bg-orange-500', label: 'Deadline' },
+  followup: { pill: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800/60', dot: 'bg-amber-500', label: 'Follow-up' },
+  rejection: { pill: 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800/60', dot: 'bg-rose-500', label: 'Rejection' },
+  general: { pill: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/60 dark:text-slate-300 dark:border-slate-700/60', dot: 'bg-slate-500', label: 'General' },
 }
 
 function getCategory(stageName, status) {
@@ -66,86 +67,103 @@ function startOfWeek(date) {
   return d
 }
 
+function CompanyAvatar({ domain, size = 'w-3.5 h-3.5', rounded = 'rounded-[3px]' }) {
+  if (!domain) return null
+  return (
+    <img
+      src={`https://logo.clearbit.com/${domain}`}
+      alt=""
+      onError={(e) => { e.currentTarget.style.display = 'none' }}
+      className={`${size} ${rounded} object-contain shrink-0`}
+    />
+  )
+}
+
 function EventPill({ ev, todayRef }) {
   const s = categoryStyles[ev.type] || categoryStyles.general
   const isPast = new Date(ev.date) < todayRef
   return (
-    <Badge
-      variant="status"
-      className={`!text-[10px] !px-1.5 !py-0.5 !rounded-[4px] !leading-tight flex items-center gap-1 transition-all duration-150 hover:shadow-sm hover:-translate-y-px cursor-pointer ${s.pill} ${isPast ? 'opacity-60' : ''}`}
+    <div
+      className={`!text-[10px] !px-1.5 !py-0.5 !rounded-[4px] !leading-tight flex items-center gap-1 border font-medium cursor-pointer hover:brightness-95 transition-all truncate ${s.pill} ${isPast ? 'opacity-50' : ''}`}
       onClick={(e) => e.stopPropagation()}
       title={`${s.label}: ${ev.company}${ev.time ? ` at ${formatTime(ev.time)}` : ''}`}
     >
-      {ev.domain && (
-        <img
-          src={`https://logo.clearbit.com/${ev.domain}`}
-          alt=""
-          onError={(e) => { e.currentTarget.style.display = 'none' }}
-          className="w-3 h-3 rounded-[3px] object-contain shrink-0"
-        />
-      )}
-      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`} />
+      <CompanyAvatar domain={ev.domain} />
+      <span className={`w-1 h-1 rounded-full shrink-0 ${s.dot}`} />
       <span className="truncate min-w-0">{ev.company}</span>
       {ev.time && (
-        <span className="shrink-0 text-[8px] opacity-75 font-semibold ml-auto">{formatTime(ev.time)}</span>
+        <span className="shrink-0 text-[9px] opacity-75 font-semibold ml-auto tabular-nums">{formatTime(ev.time)}</span>
       )}
-    </Badge>
-  )
-}
-
-function DayHeader({ date, current, isToday }) {
-  return (
-    <div className={`flex items-center gap-1 mb-1 ${isToday ? 'rounded-lg' : ''}`}>
-      <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-semibold rounded-full shrink-0 ${
-        isToday ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30' : current ? 'text-slate-700' : 'text-slate-300'
-      }`}>
-        {date.getDate()}
-      </span>
     </div>
   )
 }
 
+function DayNumber({ date, current, isToday }) {
+  return (
+    <span className={`inline-flex items-center justify-center w-6 h-6 text-[11px] font-semibold rounded-full shrink-0 tabular-nums ${
+      isToday
+        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+        : current
+          ? 'text-slate-700 dark:text-slate-200'
+          : 'text-slate-300 dark:text-slate-600'
+    }`}>
+      {date.getDate()}
+    </span>
+  )
+}
+
+const CELL_BASE = 'min-h-0 relative p-1.5 flex flex-col gap-1 overflow-hidden transition-colors duration-150 border-b border-r border-slate-100 dark:border-slate-800/70'
+
 function MonthGrid({ grid, events, todayKey, todayStart, applications, onSelect }) {
   return (
-    <div className="flex-1 grid grid-cols-7 auto-rows-fr min-h-0 px-5 pb-5 pt-1">
+    <div className="flex-1 grid grid-cols-7 auto-rows-fr min-h-0">
       {grid.map((cell, i) => {
         if (!cell) return <div key={i} />
         const { day, current, key: cellKey, date } = cell
         const isToday = cellKey === todayKey
         const eventsForDay = events[cellKey] || []
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6
 
         return (
           <div
             key={i}
-            className={`min-h-0 relative p-1.5 flex flex-col gap-1 overflow-hidden transition-all duration-200 ${
-              current ? 'bg-white' : 'bg-slate-50/50'
-            } ${isToday ? 'bg-indigo-50/40' : ''} border-r border-b border-slate-100/80 ${
-              isToday ? 'border-l-2 border-l-indigo-500' : 'border-l-2 border-l-transparent'
-            } ${eventsForDay.length > 0 ? 'cursor-pointer hover:bg-indigo-50/40 hover:shadow-inner' : 'hover:bg-slate-50/60'}`}
+            className={`${CELL_BASE} ${
+              !current
+                ? 'bg-slate-50/60 dark:bg-slate-900/40'
+                : isWeekend
+                  ? 'bg-slate-50/40 dark:bg-slate-900/30'
+                  : 'bg-white dark:bg-[#090D16]'
+            } ${eventsForDay.length > 0 ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40' : ''}`}
             onClick={() => eventsForDay.length > 0 && onSelect?.(
               applications.find(a => a.id === eventsForDay[0].applicationId)
             )}
           >
             {day && (
               <>
-                <DayHeader date={date} current={current} isToday={isToday} />
+                <div className="flex items-center justify-between">
+                  <DayNumber date={date} current={current} isToday={isToday} />
+                  {eventsForDay.length > 3 && (
+                    <span className="text-[9px] font-semibold text-slate-400 dark:text-slate-500 tabular-nums">{eventsForDay.length}</span>
+                  )}
+                </div>
                 <div className="flex flex-col gap-0.5 min-h-0 overflow-hidden">
                   {eventsForDay.slice(0, 3).map((ev, ei) => (
                     <EventPill key={ev.id || ei} ev={ev} todayRef={todayStart} />
                   ))}
                   {eventsForDay.length > 3 && (
-                    <Button
-                      variant="ghost"
+                    <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation()
                         onSelect?.(applications.find(a => a.id === eventsForDay[0].applicationId))
                       }}
-                      className="!p-0 !h-auto !text-[10px] !font-medium text-left !text-slate-500 hover:!text-indigo-600"
+                      className="!p-0 !h-auto !text-[9px] !font-semibold text-left uppercase tracking-wider !text-slate-400 dark:!text-slate-500 hover:!text-indigo-600 dark:hover:!text-indigo-400 cursor-pointer bg-transparent border-0"
                     >
-                      +{eventsForDay.length - 3} more...
-                    </Button>
+                      +{eventsForDay.length - 3} more
+                    </button>
                   )}
                 </div>
+                {isToday && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500" />}
               </>
             )}
           </div>
@@ -163,7 +181,7 @@ function WeekGrid({ weekStart, events, todayKey, todayStart, applications, onSel
   })
 
   return (
-    <div className="flex-1 grid grid-cols-7 auto-rows-fr min-h-0 px-5 pb-5 pt-1">
+    <div className="flex-1 grid grid-cols-7 auto-rows-fr min-h-0">
       {days.map((d, i) => {
         const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
         const isToday = key === todayKey
@@ -173,15 +191,18 @@ function WeekGrid({ weekStart, events, todayKey, todayStart, applications, onSel
         return (
           <div
             key={i}
-            className={`min-h-0 p-1.5 flex flex-col gap-1 overflow-hidden transition-all duration-200 border-r border-b border-slate-100/80 ${
-              isToday ? 'bg-indigo-50/40 border-l-2 border-l-indigo-500' : isWeekend ? 'bg-slate-50/50' : 'bg-white'
-            } ${isToday ? '' : 'border-l-2 border-l-transparent'} ${eventsForDay.length > 0 ? 'cursor-pointer hover:bg-indigo-50/40' : 'hover:bg-slate-50/60'}`}
+            className={`${CELL_BASE} ${
+              isWeekend ? 'bg-slate-50/40 dark:bg-slate-900/30' : 'bg-white dark:bg-[#090D16]'
+            } ${eventsForDay.length > 0 ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40' : ''}`}
             onClick={() => eventsForDay.length > 0 && onSelect?.(
               applications.find(a => a.id === eventsForDay[0].applicationId)
             )}
           >
-            <DayHeader date={d} current={true} isToday={isToday} />
-            <div className="flex flex-col gap-0.5 min-h-0 overflow-hidden">
+            <div className="flex items-center justify-between">
+              <DayNumber date={d} current={true} isToday={isToday} />
+              {isToday && <span className="text-[9px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Today</span>}
+            </div>
+            <div className="flex flex-col gap-1 min-h-0 overflow-y-auto scrollbar-thin">
               {eventsForDay.map((ev, ei) => (
                 <EventPill key={ev.id || ei} ev={ev} todayRef={todayStart} />
               ))}
@@ -199,15 +220,7 @@ function DayView({ date, events, todayStart, applications, onSelect }) {
   const isToday = key === `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`
 
   return (
-    <div className="flex-1 min-h-0 px-5 pb-5 pt-2 overflow-y-auto">
-      <div className="mb-3 flex items-center gap-2">
-        <Heading size="sm" className="capitalize">
-          {date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </Heading>
-        {isToday && (
-          <Badge variant="count-pill" className="!text-[10px] !font-bold !uppercase !tracking-wider !text-indigo-600 !bg-indigo-50 !border !border-indigo-200">Today</Badge>
-        )}
-      </div>
+    <div className="flex-1 min-h-0 p-5 overflow-y-auto scrollbar-thin">
       {eventsForDay.length === 0 ? (
         <WelcomeEmpty
           icon={Inbox}
@@ -217,29 +230,27 @@ function DayView({ date, events, todayStart, applications, onSelect }) {
         />
       ) : (
         <div className="space-y-1.5">
-          {eventsForDay.map((ev, ei) => (
-            <div
-              key={ev.id || ei}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 hover:bg-indigo-50/50 border border-slate-100 transition-colors cursor-pointer"
-              onClick={() => onSelect?.(applications.find(a => a.id === ev.applicationId))}
-            >
-              {ev.domain && (
-                <img
-                  src={`https://logo.clearbit.com/${ev.domain}`}
-                  alt=""
-                  onError={(e) => { e.currentTarget.style.display = 'none' }}
-                  className="w-6 h-6 rounded-md object-contain shrink-0"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <Text variant="body" className="!font-semibold !text-slate-900 truncate">{ev.company}</Text>
-                <Text variant="subtle" className="truncate">{ev.stageName || ev.role}</Text>
+          {eventsForDay.map((ev, ei) => {
+            const s = categoryStyles[ev.type] || categoryStyles.general
+            const isPast = new Date(ev.date) < todayStart
+            return (
+              <div
+                key={ev.id || ei}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg border bg-white dark:bg-[#090D16] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors cursor-pointer ${isPast ? 'opacity-60' : ''}`}
+                onClick={() => onSelect?.(applications.find(a => a.id === ev.applicationId))}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`} />
+                <CompanyAvatar domain={ev.domain} size="w-6 h-6" rounded="rounded-md" />
+                <div className="min-w-0 flex-1">
+                  <Text variant="body" className="!font-semibold !text-slate-900 dark:!text-white truncate">{ev.company}</Text>
+                  <Text variant="subtle" className="truncate">{ev.stageName || ev.role}</Text>
+                </div>
+                {ev.time && (
+                  <Text variant="body" className="!font-semibold !text-slate-600 dark:!text-slate-300 shrink-0 tabular-nums">{formatTime(ev.time)}</Text>
+                )}
               </div>
-              {ev.time && (
-                <Text variant="body" className="!font-semibold !text-slate-600 shrink-0">{formatTime(ev.time)}</Text>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
@@ -258,7 +269,7 @@ function AgendaView({ allEvents, todayStart, applications, onSelect, onAdd }) {
   }, [allEvents])
 
   return (
-    <div className="flex-1 min-h-0 px-5 pb-5 pt-2 overflow-y-auto">
+    <div className="flex-1 min-h-0 p-5 overflow-y-auto scrollbar-thin">
       {grouped.length === 0 ? (
         applications.length === 0 ? (
           <WelcomeEmpty
@@ -277,38 +288,39 @@ function AgendaView({ allEvents, todayStart, applications, onSelect, onAdd }) {
           />
         )
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {grouped.map(([dateKey, evs]) => {
             const [y, m, d] = dateKey.split('-').map(Number)
             const date = new Date(y, m - 1, d)
             return (
               <div key={dateKey}>
-                <Heading size="xs" className="mb-1.5">
-                  {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                </Heading>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                  </span>
+                  <span className="flex-1 h-px bg-slate-200 dark:bg-slate-800/80" />
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">{evs.length}</span>
+                </div>
                 <div className="space-y-1">
-                  {evs.map((ev, ei) => (
-                    <div
-                      key={ev.id || ei}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-indigo-50/50 border border-slate-100 transition-colors cursor-pointer"
-                      onClick={() => onSelect?.(applications.find(a => a.id === ev.applicationId))}
-                    >
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${(categoryStyles[ev.type] || categoryStyles.general).dot}`} />
-                      {ev.domain && (
-                        <img
-                          src={`https://logo.clearbit.com/${ev.domain}`}
-                          alt=""
-                          onError={(e) => { e.currentTarget.style.display = 'none' }}
-                          className="w-5 h-5 rounded-md object-contain shrink-0"
-                        />
-                      )}
-                      <Text variant="body" className="truncate">{ev.company}</Text>
-                      <Text variant="subtle" className="truncate">{ev.stageName || ev.role}</Text>
-                      {ev.time && (
-                        <Text variant="body" className="!font-semibold !text-slate-600 ml-auto shrink-0">{formatTime(ev.time)}</Text>
-                      )}
-                    </div>
-                  ))}
+                  {evs.map((ev, ei) => {
+                    const s = categoryStyles[ev.type] || categoryStyles.general
+                    const isPast = new Date(ev.date) < todayStart
+                    return (
+                      <div
+                        key={ev.id || ei}
+                        className={`flex items-center gap-3 px-3.5 py-2 rounded-lg border bg-white dark:bg-[#090D16] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors cursor-pointer ${isPast ? 'opacity-60' : ''}`}
+                        onClick={() => onSelect?.(applications.find(a => a.id === ev.applicationId))}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`} />
+                        <CompanyAvatar domain={ev.domain} size="w-5 h-5" rounded="rounded-md" />
+                        <Text variant="body" className="!font-medium truncate !text-slate-700 dark:!text-slate-200">{ev.company}</Text>
+                        <Text variant="subtle" className="truncate hidden sm:block">{ev.stageName || ev.role}</Text>
+                        {ev.time && (
+                          <Text variant="body" className="!font-semibold !text-slate-600 dark:!text-slate-300 ml-auto shrink-0 tabular-nums">{formatTime(ev.time)}</Text>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )
@@ -357,9 +369,11 @@ export default function CalendarView({ applications, onSelect, onAdd }) {
   const month = cursor.getMonth()
   const grid = getMonthGrid(year, month)
 
-  const interviewingCount = applications.filter(a => a.status === 'interviewing').length
-  const awaitingCount = applications.filter(a => a.status === 'applied' || a.status === 'wishlist').length
-  const offersCount = applications.filter(a => a.status === 'offer').length
+  const stats = useMemo(() => ({
+    interviews: applications.filter(a => a.status === 'interviewing').length,
+    awaiting: applications.filter(a => a.status === 'applied' || a.status === 'wishlist').length,
+    offers: applications.filter(a => a.status === 'offer').length,
+  }), [applications])
 
   const handleNav = (dir) => {
     if (view === 'month') {
@@ -394,71 +408,59 @@ export default function CalendarView({ applications, onSelect, onAdd }) {
     { id: 'agenda', icon: List, label: 'Agenda' },
   ]
 
-  const totalEvents = events._total || 0
-
   return (
-    <Card className="flex flex-col h-full !shadow-sm !rounded-xl">
-      {/* Hero header */}
-      <div className="shrink-0 px-5 pt-5 pb-4 bg-gradient-to-br from-indigo-50 via-white to-amber-50/40 rounded-t-xl">
-        <div className="flex items-center justify-between gap-4">
+    <Card className="flex flex-col h-full !shadow-none !rounded-xl !border-slate-200 dark:!border-slate-800 !bg-white dark:!bg-[#090D16] overflow-hidden">
+      {/* Header */}
+      <div className="shrink-0 px-5 pt-4 pb-4 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-br from-indigo-50 via-white to-amber-50/40 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <Text variant="muted-sm" className="!uppercase !tracking-wider !font-bold !text-indigo-500 mb-0.5">Job Search Calendar</Text>
-            <Heading size="md" className="!text-xl">{viewTitle}</Heading>
+            <p className="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">Job search calendar</p>
+            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white mt-0.5">{viewTitle}</h2>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex border border-slate-200 bg-white rounded-lg overflow-hidden shadow-sm">
+            <div className="flex p-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
               {viewButtons.map(vb => (
-                <Button
+                <button
                   key={vb.id}
-                  variant={view === vb.id ? 'indigo' : 'ghost'}
+                  type="button"
                   onClick={() => setView(vb.id)}
-                  className="!rounded-none !px-3 !py-1.5"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                    view === vb.id
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+                  }`}
                 >
                   <vb.icon size={13} />
                   <span className="hidden lg:inline">{vb.label}</span>
-                </Button>
+                </button>
               ))}
             </div>
             <div className="flex gap-1">
-              <IconButton onClick={() => handleNav(-1)} className="border border-transparent hover:border-slate-200" title="Previous"><ChevronLeft size={16} /></IconButton>
-              <IconButton onClick={() => handleNav(1)} className="border border-transparent hover:border-slate-200" title="Next"><ChevronRight size={16} /></IconButton>
+              <IconButton onClick={() => handleNav(-1)} className="border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700" title="Previous"><ChevronLeft size={16} /></IconButton>
+              <IconButton onClick={() => handleNav(1)} className="border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700" title="Next"><ChevronRight size={16} /></IconButton>
             </div>
           </div>
         </div>
 
         {/* Quick stats */}
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <Card className="!rounded-lg !p-3 flex items-center gap-2.5 bg-white/80 !border-indigo-100">
-            <span className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0"><Zap size={15} /></span>
-            <div>
-              <Heading size="sm" className="!text-base !leading-none">{interviewingCount}</Heading>
-              <Text variant="muted-sm" className="!uppercase !tracking-wider">Interviews Scheduled</Text>
-            </div>
-          </Card>
-          <Card className="!rounded-lg !p-3 flex items-center gap-2.5 bg-white/80 !border-blue-100">
-            <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><Inbox size={15} /></span>
-            <div>
-              <Heading size="sm" className="!text-base !leading-none">{awaitingCount}</Heading>
-              <Text variant="muted-sm" className="!uppercase !tracking-wider">Awaiting Response</Text>
-            </div>
-          </Card>
-          <Card className="!rounded-lg !p-3 flex items-center gap-2.5 bg-white/80 !border-emerald-100">
-            <span className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0"><Award size={15} /></span>
-            <div>
-              <Heading size="sm" className="!text-base !leading-none">{offersCount}</Heading>
-              <Text variant="muted-sm" className="!uppercase !tracking-wider">Offers</Text>
-            </div>
-          </Card>
+        <div className="mt-4">
+          <StatStrip
+            items={[
+              { label: 'Interviews', value: stats.interviews, color: 'violet' },
+              { label: 'Awaiting response', value: stats.awaiting, color: 'blue' },
+              { label: 'Offers', value: stats.offers, color: 'emerald' },
+            ]}
+          />
         </div>
       </div>
 
       {/* Weekday headers */}
       {view === 'month' && (
-        <div className="grid grid-cols-7 px-5 shrink-0">
+        <div className="grid grid-cols-7 shrink-0 border-b border-slate-200 dark:border-slate-800">
           {WEEKDAYS.map(d => (
-            <Text key={d} variant="muted-sm" className="!uppercase !tracking-wider text-center py-1.5 border-b border-slate-100">
+            <span key={d} className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center py-2">
               {d}
-            </Text>
+            </span>
           ))}
         </div>
       )}
