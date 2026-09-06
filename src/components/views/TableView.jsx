@@ -148,7 +148,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect, on
 
   return (
     <div className="flex flex-col flex-1 min-h-0 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm overflow-hidden shadow-sm">
-      <Table className="!border-0 !shadow-none !bg-transparent">
+      <Table className="!border-0 !shadow-none !bg-transparent" fill={pageItems.length >= pageSize}>
       {selected.size > 0 && (
         <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50/70 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/40">
           <Text variant="body" className="!text-indigo-700 dark:!text-indigo-300 !font-medium">{selected.size} selected</Text>
@@ -203,28 +203,28 @@ export default function TableView({ applications, onEdit, onDelete, onSelect, on
                 <input type="checkbox" checked={selected.has(app.id)} onChange={() => toggleSelect(app.id)} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
               </Td>
               <Td>
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
                   <CompanyLogo domain={domain} company={app.company} size="sm" />
                   <div className="min-w-0 leading-tight">
                     <div className="flex items-center gap-1.5">
-                      <Text variant="body" className="!font-semibold !text-slate-900 dark:!text-white truncate">{app.company}</Text>
+                      <Text variant="body" className="!text-[13px] !font-semibold !text-slate-900 dark:!text-white truncate">{app.company}</Text>
                       {app.starred && <span className="text-amber-400 text-[10px]">★</span>}
                     </div>
-                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block truncate">{app.employmentType || ''}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 block truncate">{app.employmentType || ''}</span>
                   </div>
                 </div>
               </Td>
-              <Td className="!py-2.5">
-                <Text variant="body" className="!text-slate-700 dark:!text-slate-200 truncate max-w-[220px]">{app.role}</Text>
+              <Td>
+                <Text variant="body" className="!text-[13px] !text-slate-700 dark:!text-slate-200 truncate max-w-[220px]">{app.role}</Text>
               </Td>
-              <Td className="text-sm text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
+              <Td className="text-[13px] text-slate-500 dark:text-slate-400">{app.location || '-'}</Td>
               <Td className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 whitespace-nowrap">{formatSalary(app.salary) || '-'}</Td>
               <Td>
-                <Badge variant="status" className={`!border !text-[11px] ${statusColors[app.status]}`}>
+                <Badge variant="status" className={`!border !text-[11px] !px-1.5 !py-0 ${statusColors[app.status]}`}>
                   {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                 </Badge>
               </Td>
-              <Td className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">
+              <Td className="text-[13px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
                 {app.dateApplied ? getRelativeTime(app.dateApplied) : '-'}
               </Td>
               <Td>
@@ -238,7 +238,7 @@ export default function TableView({ applications, onEdit, onDelete, onSelect, on
               <Td className="text-right" onClick={e => e.stopPropagation()}>
                 <div className="flex gap-0.5 justify-end opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                   {app.jobUrl && (
-                    <a href={app.jobUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                    <a href={app.jobUrl} target="_blank" rel="noopener noreferrer" className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
                       <ExternalLink size={14} />
                     </a>
                   )}
