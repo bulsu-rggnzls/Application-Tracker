@@ -159,16 +159,16 @@ export default function TableView({ applications, onEdit, onDelete, onSelect, on
         <Th className="w-10 !px-4">
           <input type="checkbox" checked={selected.size === filtered.length && filtered.length > 0} onChange={toggleAll} className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer" />
         </Th>
-        <Th className="w-[18%]">
+        <Th className="w-auto">
           <SortOrderToggle label="Company" currentSort={sort} onSortChange={handleSort} color="indigo" />
         </Th>
-        <Th className="w-[22%]">
+        <Th className="w-auto min-w-[140px]">
           <SortOrderToggle label="Role" currentSort={sort} onSortChange={handleSort} color="sky" />
         </Th>
-        <Th className="w-[12%]">
+        <Th className="w-auto min-w-[90px]">
           <MultiSelectFilter title="Location" options={locationOptions} selectedValues={locationFilter} onChange={setLocationFilter} color="teal" />
         </Th>
-        <Th className="w-[12%]">
+        <Th className="w-auto min-w-[90px]">
           <SalaryRangeFilter
             minSalary={salaryRange.min}
             maxSalary={salaryRange.max}
@@ -176,13 +176,13 @@ export default function TableView({ applications, onEdit, onDelete, onSelect, on
             onChange={setSalaryRange}
           />
         </Th>
-        <Th className="w-[10%]">
+        <Th className="w-auto min-w-[90px]">
           <MultiSelectFilter title="Status" options={statusOptions} selectedValues={statusFilter} onChange={setStatusFilter} color="purple" />
         </Th>
-        <Th className="w-[9%]">
+        <Th className="w-auto min-w-[80px]">
           <DateRangeFilter value={dateRange} onChange={setDateRange} />
         </Th>
-        <Th className="w-[14%]">
+        <Th className="w-auto min-w-[120px]">
           <TagFilter availableTags={allTags} selectedTags={tagFilter} onChange={setTagFilter} />
         </Th>
         <Th className="w-28 !px-4 !text-right">Actions</Th>
@@ -230,13 +230,13 @@ export default function TableView({ applications, onEdit, onDelete, onSelect, on
               <Td>
                 <div className="flex gap-1 flex-wrap">
                   {app.tags.slice(0, 2).map(t => (
-                    <Badge key={t} variant="table">{t}</Badge>
+                    <Badge key={t} variant="table" className="max-w-[110px] truncate">{t}</Badge>
                   ))}
                   {app.tags.length > 2 && <Text variant="muted-sm">+{app.tags.length - 2}</Text>}
                 </div>
               </Td>
               <Td className="text-right" onClick={e => e.stopPropagation()}>
-                <div className="flex gap-0.5 justify-end opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                <div className="flex gap-0.5 justify-end opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100 transition-opacity">
                   {app.jobUrl && (
                     <a href={app.jobUrl} target="_blank" rel="noopener noreferrer" className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
                       <ExternalLink size={14} />
