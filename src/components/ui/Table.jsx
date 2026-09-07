@@ -2,7 +2,7 @@ export function Table({ className = '', fill = false, children, ...props }) {
   return (
     <div className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 ${className}`} {...props}>
       <div className="overflow-auto flex-1 min-h-0 scrollbar-thin" style={{ scrollbarGutter: 'stable' }}>
-        <table className={`w-full table-fixed text-sm ${fill ? 'h-full' : ''}`}>{children}</table>
+        <table className={`w-full table-auto text-sm min-w-[880px] ${fill ? 'h-full' : ''}`}>{children}</table>
       </div>
     </div>
   )
@@ -11,7 +11,7 @@ export function Table({ className = '', fill = false, children, ...props }) {
 export function Thead({ children }) {
   return (
     <thead className="sticky top-0 z-10">
-      <tr className="border-b border-slate-200 dark:border-slate-700 bg-indigo-50/50 dark:bg-indigo-950/30">
+      <tr className="border-b border-slate-200 dark:border-slate-700 bg-indigo-50 dark:bg-slate-900">
         {children}
       </tr>
     </thead>
