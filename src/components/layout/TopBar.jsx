@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Calendar, Clock, Check, LogOut, Briefcase } from 'lucide-react'
+import { Bell, Calendar, Clock, Check, LogOut, Briefcase, Menu } from 'lucide-react'
 import { Badge, Heading, IconButton, Text } from '../ui'
 import formatTime from '../../utils/formatTime'
 
@@ -40,20 +40,27 @@ function formatTimeLeft(dt) {
   return `${Math.floor(hrs / 24)}d left`
 }
 
-export default function TopBar({ applications, onSignOut }) {
+export default function TopBar({ applications, onSignOut, onOpenMenu }) {
   const [notifOpen, setNotifOpen] = useState(false)
 
   const upcoming = getUpcomingInterviews(applications || [])
 
   return (
-    <header className="h-14 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0 relative z-40">
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 flex items-center justify-center">
+    <header className="flex items-center justify-between w-full px-4 py-3 h-14 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800 shrink-0 relative z-40">
+      <div className="flex items-center gap-2.5 min-w-0">
+        <IconButton
+          onClick={onOpenMenu}
+          className="md:hidden !text-slate-500 dark:!text-slate-400"
+          title="Menu"
+        >
+          <Menu size={18} />
+        </IconButton>
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 flex items-center justify-center shrink-0">
           <Briefcase size={15} />
         </div>
-        <div className="leading-tight">
-          <Heading size="sm" className="!tracking-tight">AppTracker</Heading>
-          <p className="text-[11px] font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-400">Your job hunt, one board</p>
+        <div className="leading-tight min-w-0">
+          <Heading size="sm" className="!tracking-tight truncate">AppTracker</Heading>
+          <p className="text-[11px] font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-400 hidden sm:block">Your job hunt, one board</p>
         </div>
       </div>
       <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
@@ -120,7 +127,7 @@ export default function TopBar({ applications, onSignOut }) {
         </div>
         <IconButton
           onClick={onSignOut}
-          className="!text-slate-500 dark:!text-slate-400 hover:!text-rose-600 dark:hover:!text-rose-400"
+          className="hidden md:inline-flex !text-slate-500 dark:!text-slate-400 hover:!text-rose-600 dark:hover:!text-rose-400"
           title="Sign out"
         >
           <LogOut size={18} />

@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [applications, setApplications] = useState([])
   const [dataLoading, setDataLoading] = useState(true)
   const [viewMode, setViewMode] = useState('board')
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeView, setActiveView] = useState('board')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingJob, setEditingJob] = useState(null)
@@ -170,15 +171,35 @@ export default function Dashboard() {
     }))
   }, [persist])
 
-  const handleStatusChange = useCallback((id, newStatus) => {
+  const handleStatusChange = useCallback((id, newStatus, fromStatus) => {
+    if (newStatus === 'interviewing' && fromStatus !== 'interviewing') {
+      const app = applications.find(a => a.id === id)
+      setPendingInterview({ jobId: id, sourceStatus: fromStatus || app?.status || 'wishlist' })
+      setApplications(prev => prev.map(a => {
+        if (a.id !== id) return a
+        const updated = logActivity({ ...a, status: 'interviewing' }, 'status_change', `Moved to interviewing`)
+        persist(updated)
+        return updated
+      }))
+      return
+    }
+    if (newStatus === 'offer' && fromStatus !== 'offer') {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#34d399', '#059669', '#fbbf24', '#f59e0b'],
+      })
+    }
     setApplications(prev => prev.map(app => {
       if (app.id !== id) return app
-      const updated = logActivity({ ...app, status: newStatus }, 'status_change', `Moved to ${newStatus}`)
+      if (app.status === newStatus) return app
+      const updated = logActivity({ ...app, status: newStatus }, 'status_change', `Moved from ${app.status} to ${newStatus}`)
       persist(updated)
       return updated
     }))
     setDetailJob(prev => prev && prev.id === id ? { ...prev, status: newStatus } : prev)
-  }, [persist])
+  }, [persist, applications])
 
   const handleUpdateJob = useCallback((updates) => {
     setApplications(prev => prev.map(app => app.id === updates.id ? { ...app, ...updates } : app))
@@ -281,12 +302,12 @@ export default function Dashboard() {
         ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900'
         : 'bg-gradient-to-br from-slate-50 via-indigo-50/60 to-purple-50/40'
     }`}>
-      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onSignOut={signOut} />
+      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onSignOut={signOut} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <TopBar applications={applications} onSignOut={signOut} />
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden max-w-full">
+          <TopBar applications={applications} onSignOut={signOut} onOpenMenu={() => setDrawerOpen(true)} />
 
-          <div className="flex-1 min-h-0 flex flex-col px-6 py-4">
+          <div className="flex-1 min-h-0 flex flex-col px-4 py-3 md:px-6 md:py-4 overflow-x-hidden">
             {activeView === 'board' || activeView === 'table' ? (
               <div className="max-w-[104rem] mx-auto w-full flex flex-col flex-1 min-h-0">
                 <ControlsBar
@@ -297,10 +318,10 @@ export default function Dashboard() {
                   onExport={handleExport}
                   onImport={handleImport}
                 />
-                <div className="mt-4 shrink-0">
+                <div className="mt-3 sm:mt-4 shrink-0">
                   <AnalyticsBar applications={applications} />
                 </div>
-                <div className="mt-4 flex-1 min-h-0 flex flex-col">
+                <div className="mt-3 sm:mt-4 flex-1 min-h-0 flex flex-col">
                 {viewMode === 'board' ? (
                   applications.length === 0 ? (
                     <WelcomeEmpty
@@ -321,6 +342,7 @@ export default function Dashboard() {
                       onAcceptOffer={handleAcceptOffer}
                       onRejectOffer={handleRejectOffer}
                       onSelect={setDetailJob}
+                      onStatusChange={handleStatusChange}
                     />
                   )
                 ) : (

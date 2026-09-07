@@ -6,7 +6,7 @@ import {
   IconCalendarMonth,
   IconTimeline,
 } from '@tabler/icons-react'
-import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar'
+import { Sidebar, SidebarBody, SidebarLink, MobileSidebar } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -24,87 +24,150 @@ function getInitials(user) {
   return 'AT'
 }
 
-export default function AppSidebar({ activeView, onViewChange, applications, user, onSignOut }) {
-  const [open, setOpen] = useState(false)
+export default function AppSidebar({ activeView, onViewChange, applications, user, onSignOut, drawerOpen, setDrawerOpen }) {
+  const [railOpen, setRailOpen] = useState(false)
   const interviewingCount = applications.filter(a => a.status === 'interviewing').length
   const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Guest'
   const email = user?.email || ''
 
   return (
-    <Sidebar open={open} setOpen={setOpen}>
-      <SidebarBody className="justify-between gap-4">
-        <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scrollbar-thin">
-          <Logo open={open} />
-          <div className="mt-8">
-            <p className={cn(
-              'px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500',
-              open ? 'block' : 'hidden'
-            )}>
-              Workspace
-            </p>
-            <nav className="flex flex-col space-y-1.5">
-              {navItems.map((item) => (
-                <SidebarLink
-                  key={item.id}
-                  link={{
-                    label: item.label,
-                    href: '#',
-                    icon: (
-                      <div className="relative">
-                        <item.icon className={cn(
-                          'h-5 w-5 shrink-0 transition-colors duration-200',
-                          activeView === item.id
-                            ? 'text-white'
-                            : 'text-slate-400 group-hover/sidebar:text-white'
-                        )} />
-                        {item.id === 'calendar' && interviewingCount > 0 && (
-                          <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 ring-2 ring-[#090D16] text-[8px] font-bold text-white">
-                            {interviewingCount}
-                          </span>
-                        )}
-                      </div>
-                    ),
-                  }}
-                  className={cn(
-                    activeView === item.id && 'bg-white/10 text-white font-medium'
-                  )}
-                  onClick={(e) => { e.preventDefault(); onViewChange(item.id) }}
-                  active={activeView === item.id}
-                />
-              ))}
-            </nav>
-          </div>
-        </div>
+    <>
+      {/* Desktop rail */}
+      <div className="hidden md:block h-full">
+        <Sidebar open={railOpen} setOpen={setRailOpen}>
+          <SidebarBody className="justify-between gap-4">
+            <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scrollbar-thin">
+              <Logo open={railOpen} />
+              <div className="mt-8">
+                <p className={cn(
+                  'px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500',
+                  open ? 'block' : 'hidden'
+                )}>
+                  Workspace
+                </p>
+                <nav className="flex flex-col space-y-1.5">
+                  {navItems.map((item) => (
+                    <SidebarLink
+                      key={item.id}
+                      link={{
+                        label: item.label,
+                        href: '#',
+                        icon: (
+                          <div className="relative">
+                            <item.icon className={cn(
+                              'h-5 w-5 shrink-0 transition-colors duration-200',
+                              activeView === item.id
+                                ? 'text-white'
+                                : 'text-slate-400 group-hover/sidebar:text-white'
+                            )} />
+                            {item.id === 'calendar' && interviewingCount > 0 && (
+                              <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 ring-2 ring-[#090D16] text-[8px] font-bold text-white">
+                                {interviewingCount}
+                              </span>
+                            )}
+                          </div>
+                        ),
+                      }}
+                      className={cn(
+                        activeView === item.id && 'bg-white/10 text-white font-medium'
+                      )}
+                      onClick={(e) => { e.preventDefault(); onViewChange(item.id) }}
+                      active={activeView === item.id}
+                    />
+                  ))}
+                </nav>
+              </div>
+            </div>
 
-        {/* User footer */}
-        <div className="shrink-0 border-t border-white/[0.06] pt-3">
-          <div className={cn('flex items-center gap-2.5 rounded-xl px-1.5 py-1', !open && 'justify-center')}>
-            <span
-              title={email}
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-1 ring-white/10"
-            >
-              {getInitials(user)}
-            </span>
-            {open && (
-              <>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-white truncate leading-tight">{displayName}</p>
-                  <p className="text-[10px] text-slate-500 truncate leading-tight">{email}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={onSignOut}
-                  title="Sign out"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors duration-150 cursor-pointer bg-transparent border-0"
+            {/* User footer */}
+            <div className="shrink-0 border-t border-white/[0.06] pt-3">
+              <div className={cn('flex items-center gap-2.5 rounded-xl px-1.5 py-1', !open && 'justify-center')}>
+                <span
+                  title={email}
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-1 ring-white/10"
                 >
-                  <LogOut size={14} />
-                </button>
-              </>
-            )}
+                  {getInitials(user)}
+                </span>
+                {open && (
+                  <>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold text-white truncate leading-tight">{displayName}</p>
+                      <p className="text-[10px] text-slate-500 truncate leading-tight">{email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={onSignOut}
+                      title="Sign out"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors duration-150 cursor-pointer bg-transparent border-0"
+                    >
+                      <LogOut size={14} />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </SidebarBody>
+        </Sidebar>
+      </div>
+
+      {/* Mobile drawer */}
+      <Sidebar open={drawerOpen} setOpen={setDrawerOpen}>
+        <MobileSidebar>
+          <div className="shrink-0 pr-10">
+            <Logo open={true} />
           </div>
-        </div>
-      </SidebarBody>
-    </Sidebar>
+          <p className="px-2 mt-6 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Menu</p>
+          <nav className="flex flex-col space-y-1.5">
+            {navItems.map((item) => (
+              <SidebarLink
+                key={item.id}
+                link={{
+                  label: item.label,
+                  href: '#',
+                  icon: (
+                    <div className="relative">
+                      <item.icon className={cn(
+                        'h-5 w-5 shrink-0',
+                        activeView === item.id ? 'text-white' : 'text-slate-400'
+                      )} />
+                      {item.id === 'calendar' && interviewingCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 ring-2 ring-[#090D16] text-[8px] font-bold text-white">
+                          {interviewingCount}
+                        </span>
+                      )}
+                    </div>
+                  ),
+                }}
+                className={cn(
+                  activeView === item.id && 'bg-white/10 text-white font-medium'
+                )}
+                onClick={(e) => { e.preventDefault(); onViewChange(item.id); setDrawerOpen(false) }}
+                active={activeView === item.id}
+              />
+            ))}
+          </nav>
+          <div className="mt-auto border-t border-white/[0.06] pt-3">
+            <div className="flex items-center gap-2.5 rounded-xl px-1.5 py-1">
+              <span className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-1 ring-white/10">
+                {getInitials(user)}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-white truncate leading-tight">{displayName}</p>
+                <p className="text-[10px] text-slate-500 truncate leading-tight">{email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={onSignOut}
+                title="Sign out"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors duration-150 cursor-pointer bg-transparent border-0"
+              >
+                <LogOut size={14} />
+              </button>
+            </div>
+          </div>
+        </MobileSidebar>
+      </Sidebar>
+    </>
   )
 }
 

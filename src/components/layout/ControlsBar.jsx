@@ -7,9 +7,9 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg">
+    <div className="flex items-center justify-between w-full gap-2 mb-3">
+      <div className="flex items-center gap-2 min-w-0">
+        <div className="flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0">
           <button
             type="button"
             onClick={() => onViewModeChange('board')}
@@ -39,7 +39,7 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
         </div>
       </div>
 
-      <div className="flex items-center gap-2 relative">
+      <div className="flex items-center gap-1.5 relative shrink-0">
         <button
           type="button"
           onClick={() => setMenuOpen(prev => !prev)}
@@ -89,10 +89,11 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-semibold px-3.5 py-2 shadow-md shadow-indigo-500/25 transition-all duration-150 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          title="New application"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-semibold w-9 h-9 sm:w-auto px-0 sm:px-3.5 shadow-md shadow-indigo-500/25 transition-all duration-150 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 sm:hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           <Plus size={14} strokeWidth={2.5} />
-          New application
+          <span className="hidden sm:inline">New application</span>
         </button>
       </div>
     </div>
