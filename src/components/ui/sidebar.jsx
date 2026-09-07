@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { IconMenu2, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 
 const SidebarContext = createContext(undefined);
 
@@ -91,42 +91,40 @@ export const MobileSidebar = ({
 }) => {
   const { open, setOpen } = useSidebar();
   return (
-    <>
-      <div
-        className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-[#0F172A] w-full"
-        )}
-        {...props}>
-        <div className="flex justify-end z-20 w-full">
-          <IconMenu2
-            className="text-[#94A3B8]"
-            onClick={() => setOpen(!open)} />
-        </div>
-        <AnimatePresence>
-          {open && (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[99] md:hidden"
+            onClick={() => setOpen(false)}
+          />
             <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-[#0F172A] p-10 z-[100] flex flex-col justify-between",
+                "fixed inset-y-0 left-0 w-[82%] max-w-xs bg-[#090D16] p-4 z-[100] flex flex-col md:hidden shadow-2xl border-r border-white/[0.04] overflow-hidden",
                 className
-              )}>
-              <div
-                className="absolute right-10 top-10 z-50 text-[#94A3B8]"
-                onClick={() => setOpen(!open)}>
-                <IconX />
-              </div>
+              )}
+              {...props}>
+              <div aria-hidden="true" className="pointer-events-none absolute -top-24 -left-20 w-72 h-72 rounded-full bg-indigo-600/10 blur-3xl" />
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setOpen(false)}
+                className="absolute top-3.5 right-3 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-0 z-[101]">
+                <IconX size={18} />
+              </button>
               {children}
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
