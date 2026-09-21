@@ -24,7 +24,7 @@ function getInitials(user) {
   return 'AT'
 }
 
-export default function AppSidebar({ activeView, onViewChange, applications, user, onSignOut, drawerOpen, setDrawerOpen }) {
+export default function AppSidebar({ activeView, onViewChange, applications, user, onLogoutClick, drawerOpen, setDrawerOpen }) {
   const [railOpen, setRailOpen] = useState(false)
   const interviewingCount = applications.filter(a => a.status === 'interviewing').length
   const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Guest'
@@ -96,7 +96,7 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
                     </div>
                     <button
                       type="button"
-                      onClick={onSignOut}
+                      onClick={onLogoutClick}
                       title="Sign out"
                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors duration-150 cursor-pointer bg-transparent border-0"
                     >
@@ -157,7 +157,7 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
               </div>
               <button
                 type="button"
-                onClick={onSignOut}
+                onClick={onLogoutClick}
                 title="Sign out"
                 className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors duration-150 cursor-pointer bg-transparent border-0"
               >
