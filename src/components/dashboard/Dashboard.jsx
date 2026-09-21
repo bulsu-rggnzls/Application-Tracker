@@ -17,6 +17,7 @@ import AnalyticsPage from '../analytics/AnalyticsPage'
 import JobModal from '../jobs/JobModal'
 import JobDetailDrawer from '../jobs/JobDetailDrawer'
 import InterviewModal from '../jobs/InterviewModal'
+import LogoutModal from '../layout/LogoutModal'
 import { ComposeEmailCard } from '../ui'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 import confetti from 'canvas-confetti'
@@ -34,6 +35,7 @@ export default function Dashboard() {
   const [detailJob, setDetailJob] = useState(null)
   const [pendingInterview, setPendingInterview] = useState(null)
   const [composeOpen, setComposeOpen] = useState(false)
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false)
   const [darkMode, _setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true' ||
@@ -302,10 +304,10 @@ export default function Dashboard() {
         ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900'
         : 'bg-gradient-to-br from-slate-50 via-indigo-50/60 to-purple-50/40'
     }`}>
-      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onSignOut={signOut} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
+      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onLogoutClick={() => setLogoutModalOpen(true)} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden max-w-full">
-          <TopBar applications={applications} onSignOut={signOut} onOpenMenu={() => setDrawerOpen(true)} />
+          <TopBar applications={applications} onLogoutClick={() => setLogoutModalOpen(true)} onOpenMenu={() => setDrawerOpen(true)} />
 
           <div className="flex-1 min-h-0 flex flex-col px-4 py-3 md:px-6 md:py-4 overflow-x-hidden">
             {activeView === 'board' || activeView === 'table' ? (
@@ -384,6 +386,12 @@ export default function Dashboard() {
         onClose={handleInterviewCancel}
         onConfirm={handleInterviewConfirm}
         job={pendingJob}
+      />
+
+      <LogoutModal
+        isOpen={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
+        onConfirm={async () => { setLogoutModalOpen(false); await signOut() }}
       />
 
       <JobDetailDrawer
