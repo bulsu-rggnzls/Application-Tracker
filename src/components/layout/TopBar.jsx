@@ -40,7 +40,7 @@ function formatTimeLeft(dt) {
   return `${Math.floor(hrs / 24)}d left`
 }
 
-export default function TopBar({ applications, onSignOut, onOpenMenu }) {
+export default function TopBar({ applications, onLogoutClick, onOpenMenu }) {
   const [notifOpen, setNotifOpen] = useState(false)
 
   const upcoming = getUpcomingInterviews(applications || [])
@@ -126,7 +126,7 @@ export default function TopBar({ applications, onSignOut, onOpenMenu }) {
           )}
         </div>
         <IconButton
-          onClick={onSignOut}
+          onClick={onLogoutClick}
           className="hidden md:inline-flex !text-slate-500 dark:!text-slate-400 hover:!text-rose-600 dark:hover:!text-rose-400"
           title="Sign out"
         >
