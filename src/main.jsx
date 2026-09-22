@@ -4,14 +4,14 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { supabaseConfigError } from './lib/supabase.js'
-import { Heading } from './components/ui'
+import { Heading, Text } from './components/ui'
 
 function SetupRequired({ message }) {
   return (
     <div className="h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md bg-white border border-rose-200 rounded-2xl shadow-xl p-6">
         <Heading size="lg" className="!text-lg !text-rose-600 mb-2">Setup required</Heading>
-        <p className="text-sm text-slate-600 leading-relaxed">{message}</p>
+        <Text className="!text-slate-600 dark:!text-slate-400 leading-relaxed">{message}</Text>
       </div>
     </div>
   )
