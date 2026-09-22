@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, LogOut, Loader2 } from 'lucide-react'
-import { Button, IconButton, Heading } from '../ui'
+import { Button, IconButton, Heading, Text } from '../ui'
 
 export default function LogoutModal({ isOpen, onClose, onConfirm }) {
   const [loading, setLoading] = useState(false)
@@ -32,9 +32,9 @@ export default function LogoutModal({ isOpen, onClose, onConfirm }) {
 
           <div className="pt-0.5 min-w-0">
             <Heading size="sm">Sign out</Heading>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 leading-normal">
+            <Text className="mt-1 !text-slate-500 dark:!text-slate-400 leading-normal">
               Are you sure you want to sign out of your account?
-            </p>
+            </Text>
           </div>
         </div>
 
