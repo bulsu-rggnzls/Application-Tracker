@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react'
 import { BarChart2, ChevronRight } from 'lucide-react'
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  XAxis, YAxis, Tooltip, ResponsiveContainer,
   AreaChart, Area, CartesianGrid,
 } from 'recharts'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 import StatStrip from '../ui/StatStrip'
+import { Heading } from '../ui'
 
 const STATUS_COLORS = {
   wishlist: '#f59e0b',
@@ -60,7 +61,7 @@ function ChartCard({ title, hint, tone = 'indigo', children }) {
   return (
     <section className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#090D16] flex flex-col overflow-hidden">
       <header className={`flex items-center justify-between gap-3 px-4 pt-3 pb-2.5 border-b border-slate-100 dark:border-slate-800/80 bg-gradient-to-r ${TONES[tone]}`}>
-        <h3 className="text-[13px] font-semibold tracking-tight text-slate-900 dark:text-white">{title}</h3>
+        <Heading size="sm" className="!text-[13px] tracking-tight">{title}</Heading>
         {hint && (
           <span className="text-[11px] font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-500">{hint}</span>
         )}
@@ -259,7 +260,7 @@ export default function AnalyticsPage({ applications, onAdd, dark = false }) {
         <div className="col-span-12 flex items-end justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">Pipeline intelligence</p>
-            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white mt-0.5">Analytics</h2>
+            <Heading size="md" className="!font-bold tracking-tight mt-0.5">Analytics</Heading>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
               {stats.total} applications · {stats.interviewing} interviewing · {stats.offers} offers
             </p>
