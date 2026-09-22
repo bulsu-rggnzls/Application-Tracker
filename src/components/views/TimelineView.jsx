@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import getRelativeTime from '../../utils/getRelativeTime'
 import extractDomain from '../../utils/extractDomain'
-import { Text } from '../ui'
+import { Text, Heading, Button, IconButton } from '../ui'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 
 const STATUS_COLORS = {
@@ -201,7 +201,7 @@ export default function TimelineView({ applications, onSelect, onAdd }) {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">Activity log</p>
-            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white mt-0.5">Timeline</h2>
+            <Heading size="md" className="!font-bold tracking-tight mt-0.5">Timeline</Heading>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">{entries.length} activities tracked</p>
           </div>
           <div className="flex p-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
@@ -308,14 +308,15 @@ export default function TimelineView({ applications, onSelect, onAdd }) {
 
                             <div className="flex items-center gap-1.5 shrink-0">
                               {entry.jobUrl && (
-                                <button
+                                <IconButton
                                   type="button"
+                                  color="indigo"
                                   onClick={e => { e.stopPropagation(); window.open(entry.jobUrl, '_blank', 'noopener,noreferrer') }}
-                                  className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors opacity-0 group-hover/row:opacity-100 focus:opacity-100 cursor-pointer bg-transparent border-0"
+                                  className="!p-1 dark:hover:!bg-slate-800 opacity-0 group-hover/row:opacity-100 focus:opacity-100 bg-transparent border-0"
                                   title="Open job posting"
                                 >
                                   <ExternalLink size={13} />
-                                </button>
+                                </IconButton>
                               )}
                               <span className="text-[11px] text-slate-400 dark:text-slate-500 whitespace-nowrap tabular-nums">
                                 {new Date(entry.timestamp).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
@@ -331,13 +332,14 @@ export default function TimelineView({ applications, onSelect, onAdd }) {
             ))}
 
             {filteredEntries.length > visibleCount && (
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={() => setVisibleCount(prev => prev + 20)}
-                className="w-full py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 rounded-lg border border-dashed border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer bg-transparent"
+                className="w-full !py-2 !text-[11px] !font-semibold uppercase tracking-wider !text-slate-500 dark:!text-slate-400 !rounded-lg border-dashed dark:!border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-900 dark:hover:text-white bg-transparent hover:!bg-transparent dark:hover:!bg-transparent"
               >
                 Load more ({filteredEntries.length - visibleCount} remaining)
-              </button>
+              </Button>
             )}
           </div>
         )}
