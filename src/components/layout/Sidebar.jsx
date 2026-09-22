@@ -7,7 +7,7 @@ import {
   IconTimeline,
 } from '@tabler/icons-react'
 import { Sidebar, SidebarBody, SidebarLink, MobileSidebar } from '@/components/ui/sidebar'
-import { IconButton } from '@/components/ui'
+import { IconButton, Text, Heading } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -40,12 +40,12 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
             <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto scrollbar-thin">
               <Logo open={railOpen} />
               <div className="mt-8">
-                <p className={cn(
-                  'px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500',
+                <Heading size="xs" className={cn(
+                  'px-2 mb-2 !text-[10px] !text-slate-500 tracking-widest',
                   open ? 'block' : 'hidden'
                 )}>
                   Workspace
-                </p>
+                </Heading>
                 <nav className="flex flex-col space-y-1.5">
                   {navItems.map((item) => (
                     <SidebarLink
@@ -92,8 +92,8 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
                 {open && (
                   <>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-semibold text-white truncate leading-tight">{displayName}</p>
-                      <p className="text-[10px] text-slate-500 truncate leading-tight">{email}</p>
+                      <Text className="!text-xs !font-semibold !text-white truncate leading-tight">{displayName}</Text>
+                      <Text variant="muted-sm" className="truncate leading-tight">{email}</Text>
                     </div>
                     <IconButton
                       type="button"
@@ -118,7 +118,7 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
           <div className="shrink-0 pr-10">
             <Logo open={true} />
           </div>
-          <p className="px-2 mt-6 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Menu</p>
+          <Heading size="xs" className="px-2 mt-6 mb-2 !text-[10px] !text-slate-500 tracking-widest">Menu</Heading>
           <nav className="flex flex-col space-y-1.5">
             {navItems.map((item) => (
               <SidebarLink
@@ -154,8 +154,8 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
                 {getInitials(user)}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-white truncate leading-tight">{displayName}</p>
-                <p className="text-[10px] text-slate-500 truncate leading-tight">{email}</p>
+                <Text className="!text-xs !font-semibold !text-white truncate leading-tight">{displayName}</Text>
+                <Text variant="muted-sm" className="truncate leading-tight">{email}</Text>
               </div>
               <IconButton
                 type="button"
