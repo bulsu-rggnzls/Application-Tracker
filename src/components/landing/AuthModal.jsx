@@ -112,15 +112,16 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
           </div>
 
           <div className="p-5 space-y-4">
-            <button
+            <Button
               type="button"
+              variant="indigo-outline"
               onClick={handleGoogle}
               disabled={googleBusy || busy}
-              className="w-full inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 px-4 py-2.5 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-60 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="w-full !inline-flex !gap-2.5 !rounded-xl !border-slate-300 dark:!border-slate-600 !bg-white dark:!bg-slate-800 !font-semibold !text-slate-700 dark:!text-slate-200 !px-4 !transition-all !duration-200 dark:hover:!bg-slate-700 hover:shadow-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {googleBusy ? <Loader2 size={16} className="animate-spin" /> : <GoogleIcon />}
               Continue with Google
-            </button>
+            </Button>
 
             <div className="flex items-center gap-3">
               <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
