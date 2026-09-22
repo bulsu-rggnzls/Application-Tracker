@@ -18,7 +18,7 @@ import JobModal from '../jobs/JobModal'
 import JobDetailDrawer from '../jobs/JobDetailDrawer'
 import InterviewModal from '../jobs/InterviewModal'
 import LogoutModal from '../layout/LogoutModal'
-import { ComposeEmailCard } from '../ui'
+import { ComposeEmailCard, Button, Heading, Text } from '../ui'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 import confetti from 'canvas-confetti'
 import { exportToJSON, importFromJSON } from '../../utils/dataExport'
@@ -257,28 +257,30 @@ export default function Dashboard() {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
         <div className="max-w-md text-center bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-800 rounded-2xl shadow-xl p-6">
-          <h1 className="text-lg font-bold text-rose-600 dark:text-rose-400 mb-2">Couldn't load your data</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{fetchError}</p>
+          <Heading size="lg" className="!text-lg !text-rose-600 dark:!text-rose-400 mb-2">Couldn't load your data</Heading>
+          <Text>{fetchError}</Text>
           {permissionDenied && (
-            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            <Text variant="subtle" className="mt-3 leading-relaxed">
               This is a database permissions issue. Run the GRANT statements in the Supabase SQL Editor, then try again.
-            </p>
+            </Text>
           )}
           <div className="mt-5 flex items-center justify-center gap-2.5">
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={() => setRetryCount(c => c + 1)}
-              className="inline-flex items-center rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-semibold px-5 py-2.5 shadow-md shadow-indigo-500/25 hover:from-indigo-500 hover:to-violet-500 cursor-pointer"
+              className="inline-flex !rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 !text-white text-sm !font-semibold !px-5 !py-2.5 shadow-md shadow-indigo-500/25 hover:from-indigo-500 hover:to-violet-500"
             >
               Try again
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
               onClick={() => signOut()}
-              className="inline-flex items-center rounded-xl text-sm font-semibold px-5 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+              className="inline-flex !rounded-xl text-sm !font-semibold !px-5 !py-2.5 !text-slate-700 dark:!text-slate-300"
             >
               Log out
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Plus, LayoutGrid, Table2, Download, Upload, MoreHorizontal } from 'lucide-react'
 import { useState } from 'react'
+import { Button, IconButton } from '../ui'
 
 export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewModeChange, onExport, onImport }) {
   const fileRef = useRef(null)
@@ -40,14 +41,14 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
       </div>
 
       <div className="flex items-center gap-1.5 relative shrink-0">
-        <button
+        <IconButton
           type="button"
           onClick={() => setMenuOpen(prev => !prev)}
           title="More actions"
-          className="flex items-center justify-center w-9 h-9 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer"
+          className="flex items-center justify-center w-9 h-9 !rounded-lg !text-slate-500 dark:!text-slate-400 hover:!text-slate-700 dark:hover:!text-slate-200 hover:!bg-white dark:hover:!bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 !transition-all"
         >
           <MoreHorizontal size={17} />
-        </button>
+        </IconButton>
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
@@ -86,15 +87,16 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
             e.target.value = ''
           }}
         />
-        <button
+        <Button
           type="button"
+          variant="indigo"
           onClick={onAdd}
           title="New application"
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-semibold w-9 h-9 sm:w-auto px-0 sm:px-3.5 shadow-md shadow-indigo-500/25 transition-all duration-150 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 sm:hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="inline-flex !rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 !text-xs !font-semibold w-9 h-9 sm:w-auto !px-0 sm:!px-3.5 shadow-md shadow-indigo-500/25 !transition-all duration-150 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 sm:hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           <Plus size={14} strokeWidth={2.5} />
           <span className="hidden sm:inline">New application</span>
-        </button>
+        </Button>
       </div>
     </div>
   )

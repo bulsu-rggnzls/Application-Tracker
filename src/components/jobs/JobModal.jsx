@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Briefcase, User, Hash } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import { Button, IconButton, Heading, Text } from '../ui'
+import { Button, IconButton, Input, Heading, Text } from '../ui'
 import extractDomain from '../../utils/extractDomain'
 
 function getTabs(status) {
@@ -44,6 +44,8 @@ function inputCls() {
 function selectCls() {
   return `${inputCls()} appearance-none cursor-pointer pr-8`
 }
+
+const inputOverrideCls = '!px-3.5 !py-2.5 !text-slate-700 !bg-slate-50 dark:!bg-slate-800/70 !border-slate-200/80 !rounded-xl focus:!bg-white dark:focus:!bg-slate-800 focus:!border-indigo-400 dark:focus:!border-indigo-500 focus:!ring-4 focus:!ring-indigo-500/10'
 
 function Field({ label, hint, children }) {
   return (
@@ -96,9 +98,9 @@ function PillInput({ tags, onAdd, onRemove, placeholder }) {
         >
           <Hash size={11} className="text-indigo-400 dark:text-indigo-500" />
           {tag}
-          <button type="button" onClick={() => onRemove(tag)} className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 transition-colors cursor-pointer">
+          <IconButton type="button" color="indigo" onClick={() => onRemove(tag)} className="!p-0 !text-indigo-400 dark:hover:!text-indigo-200 hover:!bg-transparent dark:hover:!bg-transparent">
             <X size={12} />
-          </button>
+          </IconButton>
         </span>
       ))}
       <input
@@ -295,10 +297,10 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
             <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-2 duration-200">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Company name">
-                  <input className={inputCls()} type="text" value={form.company} onChange={handleCompanyChange} required placeholder="e.g. Stripe" autoFocus />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="text" value={form.company} onChange={handleCompanyChange} required placeholder="e.g. Stripe" autoFocus />
                 </Field>
                 <Field label="Role title">
-                  <input className={inputCls()} type="text" value={form.role} onChange={update('role')} required placeholder="e.g. Senior Frontend" />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="text" value={form.role} onChange={update('role')} required placeholder="e.g. Senior Frontend" />
                 </Field>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -310,15 +312,15 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
                   </select>
                 </Field>
                 <Field label="Location">
-                  <input className={inputCls()} type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid (NYC), On-site" />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="text" value={form.location} onChange={update('location')} placeholder="Remote, Hybrid (NYC), On-site" />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Date applied">
-                  <input className={inputCls()} type="date" value={form.dateApplied} onChange={update('dateApplied')} />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="date" value={form.dateApplied} onChange={update('dateApplied')} />
                 </Field>
                 <Field label="Job posting URL">
-                  <input className={inputCls()} type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/…" />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="url" value={form.jobUrl} onChange={handleJobUrlChange} placeholder="https://company.com/jobs/…" />
                 </Field>
               </div>
               <Field label="Status">
@@ -351,9 +353,9 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
             <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-2 duration-200">
               <Field label="Salary" hint="enter amounts in thousands (k)">
                 <div className="flex items-center rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 overflow-hidden focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:border-indigo-400 dark:focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-200">
-                  <input type="number" min="0" max="100000" step="1" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min" className="flex-1 min-w-0 px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-transparent placeholder-slate-400 focus:outline-none" />
+                  <Input flush containerClassName="relative flex-1 min-w-0" type="number" min="0" max="100000" step="1" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min" className="px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200" />
                   <span className="text-slate-300 dark:text-slate-600 font-medium select-none">–</span>
-                  <input type="number" min="0" max="100000" step="1" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max" className="flex-1 min-w-0 px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-transparent placeholder-slate-400 focus:outline-none" />
+                  <Input flush containerClassName="relative flex-1 min-w-0" type="number" min="0" max="100000" step="1" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max" className="px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200" />
                   <span className="pr-3.5 text-xs font-semibold text-slate-400 select-none shrink-0">k</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 mt-3">
@@ -371,20 +373,21 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               </Field>
 
               <div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => setShowRecruiter(!showRecruiter)}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer"
+                  className="!inline-flex !p-0 !text-xs !font-semibold !text-indigo-600 dark:!text-indigo-400 hover:!text-indigo-700 dark:hover:!text-indigo-300 hover:!bg-transparent dark:hover:!bg-transparent"
                 >
                   <User size={13} />
                   {showRecruiter ? 'Hide recruiter info' : 'Add recruiter info'}
                   <span className="text-slate-300 dark:text-slate-600 font-medium">(optional)</span>
-                </button>
+                </Button>
                 {showRecruiter && (
                   <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2.5 animate-in fade-in-0 slide-in-from-top-1 duration-150">
-                    <input className={inputCls()} type="text" value={form.recruiter.name} onChange={updateRecruiter('name')} placeholder="Name" />
-                    <input className={inputCls()} type="email" value={form.recruiter.email} onChange={updateRecruiter('email')} placeholder="Email" />
-                    <input className={inputCls()} type="url" value={form.recruiter.linkedin} onChange={updateRecruiter('linkedin')} placeholder="LinkedIn URL" />
+                    <Input containerClassName="relative w-full" className={inputOverrideCls} type="text" value={form.recruiter.name} onChange={updateRecruiter('name')} placeholder="Name" />
+                    <Input containerClassName="relative w-full" className={inputOverrideCls} type="email" value={form.recruiter.email} onChange={updateRecruiter('email')} placeholder="Email" />
+                    <Input containerClassName="relative w-full" className={inputOverrideCls} type="url" value={form.recruiter.linkedin} onChange={updateRecruiter('linkedin')} placeholder="LinkedIn URL" />
                   </div>
                 )}
               </div>
@@ -403,18 +406,18 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Interview date">
-                  <input className={inputCls()} type="date" value={form.interview.date} onChange={updateInterview('date')} />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="date" value={form.interview.date} onChange={updateInterview('date')} />
                 </Field>
                 <Field label="Time">
-                  <input className={inputCls()} type="time" value={form.interview.time} onChange={updateInterview('time')} />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="time" value={form.interview.time} onChange={updateInterview('time')} />
                 </Field>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Platform">
-                  <input className={inputCls()} type="text" value={form.interview.platform} onChange={updateInterview('platform')} placeholder="Zoom, Google Meet, onsite…" />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="text" value={form.interview.platform} onChange={updateInterview('platform')} placeholder="Zoom, Google Meet, onsite…" />
                 </Field>
                 <Field label="Interviewer">
-                  <input className={inputCls()} type="text" value={form.interview.interviewer} onChange={updateInterview('interviewer')} placeholder="e.g. Sarah Chen" />
+                  <Input containerClassName="relative w-full" className={inputOverrideCls} type="text" value={form.interview.interviewer} onChange={updateInterview('interviewer')} placeholder="e.g. Sarah Chen" />
                 </Field>
               </div>
               <Field label="Interview notes">

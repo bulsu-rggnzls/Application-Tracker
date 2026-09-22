@@ -112,15 +112,16 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
           </div>
 
           <div className="p-5 space-y-4">
-            <button
+            <Button
               type="button"
+              variant="indigo-outline"
               onClick={handleGoogle}
               disabled={googleBusy || busy}
-              className="w-full inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 px-4 py-2.5 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-60 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="w-full !inline-flex !gap-2.5 !rounded-xl !border-slate-300 dark:!border-slate-600 !bg-white dark:!bg-slate-800 !font-semibold !text-slate-700 dark:!text-slate-200 !px-4 !transition-all !duration-200 dark:hover:!bg-slate-700 hover:shadow-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {googleBusy ? <Loader2 size={16} className="animate-spin" /> : <GoogleIcon />}
               Continue with Google
-            </button>
+            </Button>
 
             <div className="flex items-center gap-3">
               <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
@@ -200,13 +201,14 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
           <div className="px-5 pb-5 text-center">
             <Text variant="muted-sm">
               {isSignup ? 'Already have an account? ' : "Don't have an account? "}
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => onSwitchMode(isSignup ? 'login' : 'signup')}
-                className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline cursor-pointer"
+                className="!inline-flex !p-0 !h-auto !gap-0 !rounded-none !text-[11px] !font-medium !text-indigo-600 dark:!text-indigo-400 hover:!underline hover:!bg-transparent dark:hover:!bg-transparent cursor-pointer"
               >
                 {isSignup ? 'Log in' : 'Sign up free'}
-              </button>
+              </Button>
             </Text>
           </div>
         </motion.div>

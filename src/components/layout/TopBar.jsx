@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Calendar, Clock, Check, LogOut, Briefcase, Menu } from 'lucide-react'
+import { Bell, Calendar, Clock, Check, LogOut, Menu } from 'lucide-react'
 import { Badge, Heading, IconButton, Text } from '../ui'
 import formatTime from '../../utils/formatTime'
 
@@ -55,13 +55,6 @@ export default function TopBar({ applications, onLogoutClick, onOpenMenu }) {
         >
           <Menu size={18} />
         </IconButton>
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 flex items-center justify-center shrink-0">
-          <Briefcase size={15} />
-        </div>
-        <div className="leading-tight min-w-0">
-          <Heading size="sm" className="!tracking-tight truncate">AppTracker</Heading>
-          <p className="text-[11px] font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-400 hidden sm:block">Your job hunt, one board</p>
-        </div>
       </div>
       <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
         <div className="relative">

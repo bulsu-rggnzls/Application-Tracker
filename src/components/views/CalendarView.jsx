@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Inbox, CalendarDays, CalendarClock, CalendarRange, List } from 'lucide-react'
-import { Badge, Card, Heading, IconButton, Text } from '../ui'
+import { Card, Heading, IconButton, Text, Button } from '../ui'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 import StatStrip from '../ui/StatStrip'
 import formatTime from '../../utils/formatTime'
@@ -151,16 +151,17 @@ function MonthGrid({ grid, events, todayKey, todayStart, applications, onSelect 
                     <EventPill key={ev.id || ei} ev={ev} todayRef={todayStart} />
                   ))}
                   {eventsForDay.length > 3 && (
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation()
                         onSelect?.(applications.find(a => a.id === eventsForDay[0].applicationId))
                       }}
-                      className="!p-0 !h-auto !text-[9px] !font-semibold text-left uppercase tracking-wider !text-slate-400 dark:!text-slate-500 hover:!text-indigo-600 dark:hover:!text-indigo-400 cursor-pointer bg-transparent border-0"
+                      className="!p-0 !h-auto !text-[9px] !font-semibold !justify-start text-left uppercase tracking-wider !text-slate-400 dark:!text-slate-500 hover:!text-indigo-600 dark:hover:!text-indigo-400 hover:!bg-transparent dark:hover:!bg-transparent cursor-pointer !rounded-none"
                     >
                       +{eventsForDay.length - 3} more
-                    </button>
+                    </Button>
                   )}
                 </div>
                 {isToday && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500" />}
@@ -415,7 +416,7 @@ export default function CalendarView({ applications, onSelect, onAdd }) {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">Job search calendar</p>
-            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white mt-0.5">{viewTitle}</h2>
+            <Heading size="md" className="!font-bold tracking-tight mt-0.5">{viewTitle}</Heading>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex p-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">

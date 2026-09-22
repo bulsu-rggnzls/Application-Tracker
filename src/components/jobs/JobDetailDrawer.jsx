@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { X, ExternalLink, Calendar, MapPin, DollarSign, Briefcase, Clock, User, Video, Check, Trash2, Star, Save, Eye, EyeOff, LayoutGrid, FileText, ClipboardList } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Markdown from 'react-markdown'
-import { Avatar, Button, Heading, IconButton, Text, Badge } from '../ui'
+import { Avatar, Badge, Button, Heading, IconButton, Input, Text } from '../ui'
 import { getTagStyle } from '../../utils/tagColors'
 import CompanyLogo from './CompanyLogo'
 import InterviewChecklist from './InterviewChecklist'
@@ -193,24 +193,24 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onDelete, onStat
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Company</label>
-                      <input type="text" value={form.company} onChange={e => update('company', e.target.value)} className={inputCls} placeholder="Company name" />
+                      <Input containerClassName="relative w-full" type="text" value={form.company} onChange={e => update('company', e.target.value)} className="!text-slate-700" placeholder="Company name" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Role Title</label>
-                      <input type="text" value={form.role} onChange={e => update('role', e.target.value)} className={inputCls} placeholder="Role title" />
+                      <Input containerClassName="relative w-full" type="text" value={form.role} onChange={e => update('role', e.target.value)} className="!text-slate-700" placeholder="Role title" />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Location</label>
-                    <input type="text" value={form.location} onChange={e => update('location', e.target.value)} className={inputCls} placeholder="Remote, Hybrid, On-site..." />
+                    <Input containerClassName="relative w-full" type="text" value={form.location} onChange={e => update('location', e.target.value)} className="!text-slate-700" placeholder="Remote, Hybrid, On-site..." />
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Salary Range</label>
                     <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2">
-                      <input type="number" min="0" value={form.salary.min} onChange={e => updateSalary('min', e.target.value)} className={inputCls} placeholder="Min (k)" />
-                      <input type="number" min="0" value={form.salary.max} onChange={e => updateSalary('max', e.target.value)} className={inputCls} placeholder="Max (k)" />
+                      <Input containerClassName="relative w-full" type="number" min="0" value={form.salary.min} onChange={e => updateSalary('min', e.target.value)} className="!text-slate-700" placeholder="Min (k)" />
+                      <Input containerClassName="relative w-full" type="number" min="0" value={form.salary.max} onChange={e => updateSalary('max', e.target.value)} className="!text-slate-700" placeholder="Max (k)" />
                       <select value={form.salary.period} onChange={e => updateSalary('period', e.target.value)} className={`${selectCls} w-24`}>
                         {PERIODS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                       </select>
@@ -230,14 +230,14 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onDelete, onStat
                       <Text variant="body" className="!font-medium">Priority</Text>
                       <Text variant="muted-sm">Star to mark this application as high priority</Text>
                     </div>
-                    <button
+                    <IconButton
                       type="button"
                       onClick={() => update('starred', !form.starred)}
                       aria-label="Toggle priority star"
-                      className="cursor-pointer transition-transform hover:scale-110"
+                      className="!p-0 hover:!bg-transparent dark:hover:!bg-transparent !transition-transform hover:scale-110"
                     >
                       <Star size={24} className={form.starred ? 'text-amber-400 fill-amber-400' : 'text-slate-300 dark:text-slate-600'} />
-                    </button>
+                    </IconButton>
                   </div>
 
                   <div>
@@ -408,28 +408,30 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onDelete, onStat
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-xs font-medium text-slate-500 dark:text-slate-400">Job Description & Notes</label>
                     <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
                         onClick={() => setNotesMode('edit')}
-                        className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                        className={`!gap-1 !px-2.5 !py-1 !text-xs ${
                           notesMode === 'edit'
-                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                            ? '!bg-white dark:!bg-slate-700 hover:!bg-white dark:hover:!bg-slate-700 !text-indigo-600 dark:!text-indigo-300 shadow-sm'
+                            : 'hover:!bg-transparent dark:hover:!bg-transparent !text-slate-500 dark:!text-slate-400 hover:!text-slate-700 dark:hover:!text-slate-200'
                         }`}
                       >
                         <EyeOff size={12} /> Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
+                        variant="ghost"
                         onClick={() => setNotesMode('preview')}
-                        className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                        className={`!gap-1 !px-2.5 !py-1 !text-xs ${
                           notesMode === 'preview'
-                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                            ? '!bg-white dark:!bg-slate-700 hover:!bg-white dark:hover:!bg-slate-700 !text-indigo-600 dark:!text-indigo-300 shadow-sm'
+                            : 'hover:!bg-transparent dark:hover:!bg-transparent !text-slate-500 dark:!text-slate-400 hover:!text-slate-700 dark:hover:!text-slate-200'
                         }`}
                       >
                         <Eye size={12} /> Preview
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
