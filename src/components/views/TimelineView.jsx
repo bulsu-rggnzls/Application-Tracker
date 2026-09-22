@@ -200,9 +200,9 @@ export default function TimelineView({ applications, onSelect, onAdd }) {
       <div className="shrink-0 px-5 pt-4 pb-4 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-br from-indigo-50 via-white to-amber-50/40 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">Activity log</p>
+            <Text variant="subtle-sm" className="!text-indigo-600 dark:!text-indigo-400 font-semibold tracking-wider uppercase">Activity log</Text>
             <Heading size="md" className="!font-bold tracking-tight mt-0.5">Timeline</Heading>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">{entries.length} activities tracked</p>
+            <Text variant="subtle" className="mt-0.5 tabular-nums">{entries.length} activities tracked</Text>
           </div>
           <div className="flex p-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
             {filterChips.map(chip => (
