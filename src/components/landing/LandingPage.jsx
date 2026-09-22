@@ -4,6 +4,7 @@ import {
   BarChart3, CalendarClock, TrendingUp, ShieldCheck, KeyRound, Database,
   Download, ArrowRight, Sparkles,
 } from 'lucide-react'
+import { Button, Heading } from '../ui'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -24,44 +25,28 @@ function Logo() {
   )
 }
 
-function PrimaryButton({ children, onClick, className = '' }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-semibold px-5 py-2.5 shadow-md shadow-indigo-500/25 transition-all duration-200 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer ${className}`}
-    >
-      {children}
-    </button>
-  )
-}
-
-function GhostButton({ children, onClick, className = '' }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold px-5 py-2.5 border border-slate-200 text-slate-700 bg-white transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer ${className}`}
-    >
-      {children}
-    </button>
-  )
-}
-
 function Header({ onLogin, onSignUp }) {
   return (
     <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-slate-200/70">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         <Logo />
         <div className="flex items-center gap-2.5">
-          <button
+          <Button
+            variant="ghost"
             type="button"
             onClick={onLogin}
-            className="inline-flex text-sm font-semibold text-slate-700 px-4 py-2.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+            className="px-4 py-2.5 font-semibold text-slate-700 dark:text-slate-700 rounded-xl hover:!bg-slate-100"
           >
             Log In
-          </button>
-          <PrimaryButton onClick={onSignUp}>Sign Up</PrimaryButton>
+          </Button>
+          <Button
+            variant="primary"
+            type="button"
+            onClick={onSignUp}
+            className="gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 font-semibold shadow-md shadow-indigo-500/25 !transition-all duration-200 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-white"
+          >
+            Sign Up
+          </Button>
         </div>
       </div>
     </header>
@@ -191,11 +176,23 @@ function Hero({ onLogin, onSignUp }) {
             ))}
           </motion.ul>
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4} className="mt-6 flex flex-wrap justify-center items-center gap-3">
-            <PrimaryButton onClick={onSignUp} className="text-base px-7 py-3 shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-[1.03] active:scale-[0.98]">
+            <Button
+              variant="primary"
+              type="button"
+              onClick={onSignUp}
+              className="gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-7 py-3 !text-base font-semibold shadow-md shadow-indigo-500/25 shadow-purple-500/20 !transition-all duration-200 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 hover:shadow-purple-500/30 hover:-translate-y-px hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-white"
+            >
               Create your board — free
               <ArrowRight size={16} />
-            </PrimaryButton>
-            <GhostButton onClick={onLogin} className="shadow-sm hover:scale-[1.03] active:scale-[0.98]">Log In</GhostButton>
+            </Button>
+            <Button
+              variant="ghost"
+              type="button"
+              onClick={onLogin}
+              className="gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-slate-700 dark:text-slate-700 bg-white font-semibold !transition-all duration-200 hover:border-slate-300 hover:!bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 shadow-sm hover:scale-[1.03] active:scale-[0.98]"
+            >
+              Log In
+            </Button>
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={5} className="mt-4 text-xs text-slate-400">
             No credit card. No limits on applications.
@@ -284,7 +281,7 @@ function Features() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
         <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
           <div className="text-xs font-bold uppercase tracking-widest text-indigo-600">Why AppTracker</div>
-          <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">The details of a search, handled</h2>
+          <Heading size="md" className="mt-2 !text-3xl !font-extrabold tracking-tight text-slate-900 dark:!text-slate-900">The details of a search, handled</Heading>
           <p className="mt-3 text-slate-600 max-w-xl">A job hunt is dozens of small threads. AppTracker ties them together so you can spend your energy on interviews, not admin.</p>
         </motion.div>
         <div className="mt-10 grid md:grid-cols-3 gap-5">
@@ -292,7 +289,7 @@ function Features() {
             <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600">
               <Columns3 size={19} />
             </span>
-            <h3 className="mt-4 text-base font-bold text-slate-900">Move cards, not spreadsheets</h3>
+            <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Move cards, not spreadsheets</Heading>
             <p className="mt-2 text-sm text-slate-600 leading-relaxed">Drag a card forward and the app does the bookkeeping — it prompts you to schedule the interview, timestamps the move, and keeps the full story behind every card.</p>
             <MiniKanban />
           </motion.div>
@@ -300,21 +297,21 @@ function Features() {
             <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-50 text-amber-600">
               <CalendarClock size={19} />
             </span>
-            <h3 className="mt-4 text-base font-bold text-slate-900">Never miss a round</h3>
+            <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Never miss a round</Heading>
             <p className="mt-2 text-sm text-slate-600 leading-relaxed">Interviews surface in the header, the calendar, and the sidebar — with time-left countdowns as the moment approaches.</p>
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} custom={2} className={tile}>
             <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-violet-50 text-violet-600">
               <LayoutGrid size={19} />
             </span>
-            <h3 className="mt-4 text-base font-bold text-slate-900">Look at it any way you need</h3>
+            <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Look at it any way you need</Heading>
             <p className="mt-2 text-sm text-slate-600 leading-relaxed">Prepping? Calendar. Comparing offers? Table. Reflecting? Timeline. Enter a job once and every view stays in sync.</p>
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} custom={3} className={tile}>
             <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-sky-50 text-sky-600">
               <BarChart3 size={19} />
             </span>
-            <h3 className="mt-4 text-base font-bold text-slate-900">See your momentum</h3>
+            <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">See your momentum</Heading>
             <p className="mt-2 text-sm text-slate-600 leading-relaxed">Response rates, pipeline health, and where each application stands — computed from your own activity.</p>
             <MiniBars />
           </motion.div>
@@ -322,7 +319,7 @@ function Features() {
             <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600">
               <ShieldCheck size={19} />
             </span>
-            <h3 className="mt-4 text-base font-bold text-slate-900">Private where it counts</h3>
+            <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Private where it counts</Heading>
             <p className="mt-2 text-sm text-slate-600 leading-relaxed">Records are filtered to your account at the database level — not just hidden in the interface.</p>
           </motion.div>
         </div>
@@ -393,7 +390,7 @@ function Views() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
         <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
           <div className="text-xs font-bold uppercase tracking-widest text-indigo-600">Five views</div>
-          <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Pick the lens that fits the moment</h2>
+          <Heading size="md" className="mt-2 !text-3xl !font-extrabold tracking-tight text-slate-900 dark:!text-slate-900">Pick the lens that fits the moment</Heading>
           <p className="mt-3 text-slate-600 max-w-xl">Each view answers a different question about the same pipeline — switch freely, nothing gets re-entered.</p>
         </motion.div>
         <div className="mt-10 grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -428,7 +425,7 @@ function Security() {
       <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
         <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
           <div className="text-xs font-bold uppercase tracking-widest text-indigo-600">Privacy</div>
-          <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Your search stays yours</h2>
+          <Heading size="md" className="mt-2 !text-3xl !font-extrabold tracking-tight text-slate-900 dark:!text-slate-900">Your search stays yours</Heading>
           <ul className="mt-7 space-y-5">
             {SECURITY_POINTS.map(p => (
               <li key={p.title} className="flex gap-3.5">
@@ -471,16 +468,17 @@ function CtaBand({ onSignUp }) {
       <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
         className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 px-8 py-14 text-center shadow-xl shadow-indigo-500/25">
         <div aria-hidden="true" className="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-white/10 blur-2xl" />
-        <h2 className="text-3xl font-extrabold tracking-tight text-white">The next application is one drag away</h2>
+        <Heading size="md" className="!text-3xl !font-extrabold tracking-tight text-white">The next application is one drag away</Heading>
         <p className="mt-3 text-indigo-100 max-w-md mx-auto">Make a free account, add your first posting, and watch the pipeline take shape.</p>
-        <button
+        <Button
+          variant="ghost"
           type="button"
           onClick={onSignUp}
-          className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white text-indigo-700 text-sm font-bold px-7 py-3 shadow-lg transition-all duration-200 hover:bg-indigo-50 hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="mt-7 inline-flex gap-2 rounded-xl bg-white !text-indigo-700 !font-bold px-7 py-3 shadow-lg !transition-all duration-200 hover:!bg-indigo-50 hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           Create your board — free
           <ArrowRight size={16} />
-        </button>
+        </Button>
       </motion.div>
     </section>
   )
@@ -492,7 +490,14 @@ function Footer({ onLogin }) {
       <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <Logo />
         <div className="text-xs text-slate-400">Private by default · Export anytime</div>
-        <button type="button" onClick={onLogin} className="text-sm text-slate-500 hover:text-slate-900 transition-colors cursor-pointer">Log in</button>
+        <Button
+          variant="ghost"
+          type="button"
+          onClick={onLogin}
+          className="!p-0 font-normal !text-slate-500 hover:!text-slate-900 hover:!bg-transparent"
+        >
+          Log in
+        </Button>
       </div>
     </footer>
   )
