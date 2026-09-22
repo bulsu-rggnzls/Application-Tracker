@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Inbox, CalendarDays, CalendarClock, CalendarRange, List } from 'lucide-react'
-import { Badge, Card, Heading, IconButton, Text } from '../ui'
+import { Card, Heading, IconButton, Text } from '../ui'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 import StatStrip from '../ui/StatStrip'
 import formatTime from '../../utils/formatTime'
@@ -415,7 +415,7 @@ export default function CalendarView({ applications, onSelect, onAdd }) {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">Job search calendar</p>
-            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white mt-0.5">{viewTitle}</h2>
+            <Heading size="md" className="!font-bold tracking-tight mt-0.5">{viewTitle}</Heading>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex p-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
