@@ -4,7 +4,7 @@ import {
   BarChart3, CalendarClock, TrendingUp, ShieldCheck, KeyRound, Database,
   Download, ArrowRight, Sparkles,
 } from 'lucide-react'
-import { Button, Heading } from '../ui'
+import { Button, Heading, Text } from '../ui'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -282,7 +282,7 @@ function Features() {
         <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
           <div className="text-xs font-bold uppercase tracking-widest text-indigo-600">Why AppTracker</div>
           <Heading size="md" className="mt-2 !text-3xl !font-extrabold tracking-tight text-slate-900 dark:!text-slate-900">The details of a search, handled</Heading>
-          <p className="mt-3 text-slate-600 max-w-xl">A job hunt is dozens of small threads. AppTracker ties them together so you can spend your energy on interviews, not admin.</p>
+          <Text className="!text-base mt-3 max-w-xl">A job hunt is dozens of small threads. AppTracker ties them together so you can spend your energy on interviews, not admin.</Text>
         </motion.div>
         <div className="mt-10 grid md:grid-cols-3 gap-5">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} custom={0} className={`${tile} md:col-span-2`}>
@@ -290,7 +290,7 @@ function Features() {
               <Columns3 size={19} />
             </span>
             <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Move cards, not spreadsheets</Heading>
-            <p className="mt-2 text-sm text-slate-600 leading-relaxed">Drag a card forward and the app does the bookkeeping — it prompts you to schedule the interview, timestamps the move, and keeps the full story behind every card.</p>
+            <Text className="mt-2 leading-relaxed">Drag a card forward and the app does the bookkeeping — it prompts you to schedule the interview, timestamps the move, and keeps the full story behind every card.</Text>
             <MiniKanban />
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} custom={1} className={tile}>
@@ -298,21 +298,21 @@ function Features() {
               <CalendarClock size={19} />
             </span>
             <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Never miss a round</Heading>
-            <p className="mt-2 text-sm text-slate-600 leading-relaxed">Interviews surface in the header, the calendar, and the sidebar — with time-left countdowns as the moment approaches.</p>
+            <Text className="mt-2 leading-relaxed">Interviews surface in the header, the calendar, and the sidebar — with time-left countdowns as the moment approaches.</Text>
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} custom={2} className={tile}>
             <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-violet-50 text-violet-600">
               <LayoutGrid size={19} />
             </span>
             <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Look at it any way you need</Heading>
-            <p className="mt-2 text-sm text-slate-600 leading-relaxed">Prepping? Calendar. Comparing offers? Table. Reflecting? Timeline. Enter a job once and every view stays in sync.</p>
+            <Text className="mt-2 leading-relaxed">Prepping? Calendar. Comparing offers? Table. Reflecting? Timeline. Enter a job once and every view stays in sync.</Text>
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} custom={3} className={tile}>
             <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-sky-50 text-sky-600">
               <BarChart3 size={19} />
             </span>
             <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">See your momentum</Heading>
-            <p className="mt-2 text-sm text-slate-600 leading-relaxed">Response rates, pipeline health, and where each application stands — computed from your own activity.</p>
+            <Text className="mt-2 leading-relaxed">Response rates, pipeline health, and where each application stands — computed from your own activity.</Text>
             <MiniBars />
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} custom={4} className={tile}>
@@ -320,7 +320,7 @@ function Features() {
               <ShieldCheck size={19} />
             </span>
             <Heading size="sm" className="mt-4 !text-base !font-bold text-slate-900 dark:!text-slate-900">Private where it counts</Heading>
-            <p className="mt-2 text-sm text-slate-600 leading-relaxed">Records are filtered to your account at the database level — not just hidden in the interface.</p>
+            <Text className="mt-2 leading-relaxed">Records are filtered to your account at the database level — not just hidden in the interface.</Text>
           </motion.div>
         </div>
       </div>
@@ -391,7 +391,7 @@ function Views() {
         <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
           <div className="text-xs font-bold uppercase tracking-widest text-indigo-600">Five views</div>
           <Heading size="md" className="mt-2 !text-3xl !font-extrabold tracking-tight text-slate-900 dark:!text-slate-900">Pick the lens that fits the moment</Heading>
-          <p className="mt-3 text-slate-600 max-w-xl">Each view answers a different question about the same pipeline — switch freely, nothing gets re-entered.</p>
+          <Text className="!text-base mt-3 max-w-xl">Each view answers a different question about the same pipeline — switch freely, nothing gets re-entered.</Text>
         </motion.div>
         <div className="mt-10 grid grid-cols-2 md:grid-cols-5 gap-4">
           {VIEWS.map((v, i) => (
@@ -469,7 +469,7 @@ function CtaBand({ onSignUp }) {
         className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 px-8 py-14 text-center shadow-xl shadow-indigo-500/25">
         <div aria-hidden="true" className="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-white/10 blur-2xl" />
         <Heading size="md" className="!text-3xl !font-extrabold tracking-tight text-white">The next application is one drag away</Heading>
-        <p className="mt-3 text-indigo-100 max-w-md mx-auto">Make a free account, add your first posting, and watch the pipeline take shape.</p>
+        <Text className="!text-base !text-indigo-100 mt-3 max-w-md mx-auto">Make a free account, add your first posting, and watch the pipeline take shape.</Text>
         <Button
           variant="ghost"
           type="button"
