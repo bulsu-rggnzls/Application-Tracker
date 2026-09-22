@@ -18,7 +18,7 @@ import JobModal from '../jobs/JobModal'
 import JobDetailDrawer from '../jobs/JobDetailDrawer'
 import InterviewModal from '../jobs/InterviewModal'
 import LogoutModal from '../layout/LogoutModal'
-import { ComposeEmailCard, Button, Heading } from '../ui'
+import { ComposeEmailCard, Button, Heading, Text } from '../ui'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 import confetti from 'canvas-confetti'
 import { exportToJSON, importFromJSON } from '../../utils/dataExport'
@@ -258,11 +258,11 @@ export default function Dashboard() {
       <div className="h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
         <div className="max-w-md text-center bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-800 rounded-2xl shadow-xl p-6">
           <Heading size="lg" className="!text-lg !text-rose-600 dark:!text-rose-400 mb-2">Couldn't load your data</Heading>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{fetchError}</p>
+          <Text>{fetchError}</Text>
           {permissionDenied && (
-            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            <Text variant="subtle" className="mt-3 leading-relaxed">
               This is a database permissions issue. Run the GRANT statements in the Supabase SQL Editor, then try again.
-            </p>
+            </Text>
           )}
           <div className="mt-5 flex items-center justify-center gap-2.5">
             <Button
