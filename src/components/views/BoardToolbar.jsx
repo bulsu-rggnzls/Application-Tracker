@@ -12,12 +12,13 @@ export default function BoardToolbar({ search, onSearchChange, filter, onFilterC
     <div className="mb-2 sm:mb-3">
       <div className="flex items-center gap-2 flex-wrap">
         <Input
-          containerClassName="relative flex-1 min-w-0 basis-40"
+          containerClassName="relative flex-1 min-w-0 basis-40 max-w-xs"
           icon={<Search size={14} />}
           type="text"
           placeholder="Filter by title or company..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
+          className="!text-xs"
         />
 
         <div className="flex items-center shrink-0 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800">
