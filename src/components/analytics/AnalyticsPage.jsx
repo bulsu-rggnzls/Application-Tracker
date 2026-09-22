@@ -6,7 +6,7 @@ import {
 } from 'recharts'
 import WelcomeEmpty from '../ui/WelcomeEmpty'
 import StatStrip from '../ui/StatStrip'
-import { Heading } from '../ui'
+import { Heading, Text } from '../ui'
 
 const STATUS_COLORS = {
   wishlist: '#f59e0b',
@@ -259,11 +259,11 @@ export default function AnalyticsPage({ applications, onAdd, dark = false }) {
 
         <div className="col-span-12 flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[11px] font-semibold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">Pipeline intelligence</p>
+            <Text variant="subtle-sm" className="!text-indigo-600 dark:!text-indigo-400 font-semibold tracking-wider uppercase">Pipeline intelligence</Text>
             <Heading size="md" className="!font-bold tracking-tight mt-0.5">Analytics</Heading>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
+            <Text variant="subtle" className="mt-0.5 tabular-nums">
               {stats.total} applications · {stats.interviewing} interviewing · {stats.offers} offers
-            </p>
+            </Text>
           </div>
           <div className="flex p-0.5 bg-white dark:bg-[#090D16] border border-slate-200 dark:border-slate-800 rounded-lg">
             {RANGES.map(r => (
