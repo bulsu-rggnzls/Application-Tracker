@@ -7,6 +7,7 @@ import {
   IconTimeline,
 } from '@tabler/icons-react'
 import { Sidebar, SidebarBody, SidebarLink, MobileSidebar } from '@/components/ui/sidebar'
+import { IconButton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -94,14 +95,15 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
                       <p className="text-xs font-semibold text-white truncate leading-tight">{displayName}</p>
                       <p className="text-[10px] text-slate-500 truncate leading-tight">{email}</p>
                     </div>
-                    <button
+                    <IconButton
                       type="button"
                       onClick={onLogoutClick}
                       title="Sign out"
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors duration-150 cursor-pointer bg-transparent border-0"
+                      color="rose-600"
+                      className="!rounded-lg hover:!bg-white/5 hover:!text-rose-400 bg-transparent border-0"
                     >
                       <LogOut size={14} />
-                    </button>
+                    </IconButton>
                   </>
                 )}
               </div>
@@ -155,14 +157,15 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
                 <p className="text-xs font-semibold text-white truncate leading-tight">{displayName}</p>
                 <p className="text-[10px] text-slate-500 truncate leading-tight">{email}</p>
               </div>
-              <button
+              <IconButton
                 type="button"
                 onClick={onLogoutClick}
                 title="Sign out"
-                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-colors duration-150 cursor-pointer bg-transparent border-0"
+                color="rose-600"
+                className="!rounded-lg hover:!bg-white/5 hover:!text-rose-400 bg-transparent border-0"
               >
                 <LogOut size={14} />
-              </button>
+              </IconButton>
             </div>
           </div>
         </MobileSidebar>
