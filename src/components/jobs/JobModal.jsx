@@ -353,9 +353,9 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
             <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-2 duration-200">
               <Field label="Salary" hint="enter amounts in thousands (k)">
                 <div className="flex items-center rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 overflow-hidden focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:border-indigo-400 dark:focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-200">
-                  <input type="number" min="0" max="100000" step="1" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min" className="flex-1 min-w-0 px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-transparent placeholder-slate-400 focus:outline-none" />
+                  <Input flush containerClassName="relative flex-1 min-w-0" type="number" min="0" max="100000" step="1" value={form.salary.min} onChange={updateSalary('min')} placeholder="Min" className="px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200" />
                   <span className="text-slate-300 dark:text-slate-600 font-medium select-none">–</span>
-                  <input type="number" min="0" max="100000" step="1" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max" className="flex-1 min-w-0 px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200 bg-transparent placeholder-slate-400 focus:outline-none" />
+                  <Input flush containerClassName="relative flex-1 min-w-0" type="number" min="0" max="100000" step="1" value={form.salary.max} onChange={updateSalary('max')} placeholder="Max" className="px-3.5 py-2.5 text-sm text-slate-700 dark:text-slate-200" />
                   <span className="pr-3.5 text-xs font-semibold text-slate-400 select-none shrink-0">k</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 mt-3">
