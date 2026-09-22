@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Check, Plus, Trash2, ClipboardList } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import { Button, Input, Text } from '../ui'
+import { Button, IconButton, Input, Text } from '../ui'
 
 function ChecklistItem({ item, onToggle, onRemove }) {
   return (
@@ -27,14 +27,15 @@ function ChecklistItem({ item, onToggle, onRemove }) {
       }`}>
         {item.text}
       </span>
-      <button
+      <IconButton
         type="button"
         onClick={onRemove}
         aria-label="Remove item"
-        className="text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+        color="rose"
+        className="!p-0 !text-slate-300 dark:!text-slate-600 hover:!text-rose-500 dark:hover:!text-rose-400 hover:!bg-transparent dark:hover:!bg-transparent opacity-0 group-hover:opacity-100"
       >
         <Trash2 size={14} />
-      </button>
+      </IconButton>
     </div>
   )
 }
