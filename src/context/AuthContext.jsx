@@ -1,33 +1,15 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth as useAuthState } from '../hooks/useAuth'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setLoading(false)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-      setSession(prev => {
-        if (event === 'TOKEN_REFRESHED' && prev && newSession?.user?.id === prev.user?.id) {
-          return prev
-        }
-        return newSession
-      })
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+  const { user, session, loading, handleGoogleLogin, handleLogout } = useAuthState()
 
   const value = {
     session,
-    user: session?.user ?? null,
+    user,
     loading,
     signIn: (email, password) => supabase.auth.signInWithPassword({ email, password }),
     signUp: (email, password, fullName) => supabase.auth.signUp({
@@ -35,11 +17,10 @@ export function AuthProvider({ children }) {
       password,
       options: { data: { full_name: fullName || '' } },
     }),
-    signInWithGoogle: () => supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + '/app' },
-    }),
-    signOut: () => supabase.auth.signOut(),
+    signInWithGoogle: handleGoogleLogin,
+    handleGoogleLogin,
+    signOut: handleLogout,
+    handleLogout,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
