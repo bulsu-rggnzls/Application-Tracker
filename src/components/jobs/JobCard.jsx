@@ -1,5 +1,4 @@
 import { Edit3, Trash2, ExternalLink, Clock, Check, X, Star, BellRing, ChevronDown } from 'lucide-react'
-import { motion } from 'framer-motion'
 import { Button, IconButton, Text } from '../ui'
 import { getTagStyle } from '../../utils/tagColors'
 import CompanyLogo from './CompanyLogo'
@@ -57,12 +56,12 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
 
   if (compact) {
     return (
-      <motion.div
+      <div
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         onClick={() => onSelect?.(application)}
-        className={`group bg-white dark:bg-slate-800/60 border ${borderClass} rounded-lg transition-all cursor-pointer ${
+        className={`group bg-white dark:bg-slate-800/60 border ${borderClass} rounded-lg transition-[border-color,box-shadow] duration-150 cursor-pointer ${
           snapshot.isDragging
             ? 'shadow-xl rotate-2 !border-indigo-400 ring-2 ring-indigo-400/20 z-50'
             : 'hover:shadow-md'
@@ -104,7 +103,7 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
             <IconButton color="rose" className="!p-0.5" onClick={(e) => { e.stopPropagation(); onDelete(id) }}><Trash2 size={10} /></IconButton>
           </div>
         </div>
-      </motion.div>
+      </div>
     )
   }
 
@@ -180,18 +179,16 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
   }
 
   return (
-    <motion.div
+    <div
       ref={provided?.innerRef}
       {...(provided?.draggableProps || {})}
       {...(provided?.dragHandleProps || {})}
       onClick={() => onSelect?.(application)}
-      className={`group relative bg-white dark:bg-slate-800/60 border ${borderClass} rounded-lg transition-all cursor-pointer ${
+      className={`group relative bg-white dark:bg-slate-800/60 border ${borderClass} rounded-lg transition-[border-color,box-shadow] duration-150 cursor-pointer ${
         snapshot?.isDragging
           ? 'shadow-xl rotate-2 !border-indigo-400 ring-2 ring-indigo-400/20 z-50'
-          : 'hover:shadow-md'
+          : 'hover:shadow-md hover:-translate-y-px'
       }`}
-      whileHover={snapshot?.isDragging ? undefined : { y: -1 }}
-      transition={{ duration: 0.15 }}
     >
       <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity z-10">
         {jobUrl && (
@@ -271,6 +268,6 @@ export default function JobCard({ application, onEdit, onDelete, onAcceptOffer, 
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }
