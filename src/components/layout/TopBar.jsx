@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Calendar, Clock, Check, LogOut, Menu } from 'lucide-react'
+import { Bell, Calendar, Clock, Check, Menu } from 'lucide-react'
 import { Badge, Heading, IconButton, Text } from '../ui'
 import formatTime from '../../utils/formatTime'
 
@@ -40,7 +40,7 @@ function formatTimeLeft(dt) {
   return `${Math.floor(hrs / 24)}d left`
 }
 
-export default function TopBar({ applications, onLogoutClick, onOpenMenu }) {
+export default function TopBar({ applications, onOpenMenu }) {
   const [notifOpen, setNotifOpen] = useState(false)
 
   const upcoming = getUpcomingInterviews(applications || [])
@@ -118,13 +118,6 @@ export default function TopBar({ applications, onLogoutClick, onOpenMenu }) {
             </>
           )}
         </div>
-        <IconButton
-          onClick={onLogoutClick}
-          className="hidden md:inline-flex !text-slate-500 dark:!text-slate-400 hover:!text-rose-600 dark:hover:!text-rose-400"
-          title="Sign out"
-        >
-          <LogOut size={18} />
-        </IconButton>
       </div>
     </header>
   )

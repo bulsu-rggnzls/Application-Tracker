@@ -24,7 +24,7 @@ import confetti from 'canvas-confetti'
 import { exportToJSON, importFromJSON } from '../../utils/dataExport'
 
 export default function Dashboard() {
-  const { user, loading: authLoading, signOut } = useAuth()
+  const { user, loading: authLoading, handleLogout, handleGoogleLogin } = useAuth()
   const [applications, setApplications] = useState([])
   const [dataLoading, setDataLoading] = useState(true)
   const [viewMode, setViewMode] = useState('board')
@@ -276,7 +276,7 @@ export default function Dashboard() {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => signOut()}
+              onClick={() => handleLogout()}
               className="inline-flex !rounded-xl text-sm !font-semibold !px-5 !py-2.5 !text-slate-700 dark:!text-slate-300"
             >
               Log out
@@ -306,10 +306,10 @@ export default function Dashboard() {
         ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900'
         : 'bg-gradient-to-br from-slate-50 via-indigo-50/60 to-purple-50/40'
     }`}>
-      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onLogoutClick={() => setLogoutModalOpen(true)} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
+      <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onLogoutClick={() => setLogoutModalOpen(true)} onGoogleLogin={handleGoogleLogin} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden max-w-full">
-          <TopBar applications={applications} onLogoutClick={() => setLogoutModalOpen(true)} onOpenMenu={() => setDrawerOpen(true)} />
+          <TopBar applications={applications} onOpenMenu={() => setDrawerOpen(true)} />
 
           <div className="flex-1 min-h-0 flex flex-col px-4 py-3 md:px-6 md:py-4 overflow-x-hidden">
             {activeView === 'board' || activeView === 'table' ? (
@@ -393,7 +393,7 @@ export default function Dashboard() {
       <LogoutModal
         isOpen={logoutModalOpen}
         onClose={() => setLogoutModalOpen(false)}
-        onConfirm={async () => { setLogoutModalOpen(false); await signOut() }}
+        onConfirm={async () => { setLogoutModalOpen(false); await handleLogout() }}
       />
 
       <JobDetailDrawer

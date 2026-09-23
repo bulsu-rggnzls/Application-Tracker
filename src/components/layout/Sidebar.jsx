@@ -7,7 +7,7 @@ import {
   IconTimeline,
 } from '@tabler/icons-react'
 import { Sidebar, SidebarBody, SidebarLink, MobileSidebar } from '@/components/ui/sidebar'
-import { IconButton, Text, Heading } from '@/components/ui'
+import { Button, IconButton, Text, Heading, GoogleIcon } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -17,6 +17,21 @@ const navItems = [
   { id: 'timeline', icon: IconTimeline, activeIcon: History, label: 'Timeline' },
 ]
 
+function GoogleSignInButton({ onClick, showLabel }) {
+  return (
+    <Button
+      type="button"
+      variant="secondary"
+      onClick={onClick}
+      aria-label="Continue with Google"
+      className="w-full !gap-2 !rounded-xl !border-white/10 !bg-white/[0.06] !text-slate-200 hover:!bg-white/10 hover:!text-white !py-2.5 !text-xs !font-semibold !transition-all"
+    >
+      <GoogleIcon className="w-4 h-4 shrink-0" />
+      {showLabel && <span>Continue with Google</span>}
+    </Button>
+  )
+}
+
 function getInitials(user) {
   const name = user?.user_metadata?.full_name || user?.email || ''
   const parts = name.trim().split(/[\s@._]+/).filter(Boolean)
@@ -25,7 +40,7 @@ function getInitials(user) {
   return 'AT'
 }
 
-export default function AppSidebar({ activeView, onViewChange, applications, user, onLogoutClick, drawerOpen, setDrawerOpen }) {
+export default function AppSidebar({ activeView, onViewChange, applications, user, onLogoutClick, onGoogleLogin, drawerOpen, setDrawerOpen }) {
   const [railOpen, setRailOpen] = useState(false)
   const interviewingCount = applications.filter(a => a.status === 'interviewing').length
   const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Guest'
@@ -82,31 +97,35 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
 
             {/* User footer */}
             <div className="shrink-0 border-t border-white/[0.06] pt-3">
-              <div className={cn('flex items-center gap-2.5 rounded-xl px-1.5 py-1', !open && 'justify-center')}>
-                <span
-                  title={email}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-1 ring-white/10"
-                >
-                  {getInitials(user)}
-                </span>
-                {open && (
-                  <>
-                    <div className="min-w-0 flex-1">
-                      <Text className="!text-xs !font-semibold !text-white truncate leading-tight">{displayName}</Text>
-                      <Text variant="muted-sm" className="truncate leading-tight">{email}</Text>
-                    </div>
-                    <IconButton
-                      type="button"
-                      onClick={onLogoutClick}
-                      title="Sign out"
-                      color="rose-600"
-                      className="!rounded-lg hover:!bg-white/5 hover:!text-rose-400 bg-transparent border-0"
-                    >
-                      <LogOut size={14} />
-                    </IconButton>
-                  </>
-                )}
-              </div>
+              {user ? (
+                <div className={cn('flex items-center gap-2.5 rounded-xl px-1.5 py-1', !open && 'justify-center')}>
+                  <span
+                    title={email}
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-1 ring-white/10"
+                  >
+                    {getInitials(user)}
+                  </span>
+                  {open && (
+                    <>
+                      <div className="min-w-0 flex-1">
+                        <Text className="!text-xs !font-semibold !text-white truncate leading-tight">{displayName}</Text>
+                        <Text variant="muted-sm" className="truncate leading-tight">{email}</Text>
+                      </div>
+                      <IconButton
+                        type="button"
+                        onClick={onLogoutClick}
+                        title="Sign out"
+                        color="rose-600"
+                        className="!rounded-lg hover:!bg-white/5 hover:!text-rose-400 bg-transparent border-0"
+                      >
+                        <LogOut size={14} />
+                      </IconButton>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <GoogleSignInButton onClick={onGoogleLogin} showLabel={open} />
+              )}
             </div>
           </SidebarBody>
         </Sidebar>
@@ -149,24 +168,28 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
             ))}
           </nav>
           <div className="mt-auto border-t border-white/[0.06] pt-3">
-            <div className="flex items-center gap-2.5 rounded-xl px-1.5 py-1">
-              <span className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-1 ring-white/10">
-                {getInitials(user)}
-              </span>
-              <div className="min-w-0 flex-1">
-                <Text className="!text-xs !font-semibold !text-white truncate leading-tight">{displayName}</Text>
-                <Text variant="muted-sm" className="truncate leading-tight">{email}</Text>
+            {user ? (
+              <div className="flex items-center gap-2.5 rounded-xl px-1.5 py-1">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/25 ring-1 ring-white/10">
+                  {getInitials(user)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <Text className="!text-xs !font-semibold !text-white truncate leading-tight">{displayName}</Text>
+                  <Text variant="muted-sm" className="truncate leading-tight">{email}</Text>
+                </div>
+                <IconButton
+                  type="button"
+                  onClick={onLogoutClick}
+                  title="Sign out"
+                  color="rose-600"
+                  className="!rounded-lg hover:!bg-white/5 hover:!text-rose-400 bg-transparent border-0"
+                >
+                  <LogOut size={14} />
+                </IconButton>
               </div>
-              <IconButton
-                type="button"
-                onClick={onLogoutClick}
-                title="Sign out"
-                color="rose-600"
-                className="!rounded-lg hover:!bg-white/5 hover:!text-rose-400 bg-transparent border-0"
-              >
-                <LogOut size={14} />
-              </IconButton>
-            </div>
+            ) : (
+              <GoogleSignInButton onClick={onGoogleLogin} showLabel />
+            )}
           </div>
         </MobileSidebar>
       </Sidebar>
