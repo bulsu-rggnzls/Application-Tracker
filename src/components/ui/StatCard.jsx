@@ -15,7 +15,7 @@ export default function StatCard({ label, value, sub, icon: Icon, color = 'indig
   }
 
   return (
-    <div className={`rounded-xl border px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 ${accents[color] || accents.indigo} ${className}`}>
+    <div className={`rounded-xl border px-4 py-3 shadow-sm hover:shadow-md transition-ui ${accents[color] || accents.indigo} ${className}`}>
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
