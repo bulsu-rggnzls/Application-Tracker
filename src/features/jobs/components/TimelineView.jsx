@@ -1,0 +1,274 @@
+import {
+  ArrowRight,
+  Briefcase,
+  CalendarPlus,
+  CheckCircle2,
+  ExternalLink,
+  FileText,
+  History,
+  Sparkles,
+  XCircle,
+} from 'lucide-react'
+import { Button, Heading, IconButton, Text } from '@/components/ui'
+import WelcomeEmpty from '@/components/ui/WelcomeEmpty'
+import useTimeline from '../hooks/useTimeline'
+import { statusChip, statusLabel, statusDot, statusSoftBg } from '@/lib/status'
+
+const actionConfig = {
+  interview_scheduled: {
+    icon: CalendarPlus,
+    dot: 'bg-blue-500',
+    soft: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+    chip: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+    label: 'Interview',
+  },
+  interview_completed: {
+    icon: CheckCircle2,
+    dot: 'bg-emerald-500',
+    soft: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+    chip: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
+    label: 'Completed',
+  },
+  offer_accepted: {
+    icon: Briefcase,
+    dot: 'bg-emerald-500',
+    soft: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+    chip: 'bg-emerald-500 text-white border-emerald-500',
+    label: 'Offer Accepted',
+  },
+  offer_rejected: {
+    icon: XCircle,
+    dot: 'bg-rose-500',
+    soft: 'bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400',
+    chip: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800',
+    label: 'Offer Declined',
+  },
+  note_added: {
+    icon: FileText,
+    dot: 'bg-slate-400',
+    soft: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
+    chip: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+    label: 'Note',
+  },
+}
+
+function classifyStatusChange(details = '') {
+  const d = details.toLowerCase()
+  if (d.includes('offer')) return { icon: Briefcase, dot: statusDot('offer'), soft: statusSoftBg('offer'), chip: statusChip('offer'), label: statusLabel('offer') }
+  if (d.includes('reject') || d.includes('decline')) return { icon: XCircle, dot: statusDot('rejected'), soft: statusSoftBg('rejected'), chip: statusChip('rejected'), label: statusLabel('rejected') }
+  if (d.includes('applied')) return { icon: Sparkles, dot: statusDot('applied'), soft: statusSoftBg('applied'), chip: statusChip('applied'), label: statusLabel('applied') }
+  if (d.includes('moved') || d.includes('→')) return { icon: ArrowRight, dot: 'bg-brand', soft: 'bg-brand-soft text-brand-strong dark:text-brand', chip: 'bg-brand-soft text-brand-strong border-brand/30 dark:bg-brand/10 dark:text-brand dark:border-brand/40', label: 'Update' }
+  return { icon: ArrowRight, dot: 'bg-slate-500', soft: 'bg-surface-muted text-text-muted', chip: 'bg-surface-muted text-text-muted border-border', label: 'Update' }
+}
+
+function getConfig(entry) {
+  if (entry.action === 'status_change') return classifyStatusChange(entry.details)
+  return actionConfig[entry.action] || { icon: FileText, dot: 'bg-slate-400', soft: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400', chip: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700', label: 'Update' }
+}
+
+function parseStatusTransition(details) {
+  const match = details.match(/Moved from (\w+) to (\w+)/i)
+  if (match) return { from: match[1], to: match[2] }
+  const match2 = details.match(/Moved to (\w+)/i)
+  if (match2) return { to: match2[1] }
+  return null
+}
+
+function Favicon({ domain }) {
+  if (!domain) return null
+  return (
+    <img
+      src={`https://logo.clearbit.com/${domain}`}
+      alt=""
+      onError={(e) => { e.currentTarget.style.display = 'none' }}
+      className="w-5 h-5 rounded-md object-contain shrink-0 bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700"
+    />
+  )
+}
+
+export default function TimelineView({ applications, onSelect, onAdd }) {
+  const {
+    filter,
+    selectFilter,
+    entries,
+    filteredEntries,
+    filterCounts,
+    groups,
+    visibleCount,
+    loadMore,
+  } = useTimeline(applications)
+
+  const filterChips = [
+    { id: 'all', label: 'All' },
+    { id: 'interviews', label: 'Interviews' },
+    { id: 'offers', label: 'Offers' },
+    { id: 'updates', label: 'Updates' },
+  ]
+
+  if (entries.length === 0 && applications.length === 0) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <WelcomeEmpty
+          icon={History}
+          title="Your story starts with the first application"
+          description="Every move you make — adding a job, scheduling an interview, landing an offer — shows up here as a timeline."
+          actionLabel="+ Add your first application"
+          onAction={onAdd}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 min-h-0 flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-surface overflow-hidden">
+      {/* Header */}
+      <div className="shrink-0 px-5 pt-4 pb-4 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-br from-indigo-50 via-white to-amber-50/40 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <Text variant="subtle-sm" className="!text-indigo-600 dark:!text-indigo-400 font-semibold tracking-wider uppercase">Activity log</Text>
+            <Heading size="md" className="!font-bold tracking-tight mt-0.5">Timeline</Heading>
+            <Text variant="subtle" className="mt-0.5 tabular-nums">{entries.length} activities tracked</Text>
+          </div>
+          <div className="flex p-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
+            {filterChips.map(chip => (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => selectFilter(chip.id)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-ui cursor-pointer ${
+                  filter === chip.id
+                    ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+                }`}
+              >
+                {chip.label}
+                <span className={`ml-1.5 tabular-nums ${filter === chip.id ? 'opacity-60' : 'text-slate-400 dark:text-slate-500'}`}>
+                  {filterCounts[chip.id]}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin p-5">
+        {filteredEntries.length === 0 ? (
+          <div className="flex items-center justify-center py-10">
+            <WelcomeEmpty
+              icon={History}
+              title="No activity in this filter"
+              description="Try another filter, or add a new application to get things moving."
+              compact
+            />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {groups.map(group => (
+              <div key={group.key}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                    {group.label}
+                  </span>
+                  <span className="flex-1 h-px bg-slate-200 dark:bg-slate-800/80" />
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">{group.items.length}</span>
+                </div>
+
+                <div className="relative pl-8">
+                  <div className="absolute left-[11px] top-2 bottom-2 w-[2px] bg-gradient-to-b from-indigo-300 via-indigo-200 to-transparent dark:from-indigo-700 dark:via-indigo-800 dark:to-transparent" />
+                  <div className="space-y-2">
+                    {group.items.map(entry => {
+                      const config = getConfig(entry)
+                      const Icon = config.icon
+                      const transition = entry.action === 'status_change' ? parseStatusTransition(entry.details) : null
+
+                      return (
+                        <div
+                          key={entry.id}
+                          className="relative group cursor-pointer"
+                          onClick={() => onSelect?.(applications.find(a => a.id === entry.applicationId))}
+                        >
+                          <span className={`absolute -left-[24px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white dark:border-chrome ${config.dot}`} />
+
+                          <div className="flex items-start gap-3 px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-surface hover:border-slate-300 dark:hover:border-slate-700 transition-colors duration-150 group/row">
+                            <div className="mt-0.5 relative">
+                              <Favicon domain={entry.domain} />
+                              <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full ${config.soft} border border-white dark:border-chrome flex items-center justify-center`}>
+                                <Icon size={9} />
+                              </span>
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Text variant="body" className="!font-semibold !text-slate-900 dark:!text-white truncate">{entry.company}</Text>
+                                <span className={`!text-[10px] !px-1.5 !py-0.5 !rounded-md !border !font-medium ${config.chip}`}>
+                                  {config.label}
+                                </span>
+                                {entry.role && (
+                                  <Text variant="muted-sm" className="truncate">· {entry.role}</Text>
+                                )}
+                              </div>
+
+                              <div className="mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                {transition ? (
+                                  <>
+                                    {transition.from && (
+                                      <span className={`text-[10px] px-1.5 py-0.5 rounded-md border font-medium ${statusChip(transition.from)}`}>
+                                        {statusLabel(transition.from)}
+                                      </span>
+                                    )}
+                                    {transition.from && <ArrowRight size={11} className="text-slate-400 dark:text-slate-500 shrink-0" />}
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md border font-medium ${statusChip(transition.to)}`}>
+                                      {statusLabel(transition.to)}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <Text variant="subtle" className="leading-snug">
+                                    {entry.details || 'Activity logged'}
+                                  </Text>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {entry.jobUrl && (
+                                <IconButton
+                                  type="button"
+                                  color="indigo"
+                                  onClick={e => { e.stopPropagation(); window.open(entry.jobUrl, '_blank', 'noopener,noreferrer') }}
+                                  className="!p-1 dark:hover:!bg-slate-800 opacity-0 group-hover/row:opacity-100 focus:opacity-100 bg-transparent border-0"
+                                  title="Open job posting"
+                                >
+                                  <ExternalLink size={13} />
+                                </IconButton>
+                              )}
+                              <span className="text-[11px] text-slate-400 dark:text-slate-500 whitespace-nowrap tabular-nums">
+                                {new Date(entry.timestamp).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {filteredEntries.length > visibleCount && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={loadMore}
+                className="w-full !py-2 !text-[11px] !font-semibold uppercase tracking-wider !text-slate-500 dark:!text-slate-400 !rounded-lg border-dashed dark:!border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-900 dark:hover:text-white bg-transparent hover:!bg-transparent dark:hover:!bg-transparent"
+              >
+                Load more ({filteredEntries.length - visibleCount} remaining)
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
