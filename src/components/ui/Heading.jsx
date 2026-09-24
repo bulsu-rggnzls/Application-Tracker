@@ -1,14 +1,38 @@
-const sizes = {
-  xs: 'text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider',
-  sm: 'text-sm font-semibold text-slate-900 dark:text-white',
-  md: 'text-lg font-semibold text-slate-900 dark:text-white',
-  lg: 'text-2xl font-bold text-slate-900 dark:text-white',
-}
+import { cva } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
 
-export default function Heading({ size = 'xs', className = '', children, ...props }) {
-  const Tag = size === 'lg' ? 'h1' : size === 'md' ? 'h2' : size === 'sm' ? 'h3' : 'h4'
+export const headingVariants = cva('font-semibold text-text dark:text-white', {
+  variants: {
+    size: {
+      xs: 'text-xs uppercase tracking-wider text-text-subtle',
+      sm: 'text-sm',
+      md: 'text-lg',
+      lg: 'text-2xl font-bold',
+    },
+    tone: {
+      default: '',
+      muted: 'text-text-subtle dark:text-slate-500',
+      brand: 'text-brand-strong dark:text-brand',
+    },
+  },
+  defaultVariants: {
+    size: 'xs',
+    tone: 'default',
+  },
+})
+
+const tags = { lg: 'h1', md: 'h2', sm: 'h3', xs: 'h4' }
+
+export default function Heading({
+  size = 'xs',
+  tone,
+  className,
+  children,
+  ...props
+}) {
+  const Tag = tags[size] || 'h4'
   return (
-    <Tag className={`${sizes[size] || sizes.xs} ${className}`} {...props}>
+    <Tag className={cn(headingVariants({ size, tone }), className)} {...props}>
       {children}
     </Tag>
   )
