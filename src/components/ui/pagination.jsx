@@ -34,7 +34,7 @@ function PaginationLink({ className, isActive, disabled = false, children, onCli
         'flex min-w-8 h-8 items-center justify-center px-2.5 text-sm font-medium rounded-md transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-40',
         isActive
           ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
+          : 'text-text-secondary hover:bg-slate-100 dark:hover:bg-slate-800',
         className
       )}
       {...props}
