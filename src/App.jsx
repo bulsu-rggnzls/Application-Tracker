@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
-import Dashboard from './components/dashboard/Dashboard'
-import LandingPage from './components/landing/LandingPage'
-import AuthModal from './components/landing/AuthModal'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth, useAuthModalRoute, AuthModal } from '@/features/auth'
+import Dashboard from '@/pages/Dashboard'
+import LandingPage from '@/pages/LandingPage'
 
 function FullSpinner() {
   return (
     <div className="h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-      <div className="w-8 h-8 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-3 border-brand/30 border-t-indigo-500 rounded-full animate-spin" />
     </div>
   )
 }
@@ -28,29 +26,7 @@ function PublicOnly({ children }) {
 }
 
 function LandingRoute() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const routeMode = location.pathname === '/login' ? 'login' : location.pathname === '/signup' ? 'signup' : null
-  const [authModalMode, setAuthModalMode] = useState(routeMode)
-
-  useEffect(() => {
-    setAuthModalMode(routeMode)
-  }, [routeMode])
-
-  const openAuth = (mode) => {
-    setAuthModalMode(mode)
-    navigate(`/${mode}`)
-  }
-
-  const closeAuth = () => {
-    setAuthModalMode(null)
-    navigate('/')
-  }
-
-  const switchMode = (mode) => {
-    setAuthModalMode(mode)
-    navigate(`/${mode}`, { replace: true })
-  }
+  const { authModalMode, openAuth, closeAuth, switchMode } = useAuthModalRoute()
 
   return (
     <>
