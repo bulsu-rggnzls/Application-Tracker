@@ -24,7 +24,7 @@ function GoogleSignInButton({ onClick, showLabel }) {
       variant="secondary"
       onClick={onClick}
       aria-label="Continue with Google"
-      className="w-full !gap-2 !rounded-xl !border-white/10 !bg-white/[0.06] !text-slate-200 hover:!bg-white/10 hover:!text-white !py-2.5 !text-xs !font-semibold !transition-all"
+      className="w-full !gap-2 !rounded-xl !border-white/10 !bg-white/[0.06] !text-slate-200 hover:!bg-white/10 hover:!text-white !py-2.5 !text-xs !font-semibold !transition-ui"
     >
       <GoogleIcon className="w-4 h-4 shrink-0" />
       {showLabel && <span>Continue with Google</span>}
@@ -77,7 +77,7 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
                                 : 'text-slate-400 group-hover/sidebar:text-white'
                             )} />
                             {item.id === 'calendar' && interviewingCount > 0 && (
-                              <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 ring-2 ring-[#090D16] text-[8px] font-bold text-white">
+                              <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 ring-2 ring-chrome text-[8px] font-bold text-white">
                                 {interviewingCount}
                               </span>
                             )}
@@ -152,7 +152,7 @@ export default function AppSidebar({ activeView, onViewChange, applications, use
                         activeView === item.id ? 'text-white' : 'text-slate-400'
                       )} />
                       {item.id === 'calendar' && interviewingCount > 0 && (
-                        <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 ring-2 ring-[#090D16] text-[8px] font-bold text-white">
+                        <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 ring-2 ring-chrome text-[8px] font-bold text-white">
                           {interviewingCount}
                         </span>
                       )}
@@ -208,7 +208,7 @@ function Logo({ open }) {
           <Briefcase size={15} />
         </div>
       </div>
-      <div className={cn('transition-all duration-200 whitespace-nowrap', open ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden')}>
+      <div className={cn('transition-ui whitespace-nowrap', open ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden')}>
         <span className="text-sm font-bold text-white tracking-tight block leading-tight">AppTracker</span>
         <span className="text-[9px] font-semibold uppercase tracking-widest text-indigo-400 block leading-tight">Job hunt HQ</span>
       </div>

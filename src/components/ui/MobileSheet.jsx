@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import Heading from './Heading'
 
 export default function MobileSheet({ open, onClose, title, children }) {
   return (
@@ -18,7 +19,7 @@ export default function MobileSheet({ open, onClose, title, children }) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-[111] md:hidden bg-white dark:bg-[#090D16] rounded-t-2xl shadow-2xl border-t border-x border-slate-200 dark:border-slate-800 max-h-[80vh] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[111] md:hidden bg-white dark:bg-surface rounded-t-2xl shadow-2xl border-t border-x border-slate-200 dark:border-slate-800 max-h-[80vh] flex flex-col"
             role="dialog"
             aria-modal="true"
           >
@@ -27,7 +28,7 @@ export default function MobileSheet({ open, onClose, title, children }) {
             </div>
             {title && (
               <div className="px-5 pb-2 pt-1 shrink-0">
-                <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white truncate">{title}</h3>
+                <Heading size="sm" className="!text-sm !font-bold tracking-tight truncate">{title}</Heading>
               </div>
             )}
             <div

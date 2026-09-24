@@ -63,7 +63,7 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full py-4 px-3 hidden md:flex md:flex-col bg-[#090D16] shrink-0 overflow-hidden relative border-r border-white/[0.04]",
+        "h-full py-4 px-3 hidden md:flex md:flex-col bg-chrome shrink-0 overflow-hidden relative border-r border-white/[0.04]",
         className
       )}
       initial={false}
@@ -108,7 +108,7 @@ export const MobileSidebar = ({
               exit={{ x: "-100%" }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               className={cn(
-                "fixed inset-y-0 left-0 w-[82%] max-w-xs bg-[#090D16] p-4 z-[100] flex flex-col md:hidden shadow-2xl border-r border-white/[0.04] overflow-hidden",
+                "fixed inset-y-0 left-0 w-[82%] max-w-xs bg-chrome p-4 z-[100] flex flex-col md:hidden shadow-2xl border-r border-white/[0.04] overflow-hidden",
                 className
               )}
               {...props}>
@@ -151,7 +151,7 @@ export const SidebarLink = ({
         {link.icon}
       </div>
       <span
-        className={`text-sm whitespace-nowrap transition-all duration-200 ${
+        className={`text-sm whitespace-nowrap transition-ui ${
           open ? "opacity-100 ml-1" : "opacity-0 ml-0 w-0 overflow-hidden"
         } ${active ? "text-white" : "text-slate-400 group-hover/sidebar:text-white"}`}
       >

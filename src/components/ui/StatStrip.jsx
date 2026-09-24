@@ -18,7 +18,7 @@ const VALUES = {
 
 export default function StatStrip({ items, className = '' }) {
   return (
-    <div className={`grid grid-cols-4 sm:flex sm:items-stretch divide-x divide-slate-200/80 dark:divide-slate-800 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-[#0B1120]/80 backdrop-blur-sm overflow-hidden ${className}`}>
+    <div className={`grid grid-cols-4 sm:flex sm:items-stretch divide-x divide-slate-200/80 dark:divide-slate-800 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-surface/80 backdrop-blur-sm overflow-hidden ${className}`}>
       {items.map(item => (
         <div key={item.label} className="flex-1 min-w-0 px-2 py-1.5 sm:px-4 sm:py-2.5">
           <p className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">

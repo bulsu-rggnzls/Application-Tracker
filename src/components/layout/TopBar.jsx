@@ -1,52 +1,14 @@
-import { useState } from 'react'
-import { Bell, Calendar, Clock, Check, Menu } from 'lucide-react'
-import { Badge, Heading, IconButton, Text } from '../ui'
-import formatTime from '../../utils/formatTime'
-
-function parseInterviewDate(iv) {
-  if (!iv.date) return null
-  const d = new Date(iv.date)
-  if (isNaN(d.getTime())) return null
-  if (iv.time && !iv.date.includes('T')) {
-    const [h, m] = iv.time.split(':').map(Number)
-    if (!isNaN(h) && !isNaN(m)) d.setHours(h, m, 0, 0)
-  }
-  return d
-}
-
-function getUpcomingInterviews(applications, hours = 24) {
-  const now = Date.now()
-  const limit = now + hours * 3600 * 1000
-  const list = []
-  applications.forEach(app => {
-    ;(app.interviews || []).forEach(iv => {
-      const datetime = parseInterviewDate(iv)
-      if (!datetime) return
-      const ts = datetime.getTime()
-      if (ts > now && ts <= limit) {
-        list.push({ ...iv, company: app.company, role: app.role, datetime })
-      }
-    })
-  })
-  return list.sort((a, b) => a.datetime - b.datetime)
-}
-
-function formatTimeLeft(dt) {
-  const mins = Math.max(0, Math.round((dt.getTime() - Date.now()) / 60000))
-  if (mins < 60) return `${mins}m left`
-  const hrs = Math.floor(mins / 60)
-  const remMins = mins % 60
-  if (hrs < 24) return remMins ? `${hrs}h ${remMins}m left` : `${hrs}h left`
-  return `${Math.floor(hrs / 24)}d left`
-}
+import { Bell, Calendar, Check, Clock, Menu } from 'lucide-react'
+import { Badge, Heading, IconButton, Text } from '@/components/ui'
+import formatTime from '@/utils/formatTime'
+import { useUpcomingInterviews } from '@/features/jobs'
+import { layout } from '@/lib/layout'
 
 export default function TopBar({ applications, onOpenMenu }) {
-  const [notifOpen, setNotifOpen] = useState(false)
-
-  const upcoming = getUpcomingInterviews(applications || [])
+  const { notifOpen, toggleNotif, closeNotif, upcoming, formatTimeLeft } = useUpcomingInterviews(applications)
 
   return (
-    <header className="flex items-center justify-between w-full px-4 py-3 h-14 bg-white dark:bg-[#090D16] border-b border-slate-200 dark:border-slate-800 shrink-0 relative z-40">
+    <header className={layout.topBar}>
       <div className="flex items-center gap-2.5 min-w-0">
         <IconButton
           onClick={onOpenMenu}
@@ -59,7 +21,7 @@ export default function TopBar({ applications, onOpenMenu }) {
       <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
         <div className="relative">
           <IconButton
-            onClick={() => setNotifOpen(prev => !prev)}
+            onClick={toggleNotif}
             className={notifOpen ? '!bg-slate-100 dark:!bg-slate-800 !text-slate-700 dark:!text-slate-200' : '!text-slate-500 dark:!text-slate-400 hover:!text-slate-700 dark:hover:!text-slate-200'}
             title="Notifications"
           >
@@ -72,7 +34,7 @@ export default function TopBar({ applications, onOpenMenu }) {
           </IconButton>
           {notifOpen && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+              <div className="fixed inset-0 z-40" onClick={closeNotif} />
               <div className="absolute right-0 top-full mt-2 z-50 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden animate-fade-in">
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                   <Heading size="sm">Notifications</Heading>

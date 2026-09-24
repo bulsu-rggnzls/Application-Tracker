@@ -1,3 +1,9 @@
-export default function Divider({ className = '' }) {
-  return <div className={`border-t border-slate-100 dark:border-slate-700/50 ${className}`} />
+import { cn } from '@/lib/utils'
+
+export default function Divider({ className }) {
+  return (
+    <div
+      className={cn('border-t border-border-subtle dark:border-slate-700/50', className)}
+    />
+  )
 }

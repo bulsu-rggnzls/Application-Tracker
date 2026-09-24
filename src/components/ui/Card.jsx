@@ -1,6 +1,44 @@
-export default function Card({ className = '', children, ...props }) {
+import { cva } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
+
+export const cardVariants = cva(
+  'bg-surface border border-border rounded-xl shadow-sm transition-ui',
+  {
+    variants: {
+      interactive: {
+        true: 'hover:shadow-md hover:-translate-y-0.5',
+        false: '',
+      },
+      padded: {
+        true: 'p-5',
+        false: '',
+      },
+      flush: {
+        true: 'overflow-hidden',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      interactive: false,
+      padded: false,
+      flush: false,
+    },
+  },
+)
+
+export default function Card({
+  interactive,
+  padded,
+  flush,
+  className,
+  children,
+  ...props
+}) {
   return (
-    <div className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm ${className}`} {...props}>
+    <div
+      className={cn(cardVariants({ interactive, padded, flush }), className)}
+      {...props}
+    >
       {children}
     </div>
   )

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, LogOut, Loader2 } from 'lucide-react'
-import { Button, IconButton, Heading, Text } from '../ui'
+import { Button, IconButton, Heading, Text } from '@/components/ui'
 
 export default function LogoutModal({ isOpen, onClose, onConfirm }) {
   const [loading, setLoading] = useState(false)
@@ -13,8 +13,8 @@ export default function LogoutModal({ isOpen, onClose, onConfirm }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-2xl border border-slate-100 dark:border-slate-800 animate-fade-in" onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay backdrop-blur-sm" onClick={onClose}>
+      <div className="modal-shell relative w-full max-w-sm p-6 animate-fade-in" onClick={e => e.stopPropagation()}>
 
         <IconButton
           onClick={onClose}
@@ -51,7 +51,7 @@ export default function LogoutModal({ isOpen, onClose, onConfirm }) {
             variant="primary"
             onClick={handleConfirm}
             disabled={loading}
-            className="px-4 py-2 !text-white dark:!bg-slate-900 dark:hover:!bg-slate-800 !rounded-lg shadow-sm !transition-all active:scale-[0.98] disabled:opacity-70 inline-flex gap-2"
+            className="px-4 py-2 !text-white dark:!bg-slate-900 dark:hover:!bg-slate-800 !rounded-lg shadow-sm !transition-ui active:scale-[0.98] disabled:opacity-70 inline-flex gap-2"
           >
             {loading && <Loader2 size={14} className="animate-spin" />}
             {loading ? 'Signing out...' : 'Sign out'}
