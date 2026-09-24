@@ -1,17 +1,72 @@
-export default function Input({ className = '', containerClassName = 'relative flex-1 max-w-xs', icon, flush, ...props }) {
-  const baseCls = flush
-    ? 'w-full bg-transparent border-none outline-none placeholder-slate-400 focus:outline-none'
-    : `w-full ${icon ? 'pl-9' : 'pl-3'} pr-3 py-2 text-sm text-slate-600 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all duration-200`
+import { cva } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
 
+export const inputVariants = cva(
+  [
+    'w-full text-sm transition-ui focus-ring',
+    'placeholder:text-text-subtle',
+    'disabled:opacity-50',
+  ].join(' '),
+  {
+    variants: {
+      flush: {
+        true: 'bg-transparent border-none outline-none focus:outline-none py-1',
+        false: [
+          'pl-3 pr-3 py-2 rounded-lg',
+          'text-text-secondary bg-surface border border-border',
+          'focus:border-brand focus:ring-2 focus:ring-brand-ring',
+          'dark:bg-slate-800 dark:border-slate-700',
+        ].join(' '),
+      },
+      hasIcon: {
+        true: 'pl-9',
+        false: '',
+      },
+      tone: {
+        default: '',
+        muted: 'bg-surface-muted border-border/80',
+      },
+    },
+    compoundVariants: [
+      {
+        flush: false,
+        hasIcon: true,
+        class: 'pl-9',
+      },
+      {
+        flush: true,
+        hasIcon: true,
+        class: 'pl-7',
+      },
+    ],
+    defaultVariants: {
+      flush: false,
+      hasIcon: false,
+      tone: 'default',
+    },
+  },
+)
+
+export default function Input({
+  className,
+  containerClassName = 'relative flex-1 max-w-xs',
+  icon,
+  flush,
+  tone,
+  ...props
+}) {
   return (
     <div className={containerClassName}>
       {icon && (
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle pointer-events-none">
           {icon}
         </span>
       )}
       <input
-        className={`${baseCls} ${className}`}
+        className={cn(
+          inputVariants({ flush, hasIcon: Boolean(icon), tone }),
+          className,
+        )}
         {...props}
       />
     </div>
