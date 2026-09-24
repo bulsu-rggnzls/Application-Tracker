@@ -1,7 +1,11 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Plus, LayoutGrid, Table2, Download, Upload, MoreHorizontal } from 'lucide-react'
-import { useState } from 'react'
-import { Button, IconButton } from '../ui'
+import { Button, IconButton } from '@/components/ui'
+import { transitionUI } from '@/lib/layout'
+
+const viewBtnCls = `flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold ${transitionUI} cursor-pointer`
+const viewActive = 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+const viewIdle = 'text-text-muted hover:text-brand dark:hover:text-indigo-200'
 
 export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewModeChange, onExport, onImport }) {
   const fileRef = useRef(null)
@@ -10,16 +14,12 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
   return (
     <div className="flex items-center justify-between w-full gap-2 mb-3">
       <div className="flex items-center gap-2 min-w-0">
-        <div className="flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0">
+        <div className="flex p-0.5 bg-surface-muted rounded-lg shrink-0">
           <button
             type="button"
             onClick={() => onViewModeChange('board')}
             title="Board view"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 cursor-pointer ${
-              viewMode === 'board'
-                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
-                : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-200'
-            }`}
+            className={`${viewBtnCls} ${viewMode === 'board' ? viewActive : viewIdle}`}
           >
             <LayoutGrid size={13} />
             Board
@@ -28,11 +28,7 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
             type="button"
             onClick={() => onViewModeChange('table')}
             title="Table view"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 cursor-pointer ${
-              viewMode === 'table'
-                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
-                : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-200'
-            }`}
+            className={`${viewBtnCls} ${viewMode === 'table' ? viewActive : viewIdle}`}
           >
             <Table2 size={13} />
             Table
@@ -45,32 +41,32 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
           type="button"
           onClick={() => setMenuOpen(prev => !prev)}
           title="More actions"
-          className="flex items-center justify-center w-9 h-9 !rounded-lg !text-slate-500 dark:!text-slate-400 hover:!text-slate-700 dark:hover:!text-slate-200 hover:!bg-white dark:hover:!bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 !transition-all"
+          className="flex items-center justify-center w-9 h-9 !rounded-lg border border-transparent hover:border-border"
         >
           <MoreHorizontal size={17} />
         </IconButton>
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
-            <div className="absolute right-0 top-full mt-1.5 z-40 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg py-1 animate-fade-in">
+            <div className="absolute right-0 top-full mt-1.5 z-40 w-44 bg-surface border border-border rounded-xl shadow-lg py-1 animate-fade-in">
               <button
                 type="button"
                 onClick={() => { setMenuOpen(false); onExport() }}
-                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-muted ${transitionUI} cursor-pointer`}
               >
                 <Download size={13} /> Export JSON
               </button>
               <button
                 type="button"
                 onClick={() => { setMenuOpen(false); fileRef.current?.click() }}
-                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-muted ${transitionUI} cursor-pointer`}
               >
                 <Upload size={13} /> Import JSON
               </button>
               <button
                 type="button"
                 onClick={() => { setMenuOpen(false); onComposeEmail() }}
-                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-muted ${transitionUI} cursor-pointer`}
               >
                 <MoreHorizontal size={13} /> Compose email
               </button>
@@ -89,10 +85,10 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
         />
         <Button
           type="button"
-          variant="indigo"
+          variant="gradient"
           onClick={onAdd}
           title="New application"
-          className="inline-flex !rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 !text-xs !font-semibold w-9 h-9 sm:w-auto !px-0 sm:!px-3.5 shadow-md shadow-indigo-500/25 !transition-all duration-150 hover:from-indigo-500 hover:to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95 sm:hover:-translate-y-px cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="!rounded-lg !text-xs !font-semibold w-9 h-9 sm:w-auto !px-0 sm:!px-3.5 active:scale-95 sm:hover:-translate-y-px"
         >
           <Plus size={14} strokeWidth={2.5} />
           <span className="hidden sm:inline">New application</span>
