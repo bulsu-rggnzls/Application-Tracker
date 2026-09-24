@@ -1,70 +1,26 @@
-import { useState, useEffect } from 'react'
 import { X, Mail, Lock, Loader2, Briefcase, User } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Button, Heading, Text, Input, IconButton, GoogleIcon } from '../ui'
-import { useAuth } from '../../context/AuthContext'
+import { Button, Heading, Text, Input, IconButton, GoogleIcon } from '@/components/ui'
+import useAuthForm from '../hooks/useAuthForm'
 
 export default function AuthModal({ mode, onClose, onSwitchMode }) {
-  const { signIn, signUp, handleGoogleLogin, user } = useAuth()
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [notice, setNotice] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [googleBusy, setGoogleBusy] = useState(false)
-
-  const isSignup = mode === 'signup'
-
-  useEffect(() => {
-    setError('')
-    setNotice('')
-  }, [mode])
-
-  useEffect(() => {
-    if (user) onClose()
-  }, [user, onClose])
-
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  const {
+    isSignup,
+    fullName,
+    setFullName,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    error,
+    notice,
+    busy,
+    googleBusy,
+    handleGoogle,
+    handleSubmit,
+  } = useAuthForm({ mode, onClose })
 
   if (mode == null) return null
-
-  async function handleGoogle() {
-    setError('')
-    setNotice('')
-    setGoogleBusy(true)
-    try {
-      const { error: authError } = await handleGoogleLogin()
-      if (authError) setError(authError.message)
-    } finally {
-      setGoogleBusy(false)
-    }
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setError('')
-    setNotice('')
-    setBusy(true)
-    try {
-      const { error: authError } = isSignup
-        ? await signUp(email, password, fullName)
-        : await signIn(email, password)
-      if (authError) {
-        setError(authError.message)
-      } else if (isSignup) {
-        setNotice('Account created. You are now signed in.')
-      }
-    } finally {
-      setBusy(false)
-    }
-  }
 
   return (
     <AnimatePresence>
@@ -74,7 +30,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
+        className="modal-overlay"
         onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
       >
         <motion.div
@@ -82,7 +38,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.98 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-md"
+          className="modal-shell w-full max-w-md"
           role="dialog"
           aria-modal="true"
           aria-label={isSignup ? 'Sign up' : 'Log in'}
@@ -110,7 +66,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
               variant="indigo-outline"
               onClick={handleGoogle}
               disabled={googleBusy || busy}
-              className="w-full !inline-flex !gap-2.5 !rounded-xl !border-slate-300 dark:!border-slate-600 !bg-white dark:!bg-slate-800 !font-semibold !text-slate-700 dark:!text-slate-200 !px-4 !transition-all !duration-200 dark:hover:!bg-slate-700 hover:shadow-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="w-full !inline-flex !gap-2.5 !rounded-xl !border-slate-300 dark:!border-slate-600 !bg-white dark:!bg-slate-800 !font-semibold !text-slate-700 dark:!text-slate-200 !px-4 !transition-ui dark:hover:!bg-slate-700 hover:shadow-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {googleBusy ? <Loader2 size={16} className="animate-spin" /> : <GoogleIcon />}
               Continue with Google
