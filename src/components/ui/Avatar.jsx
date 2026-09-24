@@ -6,7 +6,7 @@ export default function Avatar({ children, className = '', size = 'md', ...props
   }
   return (
     <div
-      className={`${sizes[size] || sizes.md} bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-indigo-900/30 dark:to-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-semibold text-slate-600 dark:text-slate-300 shrink-0 ${className}`}
+      className={`${sizes[size] || sizes.md} bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-indigo-900/30 dark:to-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-semibold text-text-secondary shrink-0 ${className}`}
       {...props}
     >
       {children}
