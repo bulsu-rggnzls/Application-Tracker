@@ -69,7 +69,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
               className="w-full !inline-flex !gap-2.5 !rounded-xl !border-slate-300 dark:!border-slate-600 !bg-white dark:!bg-slate-800 !font-semibold !text-slate-700 dark:!text-slate-200 !px-4 !transition-ui dark:hover:!bg-slate-700 hover:shadow-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {googleBusy ? <Loader2 size={16} className="animate-spin" /> : <GoogleIcon />}
-              Continue with Google
+              <span>{googleBusy ? 'Connecting to Google...' : 'Continue with Google'}</span>
             </Button>
 
             <div className="flex items-center gap-3">
@@ -142,7 +142,14 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
                 disabled={busy || googleBusy}
                 className="w-full justify-center bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20"
               >
-                {busy ? <Loader2 size={16} className="animate-spin" /> : (isSignup ? 'Sign Up Free' : 'Log In')}
+                {busy ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>{isSignup ? 'Creating account...' : 'Signing in...'}</span>
+                  </span>
+                ) : (
+                  isSignup ? 'Sign Up Free' : 'Log In'
+                )}
               </Button>
             </form>
           </div>
