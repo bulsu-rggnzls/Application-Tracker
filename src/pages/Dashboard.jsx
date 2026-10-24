@@ -1,4 +1,5 @@
 import { Briefcase } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/features/auth'
 import {
   useApplications,
@@ -19,6 +20,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import TopBar from '@/components/layout/TopBar'
 import ControlsBar from '@/components/layout/ControlsBar'
 import LogoutModal from '@/components/layout/LogoutModal'
+import DashboardSkeleton from '@/components/layout/DashboardSkeleton'
 import { Button, Heading, Text } from '@/components/ui'
 import WelcomeEmpty from '@/components/ui/WelcomeEmpty'
 import { layout } from '@/lib/layout'
@@ -90,12 +92,8 @@ export default function Dashboard() {
     closeLogoutModal,
   } = useUiStore()
 
-  if (authLoading || dataLoading && applications.length === 0) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-canvas">
-        <div className="w-8 h-8 border-3 border-brand/30 border-t-brand rounded-full animate-spin" />
-      </div>
-    )
+  if (authLoading || (dataLoading && applications.length === 0)) {
+    return <DashboardSkeleton />
   }
 
   if (fetchError) {
@@ -124,11 +122,16 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`h-screen flex overflow-hidden ${
-      darkMode
-        ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900'
-        : 'bg-gradient-to-br from-slate-50 via-indigo-50/60 to-purple-50/40'
-    }`}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className={`h-screen flex overflow-hidden ${
+        darkMode
+          ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900'
+          : 'bg-gradient-to-br from-slate-50 via-indigo-50/60 to-purple-50/40'
+      }`}
+    >
       <Sidebar activeView={activeView} onViewChange={handleViewChange} applications={applications} user={user} onLogoutClick={openLogoutModal} onGoogleLogin={handleGoogleLogin} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
 
       <div className={layout.mainColumn}>
@@ -241,6 +244,6 @@ export default function Dashboard() {
           />
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }

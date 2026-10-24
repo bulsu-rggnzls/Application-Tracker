@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth, useAuthModalRoute, AuthModal } from '@/features/auth'
 import Dashboard from '@/pages/Dashboard'
 import LandingPage from '@/pages/LandingPage'
+import DashboardSkeleton from '@/components/layout/DashboardSkeleton'
 
 function FullSpinner() {
   return (
@@ -13,7 +14,7 @@ function FullSpinner() {
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
-  if (loading) return <FullSpinner />
+  if (loading) return <DashboardSkeleton />
   if (!user) return <Navigate to="/login" replace />
   return children
 }
