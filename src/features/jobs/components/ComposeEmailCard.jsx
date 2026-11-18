@@ -1,81 +1,74 @@
-'use client';;
-import useComposeEmail from '../hooks/useComposeEmail';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
-  Minus,
-  Maximize2,
   Mail,
   ChevronDown,
   Smile,
   Paperclip,
   Link2,
   Sparkles,
-  MoreHorizontal,
   Bold,
   Italic,
-  Calendar,
   Upload,
   Check,
-} from 'lucide-react';
-import { Send } from 'lucide-react';
+  Send,
+  Copy,
+  Building2,
+  BookOpen,
+  AlertCircle,
+} from 'lucide-react'
+import { Button, IconButton, Heading, Text, Input, Badge, GoogleIcon } from '@/components/ui'
+import { cn } from '@/lib/utils'
+import useComposeEmail, {
+  EMAIL_TEMPLATES,
+  buildGmailUrl,
+  buildMailtoUrl,
+} from '../hooks/useComposeEmail'
 
 const EMOJIS = [
-  '😊',
-  '👍',
-  '🙌',
-  '🔥',
-  '💡',
-  '✅',
-  '🚀',
-  '💼',
-  '📊',
-  '🎯',
-  '💬',
-  '🤝',
-  '⭐',
-  '📌',
-  '🎉',
-  '💪',
-  '🌟',
-  '📈',
-  '🔑',
-  '⚡',
-];
+  '😊', '👍', '🙌', '🔥', '💡', '✅', '🚀', '💼',
+  '📊', '🎯', '💬', '🤝', '⭐', '📌', '🎉', '💪',
+  '🌟', '📈', '🔑', '⚡',
+]
 
 const AI_SUGGESTIONS = [
-  "I'd love to schedule a quick call this week to discuss further.",
-  'Please let me know if you have any questions — happy to help!',
-  'Looking forward to your feedback on this.',
-];
+  "I would welcome the opportunity to discuss how my skill set aligns with your team's goals.",
+  'Please let me know if you need any additional portfolio samples or references.',
+  'Looking forward to your thoughts and next steps!',
+]
 
-const SCHEDULE_OPTIONS = [
-  { label: 'Tomorrow 9:00 AM', value: 'tom-9am' },
-  { label: 'Tomorrow 2:00 PM', value: 'tom-2pm' },
-  { label: 'Monday 10:00 AM', value: 'mon-10am' },
-  { label: 'Monday 3:00 PM', value: 'mon-3pm' },
-];
-
-export const ComposeEmailCard = ({
-  data,
+export function ComposeEmailCard({
+  data = {},
+  user,
+  applications = [],
   onSend,
   onClose,
-}) => {
+}) {
+  const fileInputRef = useRef(null)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
+  const [copied, setCopied] = useState(false)
+
   const {
+    toEmail,
+    setToEmail,
+    subject,
+    setSubject,
+    syncBodyText,
+    selectedAppId,
+    handleSelectApplication,
+    validationError,
+    validate,
     showToolbar,
     toolbarPos,
     safeX,
     activePopover,
-    setActivePopover,
     linkUrl,
     setLinkUrl,
     linkText,
     setLinkText,
     linkInserted,
-    scheduledTime,
     attachedFiles,
-    isDraggingOver,
-    setIsDraggingOver,
     fromOpen,
     selectedFrom,
     bodyRef,
@@ -87,222 +80,309 @@ export const ComposeEmailCard = ({
     insertEmoji,
     insertLink,
     insertAISuggestion,
-    handleSchedule,
-    handleFakeAttach,
+    applyTemplate,
+    addFiles,
     removeAttachment,
     toggleFromOpen,
     selectFrom,
-  } = useComposeEmail(data);
+    getFullPayload,
+  } = useComposeEmail({ data, user, applications })
 
-  const springConfig = {
-    type: 'spring',
-    stiffness: 450,
-    damping: 32,
-    mass: 1
-  };
+  const handleCopyDraft = async () => {
+    const payload = getFullPayload()
+    let textToCopy = `To: ${payload.to}\nSubject: ${payload.subject}\n\n${payload.body}`
+    if (payload.attachments?.length > 0) {
+      const filesText = payload.attachments.map(a => `- ${a.name} (${a.size})`).join('\n')
+      textToCopy += `\n\nAttachments:\n${filesText}`
+    }
+
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (e) {
+      console.error('Failed to copy draft', e)
+    }
+  }
+
+  const handleSendGmail = () => {
+    if (!validate()) return
+    const payload = getFullPayload()
+    const gmailUrl = buildGmailUrl(payload)
+    window.open(gmailUrl, '_blank', 'noopener,noreferrer')
+    onSend?.({ ...payload, client: 'gmail' })
+  }
+
+  const handleSendMailto = () => {
+    if (!validate()) return
+    const payload = getFullPayload()
+    const mailtoUrl = buildMailtoUrl(payload)
+
+    const link = document.createElement('a')
+    link.href = mailtoUrl
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    link.style.display = 'none'
+    document.body.appendChild(link)
+    link.click()
+    setTimeout(() => {
+      document.body.removeChild(link)
+    }, 150)
+
+    onSend?.({ ...payload, client: 'mailto' })
+  }
+
   const popoverAnim = {
     initial: { opacity: 0, y: 8, scale: 0.96 },
     animate: { opacity: 1, y: 0, scale: 1 },
     exit: { opacity: 0, y: 8, scale: 0.96 },
-    transition: { type: "spring", damping: 22, stiffness: 300 }
-  };
+    transition: { type: 'spring', damping: 22, stiffness: 300 },
+  }
+
+  const appsWithRecruiters = applications.filter((a) => a.recruiter?.email)
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.98 }}
+      initial={{ opacity: 0, y: 30, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ ...springConfig, damping: 38 }}
-      className="z-10 flex max-h-[95vh] w-full flex-col overflow-hidden rounded-4xl border border-gray-200/60 bg-surface-inset text-text-secondary antialiased shadow-lg sm:max-h-[92vh] sm:rounded-[24px] lg:max-w-145 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+      exit={{ opacity: 0, y: 20, scale: 0.98 }}
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+      className="z-10 flex max-h-[92vh] w-full flex-col overflow-hidden rounded-2xl border border-border bg-surface text-text shadow-2xl sm:max-w-2xl"
+    >
+      {/* Hidden real file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files?.length) {
+            addFiles(e.target.files)
+          }
+          e.target.value = ''
+        }}
+      />
+
       {/* Header */}
-      <div
-        className="flex flex-none items-center justify-between bg-surface-inset py-3 pr-3 pl-4 sm:py-4 sm:pr-4 sm:pl-5 dark:bg-zinc-900">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white sm:h-10 sm:w-10 sm:rounded-xl">
-            <Mail size={18} className="sm:w-5.5" strokeWidth={1.5} />
+      <div className="flex flex-none items-center justify-between border-b border-border-subtle px-5 py-3.5 bg-surface-muted/60">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-sm shadow-indigo-500/25">
+            <Mail size={16} />
           </div>
-          <span
-            className="text-[14px] font-semibold tracking-tight text-text sm:text-[15px] dark:text-zinc-100">
-            Compose email
-          </span>
+          <div>
+            <Heading size="sm">Compose Email</Heading>
+            <Text variant="subtle-sm" className="mt-0.5">
+              Draft outreach, interview follow-ups, or thank-you notes
+            </Text>
+          </div>
         </div>
-        <div className="flex items-center gap-0.5">
-          <button
-            title="minimize"
-            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:text-black/70 sm:p-2 dark:hover:text-white/70">
-            <Minus size={16} />
-          </button>
-          <button
-            title="Maximize"
-            className="hidden rounded-lg p-2 text-gray-400 transition-colors hover:text-black/70 sm:block dark:hover:text-white/70">
-            <Maximize2 size={15} />
-          </button>
-          <button
-            title="close"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:text-black/70 sm:p-2 dark:hover:text-white/70">
-            <X size={18} />
-          </button>
-        </div>
+        <IconButton
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="hover:bg-surface-muted"
+        >
+          <X size={16} />
+        </IconButton>
       </div>
-      {/* Scrollable Body */}
-      <div
-        className="custom-scrollbar flex-1 overflow-y-auto rounded-[18px] border border-border bg-white sm:rounded-4xl dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="space-y-2 px-4 pt-4 pb-2 sm:px-8 sm:pt-6">
-          {/* From Section */}
-          <div className="flex items-center text-[13px]">
-            <span className="w-12 text-gray-400 sm:w-14">From</span>
-            <div ref={fromRef} className="relative">
-              <button
-                onClick={toggleFromOpen}
-                className="flex max-w-50 cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-white px-2 py-0.5 shadow-sm transition-ui hover:border-gray-300 sm:max-w-none sm:px-2.5 sm:py-1 dark:border-zinc-800 dark:bg-zinc-900">
-                <img
-                  src={selectedFrom.avatar}
-                  alt=""
-                  className="h-4 w-4 shrink-0 rounded-full object-cover sm:h-5 sm:w-5" />
-                <span className="truncate font-medium text-gray-700 dark:text-zinc-200">
-                  {selectedFrom.name}
-                </span>
-                <ChevronDown
-                  size={14}
-                  className={`shrink-0 text-gray-400 transition-transform ${fromOpen ? 'rotate-180' : ''}`} />
-              </button>
-              <AnimatePresence>
-                {fromOpen && (
-                  <motion.div
-                    {...popoverAnim}
-                    className="absolute top-full left-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-gray-200 bg-white py-1.5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
-                    <p
-                      className="px-4 pt-1.5 pb-1 text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
-                      Switch account
-                    </p>
-                    {[
-                      {
-                        id: data.from.id,
-                        name: data.from.name,
-                        email: data.from.email ?? 'me@example.com',
-                        avatar: data.from.avatar,
-                      },
-                      {
-                        id: 'work',
-                        name: 'Work',
-                        email: 'work@company.com',
-                        avatar: data.from.avatar,
-                      },
-                      {
-                        id: 'personal',
-                        name: 'Personal',
-                        email: 'personal@gmail.com',
-                        avatar: data.from.avatar,
-                      },
-                    ].map((acc) => (
-                      <button
-                        key={acc.email}
-                        onClick={() => selectFrom(acc)}
-                        className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 ${selectedFrom.name === acc.name ? 'text-[var(--brand)]' : 'text-gray-700 dark:text-zinc-300'}`}>
-                        <img
-                          src={acc.avatar}
-                          alt=""
-                          className="h-5 w-5 shrink-0 rounded-full object-cover" />
-                        <div className="min-w-0">
-                          <p className="truncate text-xs font-medium">
-                            {acc.name}
-                          </p>
-                          <p className="truncate text-[10px] text-gray-400 dark:text-zinc-500">
-                            {acc.email}
-                          </p>
-                        </div>
-                        {selectedFrom.name === acc.name && (
-                          <Check size={13} className="ml-auto shrink-0" />
-                        )}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+
+      {/* Main Fields Form */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-3.5 scrollbar-thin">
+        {/* Linked Application Selector (optional context) */}
+        {applications.length > 0 && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-xs">
+            <Building2 size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <Text variant="subtle" className="font-semibold shrink-0 !text-indigo-900 dark:!text-indigo-200">
+              Application:
+            </Text>
+            <select
+              value={selectedAppId}
+              onChange={(e) => handleSelectApplication(e.target.value)}
+              className="flex-1 bg-transparent border-none outline-none font-medium text-indigo-700 dark:text-indigo-300 cursor-pointer truncate text-xs"
+            >
+              <option value="" className="text-text bg-surface">
+                General email (No specific application linked)
+              </option>
+              {applications.map((app) => (
+                <option key={app.id} value={app.id} className="text-text bg-surface">
+                  {app.company} — {app.role} {app.recruiter?.name ? `(${app.recruiter.name})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* From Section */}
+        <div className="flex items-center text-xs">
+          <span className="w-16 font-medium text-text-subtle">From</span>
+          <div ref={fromRef} className="relative">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={toggleFromOpen}
+              className="!px-2.5 !py-1 !text-xs !gap-2 !rounded-lg"
+            >
+              <img
+                src={selectedFrom.avatar}
+                alt=""
+                className="h-4 w-4 shrink-0 rounded-full object-cover"
+              />
+              <span className="truncate font-semibold text-text">{selectedFrom.name}</span>
+              <span className="text-[11px] text-text-subtle truncate hidden sm:inline">
+                &lt;{selectedFrom.email}&gt;
+              </span>
+              <ChevronDown
+                size={13}
+                className={`text-text-subtle transition-transform ${fromOpen ? 'rotate-180' : ''}`}
+              />
+            </Button>
+            <AnimatePresence>
+              {fromOpen && (
+                <motion.div
+                  {...popoverAnim}
+                  className="absolute top-full left-0 z-50 mt-1.5 w-60 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-xl"
+                >
+                  <Text variant="muted-sm" className="px-3 py-1 font-semibold uppercase tracking-wider">
+                    Sender Profile
+                  </Text>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => selectFrom(selectedFrom)}
+                    className="w-full !justify-start !gap-2.5 !px-3 !py-2 !rounded-none !text-left"
+                  >
+                    <img src={selectedFrom.avatar} alt="" className="h-5 w-5 rounded-full object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold text-text truncate">{selectedFrom.name}</p>
+                      <p className="text-[11px] text-text-subtle truncate">{selectedFrom.email}</p>
+                    </div>
+                    <Check size={14} className="ml-auto text-brand shrink-0" />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* To Section */}
+        <div className="flex flex-col gap-1.5 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-16 font-medium text-text-subtle">To</span>
+            <Input
+              type="email"
+              value={toEmail}
+              onChange={(e) => setToEmail(e.target.value)}
+              placeholder="recruiter@company.com"
+              containerClassName="flex-1 w-full"
+              className="!py-1.5 !text-xs"
+            />
           </div>
 
-          {/* To Section */}
-          <div
-            className="flex items-start border-b border-gray-100 py-2 text-[13px] dark:border-zinc-800">
-            <span className="mt-2 w-12 text-gray-400 sm:w-14">To</span>
-            <div className="flex flex-1 flex-wrap gap-1.5 sm:gap-2">
-              {data.to.map((recipient) => (
-                <div
-                  key={recipient.id}
-                  className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2 py-0.5 shadow-sm sm:gap-2 sm:px-2.5 sm:py-1 dark:border-zinc-800 dark:bg-zinc-900">
-                  <img
-                    src={recipient.avatar}
-                    alt=""
-                    className="h-4 w-4 rounded-full object-cover sm:h-5 sm:w-5" />
-                  <span className="font-medium text-gray-700 dark:text-zinc-200">
-                    {recipient.name}
-                  </span>
-                </div>
+          {/* Quick recruiter suggestions if available */}
+          {appsWithRecruiters.length > 0 && !toEmail && (
+            <div className="flex items-center gap-1.5 pl-16 flex-wrap">
+              <Text variant="muted-sm">Quick pick:</Text>
+              {appsWithRecruiters.slice(0, 3).map((app) => (
+                <Button
+                  key={app.id}
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setToEmail(app.recruiter.email)
+                    handleSelectApplication(app.id)
+                  }}
+                  className="!px-2 !py-0.5 !text-[11px] !rounded-full !bg-surface-muted hover:!bg-indigo-50 dark:hover:!bg-indigo-950/40 hover:!text-brand !h-auto"
+                >
+                  <span>{app.recruiter.name}</span>
+                  <span className="text-[10px] text-text-subtle">({app.company})</span>
+                </Button>
               ))}
             </div>
-            <div
-              className="mt-2.5 ml-2 flex gap-2 text-[10px] font-medium text-gray-400 sm:ml-4 sm:gap-3 sm:text-[11px]">
-              <button className="transition-colors hover:text-[var(--brand)]">
-                CC
-              </button>
-              <button className="transition-colors hover:text-[var(--brand)]">
-                BCC
-              </button>
-            </div>
-          </div>
+          )}
+        </div>
 
-          {/* Subject Section */}
-          <div
-            className="flex items-center gap-2 border-b border-gray-100 py-2 sm:gap-4 dark:border-zinc-800">
-            <span className="w-12 text-[13px] text-gray-400 sm:w-14">
-              Subject
-            </span>
-            <input
-              title="subject"
-              type="text"
-              defaultValue={data.subject}
-              className="flex-1 bg-transparent text-[14px] font-medium text-gray-800 outline-none sm:text-[15px] dark:text-zinc-100" />
+        {/* Subject Section */}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="w-16 font-medium text-text-subtle">Subject</span>
+          <Input
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="e.g. Application Follow-Up: Senior Frontend Engineer"
+            containerClassName="flex-1 w-full"
+            className="!py-1.5 !text-xs"
+          />
+        </div>
+
+        {/* Quick Email Templates Bar */}
+        <div className="flex items-center gap-2 pt-1 border-t border-border-subtle">
+          <span className="text-[11px] font-semibold text-text-muted flex items-center gap-1 shrink-0">
+            <BookOpen size={12} className="text-brand" /> Templates:
+          </span>
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-thin py-1 flex-1">
+            {EMAIL_TEMPLATES.map((tmpl) => (
+              <Button
+                key={tmpl.id}
+                type="button"
+                variant="ghost"
+                onClick={() => applyTemplate(tmpl)}
+                className="whitespace-nowrap !px-2.5 !py-1 !rounded-lg !text-[11px] !font-medium !bg-surface-muted hover:!bg-indigo-50 dark:hover:!bg-indigo-950/40 hover:!text-brand border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800"
+                title={tmpl.description}
+              >
+                {tmpl.name}
+              </Button>
+            ))}
           </div>
         </div>
 
+        {/* Validation Warning Alert */}
+        {validationError && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-300 text-xs animate-in fade-in-0 duration-150">
+            <AlertCircle size={14} className="shrink-0" />
+            <span>{validationError}</span>
+          </div>
+        )}
+
         {/* Editor Area */}
-        <div className="relative min-h-37.5 px-4 py-2 sm:min-h-50 sm:px-8">
+        <div className="relative min-h-[160px] rounded-xl border border-border p-3 bg-surface-muted/40 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand-ring transition-all">
           <AnimatePresence>
             {showToolbar && (
               <motion.div
                 ref={toolbarRef}
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  left: safeX,
-                }}
+                animate={{ opacity: 1, y: 0, scale: 1, left: safeX }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={springConfig}
-                className="absolute z-60 flex origin-bottom scale-90 items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 shadow-xl sm:scale-100 dark:border-zinc-800 dark:bg-zinc-900"
-                style={{ top: toolbarPos.y }}>
-                <button
-                  className="flex items-center gap-2 rounded-xl bg-gray-50 px-2 py-1.5 whitespace-nowrap transition-colors hover:bg-gray-100 sm:px-3 dark:bg-zinc-800 dark:hover:bg-zinc-700">
-                  <Sparkles size={14} className="text-[var(--brand)]" />
-                  <span
-                    className="text-[12px] font-semibold text-gray-700 sm:text-[13px] dark:text-zinc-200">
-                    Ask AI
-                  </span>
-                </button>
-                <div className="mx-1 h-4 w-px bg-gray-200 dark:bg-zinc-700" />
-                <button
-                  title="bold"
-                  className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-50 sm:p-2 dark:hover:bg-zinc-800">
-                  <Bold size={14} />
-                </button>
-                <button
-                  title="italic"
-                  className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-50 sm:p-2 dark:hover:bg-zinc-800">
-                  <Italic size={14} />
-                </button>
+                className="absolute z-50 flex items-center gap-1 rounded-xl border border-border bg-surface p-1 shadow-xl"
+                style={{ top: toolbarPos.y }}
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() =>
+                    insertAISuggestion('I would welcome the opportunity to discuss my qualifications further.')
+                  }
+                  className="!px-2 !py-1 !text-xs !font-semibold !text-brand hover:!bg-indigo-50 dark:hover:!bg-indigo-950/40"
+                >
+                  <Sparkles size={13} />
+                  <span>Ask AI</span>
+                </Button>
+                <div className="mx-1 h-3.5 w-px bg-border" />
+                <IconButton
+                  type="button"
+                  title="Bold"
+                  onClick={() => document.execCommand('bold', false, null)}
+                  className="!p-1.5"
+                >
+                  <Bold size={13} />
+                </IconButton>
+                <IconButton
+                  type="button"
+                  title="Italic"
+                  onClick={() => document.execCommand('italic', false, null)}
+                  className="!p-1.5"
+                >
+                  <Italic size={13} />
+                </IconButton>
               </motion.div>
             )}
           </AnimatePresence>
@@ -311,137 +391,78 @@ export const ComposeEmailCard = ({
             ref={bodyRef}
             contentEditable
             onMouseUp={handleSelection}
-            onKeyUp={handleSelection}
-            className="min-h-37.5 text-[14px] leading-relaxed whitespace-pre-wrap text-gray-700 outline-none sm:text-[15px] dark:text-zinc-300"
-            dangerouslySetInnerHTML={{ __html: data.body }} />
+            onKeyUp={() => {
+              handleSelection()
+              syncBodyText()
+            }}
+            onInput={syncBodyText}
+            className="min-h-[140px] text-xs sm:text-sm leading-relaxed text-text outline-none whitespace-pre-wrap"
+          />
 
-          {/* Attachments Section */}
-          <div className="mt-6 pb-4 sm:mt-8">
-            <h4
-              className="mb-3 text-[11px] font-medium tracking-widest text-text-subtle capitalize sm:mb-4 sm:text-[12px]">
-              Attachments
-            </h4>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {data.attachments.map((file) => (
-                <motion.div
-                  key={file.id}
-                  whileHover={{ y: -2 }}
-                  className="group flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] border-border-subtle bg-white p-2 transition-ui hover:border-[var(--brand)]/30 sm:rounded-[14px] dark:border-zinc-800 dark:bg-zinc-900">
-                  <div
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-[9px] font-bold text-gray-400 transition-colors group-hover:bg-[var(--brand-soft)] group-hover:text-[var(--brand)] sm:h-11 sm:w-11 sm:text-[10px] dark:bg-zinc-800 dark:group-hover:bg-[var(--brand)]/10">
-                    {file.icon}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className="truncate text-[13px] font-bold text-gray-800 sm:text-[14px] dark:text-zinc-200">
-                      {file.name}
-                    </p>
-                    <p
-                      className="text-[10px] font-normal text-gray-400 uppercase sm:text-[11px]">
-                      {file.type} · {file.size}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-              {/* Dynamically added attachments */}
-              {attachedFiles.map((fname) => (
-                <motion.div
-                  key={fname}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -2 }}
-                  className="group flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] border-[var(--brand)]/20 bg-white p-2 transition-ui hover:border-[var(--brand)]/40 sm:rounded-[14px] dark:bg-zinc-900">
-                  <div
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--brand-soft)] text-[9px] font-bold text-[var(--brand)] sm:h-11 sm:w-11 sm:text-[10px] dark:bg-[var(--brand)]/10">
-                    {fname.split('.').pop()?.toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className="truncate text-[13px] font-bold text-gray-800 sm:text-[14px] dark:text-zinc-200">
-                      {fname}
-                    </p>
-                    <p className="text-[10px] font-normal text-[var(--brand)] sm:text-[11px]">
-                      Just added
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => removeAttachment(fname)}
-                    className="rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800">
+          {/* Attachments Section with Real Files */}
+          {attachedFiles.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-border-subtle flex flex-wrap gap-2">
+              {attachedFiles.map((file) => (
+                <Badge
+                  key={file.id || file.name}
+                  variant="meta"
+                  className="!px-2.5 !py-1 !rounded-lg !bg-surface !border !border-border shadow-xs !text-xs !gap-1.5"
+                >
+                  <Paperclip size={12} className="text-brand shrink-0" />
+                  <span className="font-medium text-text max-w-[160px] truncate">{file.name}</span>
+                  {file.size && <span className="text-[10px] text-text-subtle">({file.size})</span>}
+                  <IconButton
+                    type="button"
+                    onClick={() => removeAttachment(file.id || file.name)}
+                    className="!p-0.5 text-text-subtle hover:text-rose-500 ml-1 hover:!bg-transparent"
+                    title="Remove attachment"
+                  >
                     <X size={12} />
-                  </button>
-                </motion.div>
+                  </IconButton>
+                </Badge>
               ))}
             </div>
-          </div>
+          )}
         </div>
       </div>
-      {/* Footer */}
-      <div
-        className="flex flex-none flex-col justify-between gap-4 border-gray-100 bg-surface-inset px-4 py-3 sm:flex-row sm:items-center sm:px-6 sm:py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        {/* Icon Toolbar with popovers */}
+
+      {/* Footer Controls & Actions */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border-subtle bg-surface-muted/60 px-5 py-3.5">
+        {/* Toolbar Popovers */}
         <div
           ref={popoverRef}
-          className="relative flex items-center gap-0.5 text-gray-400 sm:gap-1">
-          {/* More */}
-          <div className="relative">
-            <button
-              title="more"
-              onClick={() => togglePopover('more')}
-              className="rounded-lg p-2 transition-ui hover:text-gray-600 dark:hover:text-zinc-200">
-              <MoreHorizontal size={18} />
-            </button>
-            <AnimatePresence>
-              {activePopover === 'more' && (
-                <motion.div
-                  {...popoverAnim}
-                  className="absolute bottom-full left-0 z-50 mb-2 w-48 overflow-hidden rounded-2xl border border-gray-200 bg-white py-1.5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
-                  {[
-                    { label: 'Discard draft', danger: true },
-                    { label: 'Print', danger: false },
-                    { label: 'Save as template', danger: false },
-                    { label: 'Spell check', danger: false },
-                  ].map((opt) => (
-                    <button
-                      key={opt.label}
-                      onClick={() => setActivePopover(null)}
-                      className={`w-full px-4 py-2 text-left text-[13px] transition-colors ${
-                        opt.danger
-                          ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10'
-                          : 'text-gray-700 hover:bg-gray-50 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                      }`}>
-                      {opt.label}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
+          className="relative flex items-center gap-1 self-start sm:self-auto text-text-subtle"
+        >
           {/* Emoji */}
           <div className="relative">
-            <button
-              title="emoji"
+            <IconButton
+              type="button"
+              title="Add Emoji"
               onClick={() => togglePopover('emoji')}
-              className="rounded-lg p-2 transition-ui hover:text-gray-600 dark:hover:text-zinc-200">
-              <Smile size={18} />
-            </button>
+              className="!p-1.5 hover:bg-surface-muted"
+            >
+              <Smile size={16} />
+            </IconButton>
             <AnimatePresence>
               {activePopover === 'emoji' && (
                 <motion.div
                   {...popoverAnim}
-                  className="absolute bottom-full left-0 z-50 mb-2 w-52 rounded-2xl border border-gray-200 bg-white p-3 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
-                  <p
-                    className="mb-2 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
-                    Emoji
-                  </p>
+                  className="absolute bottom-full left-0 z-50 mb-2 w-52 rounded-xl border border-border bg-surface p-2.5 shadow-2xl"
+                >
+                  <Text variant="muted-sm" className="mb-1.5 font-semibold uppercase tracking-wider">
+                    Emojis
+                  </Text>
                   <div className="grid grid-cols-5 gap-1">
                     {EMOJIS.map((e) => (
-                      <button
+                      <Button
                         key={e}
+                        type="button"
+                        variant="ghost"
                         onClick={() => insertEmoji(e)}
-                        className="rounded-lg p-1 text-xl transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800">
+                        className="!p-1 !h-auto text-base hover:bg-surface-muted"
+                      >
                         {e}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </motion.div>
@@ -449,89 +470,102 @@ export const ComposeEmailCard = ({
             </AnimatePresence>
           </div>
 
-          {/* Attach */}
+          {/* Attach Real File Dropzone */}
           <div className="relative">
-            <button
-              title="attach"
+            <IconButton
+              type="button"
+              title="Attach File"
               onClick={() => togglePopover('attach')}
-              className="rounded-lg p-2 transition-ui hover:text-gray-600 dark:hover:text-zinc-200">
-              <Paperclip size={18} />
-            </button>
+              className={cn(
+                "!p-1.5 hover:bg-surface-muted",
+                attachedFiles.length > 0 && "!text-brand"
+              )}
+            >
+              <Paperclip size={16} />
+            </IconButton>
             <AnimatePresence>
               {activePopover === 'attach' && (
                 <motion.div
                   {...popoverAnim}
-                  className="absolute bottom-full left-0 z-50 mb-2 w-52 -translate-x-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl sm:w-56 sm:translate-x-0 dark:border-zinc-700 dark:bg-zinc-900">
-                  <p
-                    className="mb-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
-                    Attach File
-                  </p>
+                  className="absolute bottom-full left-0 z-50 mb-2 w-64 rounded-xl border border-border bg-surface p-3.5 shadow-2xl"
+                >
+                  <Text variant="muted-sm" className="mb-2.5 font-semibold uppercase tracking-wider">
+                    Attach Documents
+                  </Text>
                   <div
+                    onClick={() => fileInputRef.current?.click()}
                     onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDraggingOver(true);
+                      e.preventDefault()
+                      setIsDraggingOver(true)
                     }}
                     onDragLeave={() => setIsDraggingOver(false)}
                     onDrop={(e) => {
-                      e.preventDefault();
-                      setIsDraggingOver(false);
-                      handleFakeAttach();
+                      e.preventDefault()
+                      setIsDraggingOver(false)
+                      if (e.dataTransfer.files?.length) {
+                        addFiles(e.dataTransfer.files)
+                      }
                     }}
-                    onClick={handleFakeAttach}
-                    className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-4 transition-ui ${isDraggingOver ? 'border-[var(--brand)] bg-[var(--brand-soft)] dark:bg-[var(--brand)]/10' : 'border-gray-200 hover:border-[var(--brand)]/50 hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800'}`}>
-                    <Upload size={20} className="text-gray-400" />
-                    <p className="text-center text-[12px] text-gray-500 dark:text-zinc-400">
-                      Click or drag files here
-                    </p>
+                    className={cn(
+                      "w-full flex flex-col items-center justify-center gap-1.5 p-4 rounded-xl border-2 border-dashed transition-ui cursor-pointer text-xs text-center",
+                      isDraggingOver
+                        ? "border-brand bg-indigo-50/70 dark:bg-indigo-950/40 text-brand"
+                        : "border-border hover:border-brand hover:bg-surface-muted text-text-muted"
+                    )}
+                  >
+                    <Upload size={18} className="text-brand shrink-0" />
+                    <span className="font-semibold text-text">Choose file or drag & drop</span>
+                    <span className="text-[10px] text-text-subtle">Resume, PDF, DOCX, or images</span>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Link */}
+          {/* Insert Link */}
           <div className="relative">
-            <button
-              title="link"
+            <IconButton
+              type="button"
+              title="Insert Link"
               onClick={() => togglePopover('link')}
-              className="rounded-lg p-2 transition-ui hover:text-gray-600 dark:hover:text-zinc-200">
-              <Link2 size={18} />
-            </button>
+              className="!p-1.5 hover:bg-surface-muted"
+            >
+              <Link2 size={16} />
+            </IconButton>
             <AnimatePresence>
               {activePopover === 'link' && (
                 <motion.div
                   {...popoverAnim}
-                  className="absolute bottom-full left-0 z-50 mb-2 w-56 -translate-x-16 rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl sm:w-64 sm:translate-x-0 dark:border-zinc-700 dark:bg-zinc-900">
-                  <p
-                    className="mb-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
+                  className="absolute bottom-full left-0 z-50 mb-2 w-60 rounded-xl border border-border bg-surface p-3 shadow-2xl space-y-2"
+                >
+                  <Text variant="muted-sm" className="font-semibold uppercase tracking-wider">
                     Insert Link
-                  </p>
-                  <div className="space-y-2">
-                    <input
-                      type="text"
-                      placeholder="URL (e.g. https://...)"
-                      value={linkUrl}
-                      onChange={(e) => setLinkUrl(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-[13px] text-gray-800 transition-colors outline-none focus:border-[var(--brand)] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" />
-                    <input
-                      type="text"
-                      placeholder="Display text (optional)"
-                      value={linkText}
-                      onChange={(e) => setLinkText(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-[13px] text-gray-800 transition-colors outline-none focus:border-[var(--brand)] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" />
-                    <button
-                      onClick={insertLink}
-                      disabled={!linkUrl}
-                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand)] py-2 text-[13px] font-medium text-white transition-colors hover:bg-[var(--brand-stronger)] disabled:cursor-not-allowed disabled:opacity-40">
-                      {linkInserted ? (
-                        <>
-                          <Check size={14} /> Inserted!
-                        </>
-                      ) : (
-                        'Insert Link'
-                      )}
-                    </button>
-                  </div>
+                  </Text>
+                  <Input
+                    type="text"
+                    placeholder="URL (https://...)"
+                    value={linkUrl}
+                    onChange={(e) => setLinkUrl(e.target.value)}
+                    containerClassName="w-full"
+                    className="!py-1.5 !text-xs"
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Text to display"
+                    value={linkText}
+                    onChange={(e) => setLinkText(e.target.value)}
+                    containerClassName="w-full"
+                    className="!py-1.5 !text-xs"
+                  />
+                  <Button
+                    type="button"
+                    variant="indigo"
+                    onClick={insertLink}
+                    disabled={!linkUrl}
+                    className="w-full !py-1.5 !text-xs !rounded-lg justify-center"
+                  >
+                    {linkInserted ? 'Inserted!' : 'Insert Link'}
+                  </Button>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -539,97 +573,81 @@ export const ComposeEmailCard = ({
 
           {/* AI Suggestions */}
           <div className="relative">
-            <button
-              title="ai"
+            <IconButton
+              type="button"
+              title="AI Assist"
               onClick={() => togglePopover('ai')}
-              className="rounded-lg p-2 transition-ui hover:text-[var(--brand)]">
-              <Sparkles size={18} />
-            </button>
+              className="!p-1.5 hover:bg-surface-muted text-brand"
+            >
+              <Sparkles size={16} />
+            </IconButton>
             <AnimatePresence>
               {activePopover === 'ai' && (
                 <motion.div
                   {...popoverAnim}
-                  className="absolute bottom-full left-0 z-50 mb-2 w-56 -translate-x-24 rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl sm:w-72 sm:translate-x-0 dark:border-zinc-700 dark:bg-zinc-900">
-                  <div className="mb-3 flex items-center gap-2">
-                    <Sparkles size={14} className="text-[var(--brand)]" />
-                    <p
-                      className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
+                  className="absolute bottom-full left-0 z-50 mb-2 w-72 rounded-xl border border-border bg-surface p-3 shadow-2xl space-y-1.5"
+                >
+                  <div className="flex items-center gap-1.5 mb-2 text-brand">
+                    <Sparkles size={14} />
+                    <Text variant="muted-sm" className="font-semibold uppercase tracking-wider !text-brand">
                       AI Suggestions
-                    </p>
+                    </Text>
                   </div>
-                  <div className="space-y-2">
-                    {AI_SUGGESTIONS.map((s, i) => (
-                      <button
-                        key={i}
-                        onClick={() => insertAISuggestion(s)}
-                        className="w-full rounded-xl bg-gray-50 px-3 py-2.5 text-left text-[13px] leading-relaxed text-gray-700 transition-colors hover:bg-[var(--brand-soft)] hover:text-[var(--brand)] dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-[var(--brand)]/10">
-                        {s}
-                      </button>
-                    ))}
-                  </div>
+                  {AI_SUGGESTIONS.map((s, i) => (
+                    <Button
+                      key={i}
+                      type="button"
+                      variant="ghost"
+                      onClick={() => insertAISuggestion(s)}
+                      className="w-full !justify-start !p-2 !rounded-lg !text-xs !text-left text-text hover:!bg-indigo-50 dark:hover:!bg-indigo-950/40 hover:!text-brand"
+                    >
+                      {s}
+                    </Button>
+                  ))}
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-
-          <div className="mx-2 hidden h-5 w-px bg-gray-200 sm:block dark:bg-zinc-800" />
         </div>
 
-        {/* Action Buttons */}
-        <div
-          className="flex min-w-0 items-center justify-between gap-2 border-t border-gray-200 pt-3 sm:justify-end sm:gap-3 sm:border-t-0 sm:pt-0 dark:border-zinc-800">
-          <span
-            className="max-w-[140px] min-w-0 truncate text-[11px] font-medium text-text-subtle sm:max-w-[180px]">
-            {scheduledTime ? `📅 ${scheduledTime}` : 'Draft saved'}
-          </span>
-          <div className="flex flex-shrink-0 items-center gap-2">
-            {/* Schedule */}
-            <div className="relative">
-              <button
-                onClick={() => togglePopover('schedule')}
-                className={`flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[13px] font-normal transition-ui ${scheduledTime ? 'border-[var(--brand)]/40 bg-[var(--brand-soft)] text-[var(--brand)] dark:bg-[var(--brand)]/10' : 'border-gray-200 text-text-muted hover:bg-gray-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800'}`}>
-                <Calendar size={15} strokeWidth={2.5} />
-                {!scheduledTime && (
-                  <span className="hidden sm:inline">Schedule</span>
-                )}
-              </button>
-              <AnimatePresence>
-                {activePopover === 'schedule' && (
-                  <motion.div
-                    {...popoverAnim}
-                    className="absolute right-0 bottom-full z-50 mb-2 w-56 rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
-                    <p
-                      className="mb-3 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
-                      Schedule Send
-                    </p>
-                    <div className="space-y-1.5">
-                      {SCHEDULE_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          onClick={() => handleSchedule(opt.label)}
-                          className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${scheduledTime === opt.label ? 'bg-[var(--brand-soft)] text-[var(--brand)] dark:bg-[var(--brand)]/10' : 'text-gray-700 hover:bg-gray-50 dark:text-zinc-300 dark:hover:bg-zinc-800'}`}>
-                          {opt.label}
-                          {scheduledTime === opt.label && <Check size={14} />}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+        {/* Action Buttons: Copy Draft + Send via Mail App + Send via Gmail */}
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleCopyDraft}
+            className="!px-3 !py-1.5 !text-xs !rounded-xl !gap-1.5"
+            title="Copy draft and attachment names to clipboard"
+          >
+            {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+            <span>{copied ? 'Copied!' : 'Copy'}</span>
+          </Button>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onSend?.(data)}
-              className="flex items-center gap-1.5 rounded-full bg-[var(--text)] px-4 py-1.5 text-[13px] font-medium whitespace-nowrap text-white shadow-md transition-ui hover:opacity-90 sm:px-5 sm:py-2 sm:text-[14px] dark:bg-white dark:text-black">
-              <Send size={14} /> {scheduledTime ? 'Confirm' : 'Send'}
-            </motion.button>
-          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleSendMailto}
+            className="!px-3 !py-1.5 !text-xs !rounded-xl !gap-1.5 hover:!border-border-strong"
+            title="Open in your default desktop mail app"
+          >
+            <Send size={13} />
+            <span>Mail App</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="gradient"
+            onClick={handleSendGmail}
+            className="!px-3.5 !py-1.5 !text-xs !rounded-xl !gap-1.5"
+            title="Compose and send via Gmail web in a new tab"
+          >
+            <GoogleIcon className="w-3.5 h-3.5" />
+            <span>Send with Gmail</span>
+          </Button>
         </div>
       </div>
     </motion.div>
-  );
-};
+  )
+}
 
-export default ComposeEmailCard;
+export default ComposeEmailCard
