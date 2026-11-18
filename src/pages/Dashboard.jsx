@@ -21,22 +21,10 @@ import TopBar from '@/components/layout/TopBar'
 import ControlsBar from '@/components/layout/ControlsBar'
 import LogoutModal from '@/components/layout/LogoutModal'
 import DashboardSkeleton from '@/components/layout/DashboardSkeleton'
-import { Button, Heading, Text } from '@/components/ui'
+import { Button, Heading, Text, Toast } from '@/components/ui'
 import WelcomeEmpty from '@/components/ui/WelcomeEmpty'
 import { layout } from '@/lib/layout'
-
-const composeEmailData = {
-  from: {
-    id: 'me',
-    name: 'You',
-    email: 'you@example.com',
-    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=you',
-  },
-  to: [],
-  subject: '',
-  body: '',
-  attachments: [],
-}
+import logActivity from '@/utils/logActivity'
 
 export default function Dashboard() {
   const { user, loading: authLoading, handleLogout, handleGoogleLogin } = useAuth()
@@ -90,7 +78,33 @@ export default function Dashboard() {
     closeComposeEmail,
     openLogoutModal,
     closeLogoutModal,
+    toast,
+    hideToast,
+    showToast,
   } = useUiStore()
+
+  const handleSendEmail = (payload) => {
+    if (payload.applicationId) {
+      const app = applications.find(a => a.id === payload.applicationId)
+      if (app) {
+        const clientLabel = payload.client === 'gmail' ? 'Gmail' : 'Mail App'
+        const updated = logActivity(
+          app,
+          'email_sent',
+          `Drafted via ${clientLabel}: "${payload.subject}" to ${payload.to}`
+        )
+        persist(updated)
+        setApplications(prev => prev.map(a => a.id === app.id ? updated : a))
+      }
+    }
+
+    const toastMsg =
+      payload.client === 'gmail'
+        ? 'Opened in Gmail compose tab!'
+        : 'Opened in mail application!'
+    showToast(toastMsg, 'success')
+    closeComposeEmail()
+  }
 
   if (authLoading || (dataLoading && applications.length === 0)) {
     return <DashboardSkeleton />
@@ -235,15 +249,15 @@ export default function Dashboard() {
       {composeOpen && (
         <div className="modal-overlay">
           <ComposeEmailCard
-            data={composeEmailData}
-            onSend={(data) => {
-              console.log('Send email:', data)
-              closeComposeEmail()
-            }}
+            user={user}
+            applications={applications}
+            onSend={handleSendEmail}
             onClose={closeComposeEmail}
           />
         </div>
       )}
+
+      <Toast toast={toast} onClose={hideToast} />
     </motion.div>
   )
 }

@@ -1,4 +1,7 @@
+import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase'
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 // ---------- row <-> model mappers ----------
 
@@ -20,7 +23,7 @@ function salaryToColumns(salary) {
     salary_min: salary.min === '' ? null : Number(salary.min),
     salary_max: salary.max === '' ? null : Number(salary.max),
     salary_currency: salary.currency || 'PHP',
-    salary_period: salary.period || 'yearly',
+    period: salary.period || 'yearly',
   }
 }
 
@@ -162,10 +165,15 @@ async function syncRecruiter(applicationId, recruiter) {
  * Full save (create or update): writes the application row plus all nested
  * collections so the database mirrors the client model exactly.
  */
-export async function saveApplication(app) {
+export async function saveApplication(app, userId) {
+  const payload = applicationToColumns(app)
+  if (userId) {
+    payload.user_id = userId
+  }
+
   const { error } = await supabase
     .from('applications')
-    .upsert({ ...applicationToColumns(app), updated_at: new Date().toISOString() })
+    .upsert(payload)
   if (error) throw error
 
   await syncRecruiter(app.id, app.recruiter)
@@ -192,8 +200,61 @@ export async function deleteApplication(id) {
 
 // ---------- import/export helpers ----------
 
-export async function importApplications(apps) {
-  for (const app of apps) {
-    await saveApplication(app)
+export async function importApplications(apps, userId) {
+  let importedCount = 0
+  for (const rawApp of apps) {
+    if (!rawApp || typeof rawApp !== 'object' || !rawApp.company || !rawApp.role) {
+      continue
+    }
+
+    const appId = (rawApp.id && UUID_REGEX.test(rawApp.id)) ? rawApp.id : uuidv4()
+
+    const sanitizedApp = {
+      ...rawApp,
+      id: appId,
+      company: String(rawApp.company || '').trim(),
+      role: String(rawApp.role || '').trim(),
+      location: String(rawApp.location || ''),
+      employmentType: rawApp.employmentType || 'full-time',
+      status: ['wishlist', 'applied', 'interviewing', 'offer', 'rejected'].includes(rawApp.status)
+        ? rawApp.status
+        : 'wishlist',
+      starred: !!rawApp.starred,
+      dateApplied: rawApp.dateApplied || null,
+      salary: rawApp.salary || '',
+      jobUrl: rawApp.jobUrl || '',
+      tags: Array.isArray(rawApp.tags) ? rawApp.tags : [],
+      notes: typeof rawApp.notes === 'string' ? rawApp.notes : '',
+      recruiter: rawApp.recruiter ? {
+        name: rawApp.recruiter.name || '',
+        email: rawApp.recruiter.email || '',
+        linkedin: rawApp.recruiter.linkedin || '',
+      } : undefined,
+      checklist: (Array.isArray(rawApp.checklist) ? rawApp.checklist : []).map(c => ({
+        id: (c.id && UUID_REGEX.test(c.id)) ? c.id : uuidv4(),
+        text: String(c.text || ''),
+        done: !!c.done,
+      })),
+      interviews: (Array.isArray(rawApp.interviews) ? rawApp.interviews : []).map(iv => ({
+        id: (iv.id && UUID_REGEX.test(iv.id)) ? iv.id : uuidv4(),
+        stageName: iv.stageName || 'Interview',
+        date: iv.date || null,
+        time: iv.time || '',
+        interviewer: iv.interviewer || '',
+        platform: iv.platform || '',
+        meetingLink: iv.meetingLink || '',
+        notes: iv.notes || '',
+      })),
+      activityLog: (Array.isArray(rawApp.activityLog) ? rawApp.activityLog : []).map(l => ({
+        id: (l.id && UUID_REGEX.test(l.id)) ? l.id : uuidv4(),
+        action: l.action || 'imported',
+        details: l.details || `Imported application`,
+        timestamp: l.timestamp || new Date().toISOString(),
+      })),
+    }
+
+    await saveApplication(sanitizedApp, userId)
+    importedCount++
   }
+  return importedCount
 }

@@ -8,6 +8,7 @@ export const useUiStore = create((set) => ({
   editingJob: null,
   composeOpen: false,
   logoutModalOpen: false,
+  toast: null,
 
   setViewMode: (viewMode) => set({ viewMode }),
   setDrawerOpen: (drawerOpen) => set({ drawerOpen }),
@@ -23,4 +24,6 @@ export const useUiStore = create((set) => ({
   closeComposeEmail: () => set({ composeOpen: false }),
   openLogoutModal: () => set({ logoutModalOpen: true }),
   closeLogoutModal: () => set({ logoutModalOpen: false }),
+  showToast: (message, type = 'success') => set({ toast: { id: Date.now(), message, type } }),
+  hideToast: () => set({ toast: null }),
 }))
