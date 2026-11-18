@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Plus, LayoutGrid, Table2, Download, Upload, MoreHorizontal } from 'lucide-react'
+import { Plus, LayoutGrid, Table2, Download, Upload, MoreHorizontal, Mail } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { transitionUI } from '@/lib/layout'
 
@@ -68,7 +68,7 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
                 onClick={() => { setMenuOpen(false); onComposeEmail() }}
                 className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-muted ${transitionUI} cursor-pointer`}
               >
-                <MoreHorizontal size={13} /> Compose email
+                <Mail size={13} /> Compose email
               </button>
             </div>
           </>
