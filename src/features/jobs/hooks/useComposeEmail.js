@@ -47,22 +47,12 @@ export function formatFileSize(bytes) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
 }
 
-export function buildGmailUrl({ to, subject, body, attachments = [] }) {
-  let finalBody = body
-  if (attachments.length > 0) {
-    const list = attachments.map(a => `- ${a.name} (${a.size})`).join('\n')
-    finalBody += `\n\n[Attached: \n${list}]`
-  }
-  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(finalBody)}`
+export function buildGmailUrl({ to, subject, body }) {
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body || '')}`
 }
 
-export function buildMailtoUrl({ to, subject, body, attachments = [] }) {
-  let finalBody = body
-  if (attachments.length > 0) {
-    const list = attachments.map(a => `- ${a.name} (${a.size})`).join('\n')
-    finalBody += `\n\n[Attached: \n${list}]`
-  }
-  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(finalBody)}`
+export function buildMailtoUrl({ to, subject, body }) {
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body || '')}`
 }
 
 export default function useComposeEmail({ data = {}, user, applications = [] }) {
