@@ -4,10 +4,9 @@ import {
   fetchApplications,
   saveApplication,
   deleteApplication,
-  importApplications,
 } from '../api/applicationsApi'
 import { seedMockApplications } from '../api/mockSeed'
-import { exportToJSON, importFromJSON } from '@/utils/dataExport'
+import { exportToExcel } from '@/utils/dataExport'
 import { useUiStore } from '@/store/useUiStore'
 
 export default function useApplications(userId) {
@@ -57,30 +56,13 @@ export default function useApplications(userId) {
         showToast('No applications to export', 'info')
         return
       }
-      exportToJSON(applications)
-      showToast(`Exported ${applications.length} application${applications.length === 1 ? '' : 's'} to JSON`, 'success')
+      exportToExcel(applications)
+      showToast(`Exported ${applications.length} application${applications.length === 1 ? '' : 's'} to Excel (.xlsx)`, 'success')
     } catch (err) {
       console.error('Export failed:', err)
       showToast('Export failed', 'error')
     }
   }, [applications, showToast])
-
-  const importData = useCallback(async (file) => {
-    if (!file) return
-    try {
-      const data = await importFromJSON(file)
-      if (!Array.isArray(data) || data.length === 0) {
-        showToast('JSON file contains no applications to import', 'info')
-        return
-      }
-      const count = await importApplications(data, userId)
-      await queryClient.invalidateQueries({ queryKey: ['applications', userId] })
-      showToast(`Successfully imported ${count} application${count === 1 ? '' : 's'}!`, 'success')
-    } catch (err) {
-      console.error('Import failed:', err)
-      showToast(`Import failed: ${err.message || 'Invalid format'}`, 'error')
-    }
-  }, [queryClient, userId, showToast])
 
   return {
     applications,
@@ -92,6 +74,5 @@ export default function useApplications(userId) {
     loadDemoData,
     deleteJob,
     exportData,
-    importData,
   }
 }
