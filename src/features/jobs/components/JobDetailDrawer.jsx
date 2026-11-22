@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { X, ExternalLink, Calendar, MapPin, DollarSign, Briefcase, Clock, User, Video, Check, Trash2, Star, Save, Eye, EyeOff, LayoutGrid, FileText, ClipboardList } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Markdown from 'react-markdown'
@@ -33,7 +34,13 @@ const PERIODS = [
 const inputCls = 'w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-200 bg-surface border border-border rounded-lg placeholder-slate-400 focus-ring focus:border-brand transition-ui'
 const selectCls = `${inputCls} appearance-none cursor-pointer`
 
-export default function JobDetailDrawer({ job, isOpen, onClose, onDelete, onStatusChange, onUpdate }) {
+export default function JobDetailDrawer({ job: propJob, isOpen, onClose, onDelete, onStatusChange, onUpdate }) {
+  const cachedJobRef = useRef(propJob)
+  if (propJob) {
+    cachedJobRef.current = propJob
+  }
+  const job = propJob || cachedJobRef.current || {}
+
   const {
     tab,
     setTab,
@@ -55,25 +62,24 @@ export default function JobDetailDrawer({ job, isOpen, onClose, onDelete, onStat
     salaryLabel,
   } = useJobDetailForm({ job, isOpen, onStatusChange, onUpdate })
 
-  if (!isOpen || !job) return null
-
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && job.id && (
         <>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-40 bg-black/40"
             onClick={onClose}
           />
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            style={{ willChange: 'transform' }}
             className="fixed top-0 right-0 z-50 h-full w-full max-w-lg bg-white dark:bg-slate-900 shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col"
           >
             {/* ---------- HEADER ---------- */}
