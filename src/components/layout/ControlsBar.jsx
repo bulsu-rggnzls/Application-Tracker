@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { Plus, LayoutGrid, Table2, Download, Upload, MoreHorizontal, Mail } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, LayoutGrid, Table2, Download, MoreHorizontal, Mail } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { transitionUI } from '@/lib/layout'
 
@@ -7,8 +7,7 @@ const viewBtnCls = `flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs fon
 const viewActive = 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
 const viewIdle = 'text-text-muted hover:text-brand dark:hover:text-indigo-200'
 
-export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewModeChange, onExport, onImport }) {
-  const fileRef = useRef(null)
+export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewModeChange, onExport }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -54,14 +53,7 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
                 onClick={() => { setMenuOpen(false); onExport() }}
                 className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-muted ${transitionUI} cursor-pointer`}
               >
-                <Download size={13} /> Export JSON
-              </button>
-              <button
-                type="button"
-                onClick={() => { setMenuOpen(false); fileRef.current?.click() }}
-                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-text-secondary hover:bg-surface-muted ${transitionUI} cursor-pointer`}
-              >
-                <Upload size={13} /> Import JSON
+                <Download size={13} /> Export to Excel
               </button>
               <button
                 type="button"
@@ -73,16 +65,6 @@ export default function ControlsBar({ onAdd, onComposeEmail, viewMode, onViewMod
             </div>
           </>
         )}
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json,.json"
-          className="hidden"
-          onChange={(e) => {
-            onImport(e.target.files?.[0])
-            e.target.value = ''
-          }}
-        />
         <Button
           type="button"
           variant="gradient"

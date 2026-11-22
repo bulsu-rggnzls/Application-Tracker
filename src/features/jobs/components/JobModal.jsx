@@ -1,4 +1,5 @@
 import { X, Briefcase, User, Hash } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button, IconButton, Input, Heading, Text } from '@/components/ui'
 import useJobForm from '../hooks/useJobForm'
 import usePillInput from '../hooks/usePillInput'
@@ -104,13 +105,29 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
     handleSubmit,
   } = useJobForm({ isOpen, editingJob, onSave, onClose })
 
-  if (!isOpen) return null
-
   const logoInitial = form.company ? form.company[0].toUpperCase() : '?'
 
   return (
-    <div className="modal-overlay backdrop-blur-[3px]" onClick={onClose}>
-      <div className="modal-shell w-full max-w-lg max-h-[90vh] flex flex-col animate-fade-in !rounded-3xl" onClick={e => e.stopPropagation()}>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 bg-black/50"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            style={{ willChange: 'transform, opacity' }}
+            className="relative z-10 w-full max-w-lg max-h-[90vh] bg-surface border border-border flex flex-col !rounded-3xl shadow-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
 
         {/* ---------- HEADER ---------- */}
         <div className="shrink-0 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800">
@@ -337,7 +354,9 @@ export default function JobModal({ isOpen, onClose, onSave, editingJob }) {
           </div>
         </form>
 
-      </div>
-    </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   )
 }

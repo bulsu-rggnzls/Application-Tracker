@@ -401,26 +401,32 @@ export function ComposeEmailCard({
 
           {/* Attachments Section with Real Files */}
           {attachedFiles.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-border-subtle flex flex-wrap gap-2">
-              {attachedFiles.map((file) => (
-                <Badge
-                  key={file.id || file.name}
-                  variant="meta"
-                  className="!px-2.5 !py-1 !rounded-lg !bg-surface !border !border-border shadow-xs !text-xs !gap-1.5"
-                >
-                  <Paperclip size={12} className="text-brand shrink-0" />
-                  <span className="font-medium text-text max-w-[160px] truncate">{file.name}</span>
-                  {file.size && <span className="text-[10px] text-text-subtle">({file.size})</span>}
-                  <IconButton
-                    type="button"
-                    onClick={() => removeAttachment(file.id || file.name)}
-                    className="!p-0.5 text-text-subtle hover:text-rose-500 ml-1 hover:!bg-transparent"
-                    title="Remove attachment"
+            <div className="mt-3 pt-3 border-t border-border-subtle flex flex-col gap-2">
+              <div className="flex flex-wrap gap-2">
+                {attachedFiles.map((file) => (
+                  <Badge
+                    key={file.id || file.name}
+                    variant="meta"
+                    className="!px-2.5 !py-1 !rounded-lg !bg-surface !border !border-border shadow-xs !text-xs !gap-1.5"
                   >
-                    <X size={12} />
-                  </IconButton>
-                </Badge>
-              ))}
+                    <Paperclip size={12} className="text-brand shrink-0" />
+                    <span className="font-medium text-text max-w-[160px] truncate">{file.name}</span>
+                    {file.size && <span className="text-[10px] text-text-subtle">({file.size})</span>}
+                    <IconButton
+                      type="button"
+                      onClick={() => removeAttachment(file.id || file.name)}
+                      className="!p-0.5 text-text-subtle hover:text-rose-500 ml-1 hover:!bg-transparent"
+                      title="Remove attachment"
+                    >
+                      <X size={12} />
+                    </IconButton>
+                  </Badge>
+                ))}
+              </div>
+              <Text variant="muted-sm" className="!text-[11px] text-text-muted flex items-center gap-1.5">
+                <AlertCircle size={12} className="text-amber-500 shrink-0" />
+                <span>Web browsers cannot auto-attach files to Gmail/Mail App. Please attach the file in Gmail using the 📎 icon.</span>
+              </Text>
             </div>
           )}
         </div>

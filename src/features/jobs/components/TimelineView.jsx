@@ -78,7 +78,7 @@ function Favicon({ domain }) {
   if (!domain) return null
   return (
     <img
-      src={`https://logo.clearbit.com/${domain}`}
+      src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`}
       alt=""
       onError={(e) => { e.currentTarget.style.display = 'none' }}
       className="w-5 h-5 rounded-md object-contain shrink-0 bg-white dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700"

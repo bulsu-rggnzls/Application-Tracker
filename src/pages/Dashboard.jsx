@@ -38,7 +38,6 @@ export default function Dashboard() {
     loadDemoData,
     deleteJob,
     exportData,
-    importData,
     persist,
     setApplications,
   } = useApplications(userId)
@@ -98,10 +97,15 @@ export default function Dashboard() {
       }
     }
 
+    const hasAttachments = payload.attachments?.length > 0
     const toastMsg =
       payload.client === 'gmail'
-        ? 'Opened in Gmail compose tab!'
-        : 'Opened in mail application!'
+        ? (hasAttachments
+            ? "Draft opened in Gmail! Remember to attach your file using Gmail's 📎 paperclip icon."
+            : 'Opened in Gmail compose tab!')
+        : (hasAttachments
+            ? "Draft opened in Mail App! Remember to attach your file using your mail client's 📎 icon."
+            : 'Opened in mail application!')
     showToast(toastMsg, 'success')
     closeComposeEmail()
   }
@@ -160,7 +164,6 @@ export default function Dashboard() {
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
                   onExport={exportData}
-                  onImport={importData}
                 />
                 <div className="mt-3 sm:mt-4 shrink-0">
                   <AnalyticsBar applications={applications} />
