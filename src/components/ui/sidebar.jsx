@@ -71,14 +71,15 @@ export const DesktopSidebar = ({
         width: animate ? (open ? 300 : 64) : 300,
       }}
       transition={{
-        duration: 0.3,
-        ease: [0.32, 0.72, 0, 1],
+        duration: 0.2,
+        ease: [0.16, 1, 0.3, 1],
       }}
+      style={{ willChange: 'width' }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}>
-      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -left-20 w-72 h-72 rounded-full bg-indigo-600/10 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -right-20 w-72 h-72 rounded-full bg-violet-600/[0.07] blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -left-20 w-72 h-72 rounded-full bg-indigo-600/10 blur-2xl transform-gpu" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -right-20 w-72 h-72 rounded-full bg-violet-600/[0.07] blur-2xl transform-gpu" />
       {children}
     </motion.div>
   );
