@@ -20,7 +20,7 @@ export default function CompanyLogo({ domain, company, size = 'md' }) {
 
   return (
     <img
-      src={`https://icon.horse/icon/${domain}`}
+      src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
       alt={company}
       onError={onError}
       className={`${boxClass} object-contain p-1 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm shrink-0`}
