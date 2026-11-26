@@ -21,7 +21,7 @@ function CompanyAvatar({ domain, size = 'w-3.5 h-3.5', rounded = 'rounded-[3px]'
   if (!domain) return null
   return (
     <img
-      src={`https://logo.clearbit.com/${domain}`}
+      src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`}
       alt=""
       onError={(e) => { e.currentTarget.style.display = 'none' }}
       className={`${size} ${rounded} object-contain shrink-0`}

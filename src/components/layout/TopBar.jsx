@@ -1,11 +1,14 @@
-import { Bell, Calendar, Check, Clock, Menu } from 'lucide-react'
+import { Bell, Calendar, Check, Clock, Menu, Sun, Moon } from 'lucide-react'
 import { Badge, Heading, IconButton, Text } from '@/components/ui'
 import formatTime from '@/utils/formatTime'
 import { useUpcomingInterviews } from '@/features/jobs'
+import { useThemeStore } from '@/store/useThemeStore'
 import { layout } from '@/lib/layout'
 
 export default function TopBar({ applications, onOpenMenu }) {
   const { notifOpen, toggleNotif, closeNotif, upcoming, formatTimeLeft } = useUpcomingInterviews(applications)
+  const darkMode = useThemeStore((s) => s.darkMode)
+  const setDarkMode = useThemeStore((s) => s.setDarkMode)
 
   return (
     <header className={layout.topBar}>
@@ -18,7 +21,16 @@ export default function TopBar({ applications, onOpenMenu }) {
           <Menu size={18} />
         </IconButton>
       </div>
-      <div className="flex items-center gap-3 flex-1 justify-end min-w-0">
+      <div className="flex items-center gap-2 flex-1 justify-end min-w-0">
+        <IconButton
+          onClick={() => setDarkMode(!darkMode)}
+          className="!text-slate-500 dark:!text-slate-400 hover:!text-slate-700 dark:hover:!text-slate-200"
+          title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+        </IconButton>
+
         <div className="relative">
           <IconButton
             onClick={toggleNotif}

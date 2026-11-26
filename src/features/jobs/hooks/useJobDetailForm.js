@@ -59,9 +59,10 @@ export default function useJobDetailForm({ job, isOpen, onStatusChange, onUpdate
   const currentIdx = job ? STAGES.findIndex(s => s.id === job.status) : -1
   const isRejected = job?.status === 'rejected'
   const isOffer = job?.status === 'offer'
-  const interviews = job?.interviews || []
+  const interviewsList = job?.interviews
+  const interviews = useMemo(() => Array.isArray(interviewsList) ? interviewsList : [], [interviewsList])
   const upcomingInterviews = useMemo(() => interviews
-    .filter(iv => new Date(iv.date) >= new Date())
+    .filter(iv => iv?.date && new Date(iv.date) >= new Date())
     .sort((a, b) => new Date(a.date) - new Date(b.date)), [interviews])
   const nextInterview = upcomingInterviews[0]
   const activityLog = job?.activityLog || []
