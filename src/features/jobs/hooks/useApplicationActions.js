@@ -73,6 +73,7 @@ export default function useApplicationActions({ applications, setApplications, p
       persist(newJob)
       return [...prev, newJob]
     })
+    setDetailJob(prev => prev && prev.id === job.id ? job : prev)
   }, [persist, setApplications])
 
   const handleAcceptOffer = useCallback((id) => {
