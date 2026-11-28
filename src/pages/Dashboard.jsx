@@ -86,11 +86,17 @@ export default function Dashboard() {
     if (payload.applicationId) {
       const app = applications.find(a => a.id === payload.applicationId)
       if (app) {
-        const clientLabel = payload.client === 'gmail' ? 'Gmail' : 'Mail App'
+        const clientLabel =
+          payload.client === 'direct'
+            ? 'App Email'
+            : payload.client === 'gmail'
+              ? 'Gmail'
+              : 'Mail App'
+        const actionVerb = payload.client === 'direct' ? 'Sent' : 'Drafted'
         const updated = logActivity(
           app,
           'email_sent',
-          `Drafted via ${clientLabel}: "${payload.subject}" to ${payload.to}`
+          `${actionVerb} via ${clientLabel}: "${payload.subject}" to ${payload.to}`
         )
         persist(updated)
         setApplications(prev => prev.map(a => a.id === app.id ? updated : a))
@@ -99,13 +105,15 @@ export default function Dashboard() {
 
     const hasAttachments = payload.attachments?.length > 0
     const toastMsg =
-      payload.client === 'gmail'
-        ? (hasAttachments
-            ? "Draft opened in Gmail! Remember to attach your file using Gmail's 📎 paperclip icon."
-            : 'Opened in Gmail compose tab!')
-        : (hasAttachments
-            ? "Draft opened in Mail App! Remember to attach your file using your mail client's 📎 icon."
-            : 'Opened in mail application!')
+      payload.client === 'direct'
+        ? (hasAttachments ? 'Email and attachments sent successfully!' : 'Email sent successfully!')
+        : payload.client === 'gmail'
+          ? (hasAttachments
+              ? "Draft opened in Gmail! Remember to attach your file using Gmail's 📎 paperclip icon."
+              : 'Opened in Gmail compose tab!')
+          : (hasAttachments
+              ? "Draft opened in Mail App! Remember to attach your file using your mail client's 📎 icon."
+              : 'Opened in mail application!')
     showToast(toastMsg, 'success')
     closeComposeEmail()
   }
