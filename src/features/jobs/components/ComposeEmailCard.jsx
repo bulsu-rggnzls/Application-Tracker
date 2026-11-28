@@ -17,9 +17,11 @@ import {
   Building2,
   BookOpen,
   AlertCircle,
+  Loader2,
 } from 'lucide-react'
 import { Button, IconButton, Heading, Text, Input, Badge, GoogleIcon } from '@/components/ui'
 import { cn } from '@/lib/utils'
+import { sendEmailDirect } from '../api/emailApi'
 import useComposeEmail, {
   EMAIL_TEMPLATES,
   buildGmailUrl,
@@ -48,6 +50,7 @@ export function ComposeEmailCard({
   const fileInputRef = useRef(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [sending, setSending] = useState(false)
 
   const {
     toEmail,
@@ -58,6 +61,7 @@ export function ComposeEmailCard({
     selectedAppId,
     handleSelectApplication,
     validationError,
+    setValidationError,
     validate,
     showToolbar,
     toolbarPos,
@@ -102,6 +106,22 @@ export function ComposeEmailCard({
       setTimeout(() => setCopied(false), 2000)
     } catch (e) {
       console.error('Failed to copy draft', e)
+    }
+  }
+
+  const handleSendDirect = async () => {
+    if (!validate() || sending) return
+    const payload = getFullPayload()
+    setSending(true)
+    setValidationError('')
+    try {
+      await sendEmailDirect(payload)
+      onSend?.({ ...payload, client: 'direct' })
+    } catch (err) {
+      console.error('Direct email send failed:', err)
+      setValidationError(err.message || 'Failed to send email. Ensure the send-email Edge Function is deployed.')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -424,8 +444,8 @@ export function ComposeEmailCard({
                 ))}
               </div>
               <Text variant="muted-sm" className="!text-[11px] text-text-muted flex items-center gap-1.5">
-                <AlertCircle size={12} className="text-amber-500 shrink-0" />
-                <span>Web browsers cannot auto-attach files to Gmail/Mail App. Please attach the file in Gmail using the 📎 icon.</span>
+                <AlertCircle size={12} className="text-indigo-500 shrink-0" />
+                <span>Files are attached directly when clicking Send. (If opening Gmail/Mail App tabs, attach manually via 📎.)</span>
               </Text>
             </div>
           )}
@@ -616,12 +636,13 @@ export function ComposeEmailCard({
           </div>
         </div>
 
-        {/* Action Buttons: Copy Draft + Send via Mail App + Send via Gmail */}
+        {/* Action Buttons: Copy Draft + Mail App + Gmail + Direct Send */}
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
           <Button
             type="button"
             variant="secondary"
             onClick={handleCopyDraft}
+            disabled={sending}
             className="!px-3 !py-1.5 !text-xs !rounded-xl !gap-1.5"
             title="Copy draft and attachment names to clipboard"
           >
@@ -633,22 +654,36 @@ export function ComposeEmailCard({
             type="button"
             variant="secondary"
             onClick={handleSendMailto}
+            disabled={sending}
             className="!px-3 !py-1.5 !text-xs !rounded-xl !gap-1.5 hover:!border-border-strong"
             title="Open in your default desktop mail app"
           >
-            <Send size={13} />
+            <Mail size={13} />
             <span>Mail App</span>
           </Button>
 
           <Button
             type="button"
-            variant="gradient"
+            variant="secondary"
             onClick={handleSendGmail}
-            className="!px-3.5 !py-1.5 !text-xs !rounded-xl !gap-1.5"
-            title="Compose and send via Gmail web in a new tab"
+            disabled={sending}
+            className="!px-3 !py-1.5 !text-xs !rounded-xl !gap-1.5 hover:!border-border-strong"
+            title="Open draft in Gmail web in a new tab"
           >
             <GoogleIcon className="w-3.5 h-3.5" />
-            <span>Send with Gmail</span>
+            <span>Gmail</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="gradient"
+            onClick={handleSendDirect}
+            disabled={sending}
+            className="!px-4 !py-1.5 !text-xs !rounded-xl !gap-1.5"
+            title="Send email and attachments directly from the app"
+          >
+            {sending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+            <span>{sending ? 'Sending...' : 'Send'}</span>
           </Button>
         </div>
       </div>
